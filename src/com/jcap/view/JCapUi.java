@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -14,13 +13,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.google.common.collect.Lists;
-import com.jcap.model.Note;
-import com.jcap.model.NoteDaoDevelopment;
 
 public class JCapUi {
     private JFrame totallyGridbagfrm;
@@ -30,7 +26,6 @@ public class JCapUi {
     private JTable noteTable;
     private JScrollPane noteScroll;
     private JScrollPane noteTableScroll;
-    private TableModel noteTableModel;
 
     /**
      * Launch the application.
@@ -109,7 +104,7 @@ public class JCapUi {
         noteTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
-                int rowIndex = event.getFirstIndex();
+//                int rowIndex = event.getFirstIndex();
                 // TODO set text from note.
                 noteTextArea.setText("SDFDSF");
                 

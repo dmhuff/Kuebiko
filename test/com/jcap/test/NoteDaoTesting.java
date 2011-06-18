@@ -48,18 +48,18 @@ public class NoteDaoTesting implements NoteDao {
      * @see com.jcap.model.NoteDao#searchNotes()
      */
     @Override
-    public List<Note> searchNotes() {
+    public List<Note> readNotes() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.jcap.model.NoteDao#searchNotes(java.lang.String)
-     */
-    @Override
-    public List<Note> searchNotes(String searchString) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    /* (non-Javadoc)
+//     * @see com.jcap.model.NoteDao#searchNotes(java.lang.String)
+//     */
+//    @Override
+//    public List<Note> searchNotes(String searchString) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 
 }

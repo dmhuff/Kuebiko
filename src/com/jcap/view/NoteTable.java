@@ -26,11 +26,10 @@ public class NoteTable extends JTable {
     
     private static class DateTimeCellRenderer extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
-        private static final DateFormat FORMATTER = DateFormat.getDateTimeInstance();
 
         @Override
         public void setValue(Object value) {
-            setText((value == null)? "" : FORMATTER.format(value));
+            setText((value == null)? "" : DateFormat.getDateTimeInstance().format(value));
         }
     }
     
@@ -80,7 +79,7 @@ public class NoteTable extends JTable {
 
     public NoteTable() {
         NoteDao noteDao = new NoteDaoDevelopment();
-        final List<Note> searchNotes = noteDao.searchNotes();
+        final List<Note> searchNotes = noteDao.readNotes();
         NoteTableModel noteTableModel = new NoteTableModel(searchNotes);
         setModel(noteTableModel);
         

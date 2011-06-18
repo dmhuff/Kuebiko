@@ -27,7 +27,8 @@ public class AppWindowTest {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+			@Override
+            public void run() {
 				try {
 					AppWindowTest window = new AppWindowTest();
 					window.totallyGridbagfrm.setVisible(true);

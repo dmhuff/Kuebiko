@@ -16,6 +16,7 @@ import com.jcap.model.NoteDao;
 import com.jcap.model.NoteDaoFactory;
 
 public class NoteManager {
+    @SuppressWarnings("unused")
     private static final Function<Note, String> TITLE_TRANSFORMER =
             new Function<Note, String>() {
                 @Override
@@ -41,7 +42,7 @@ public class NoteManager {
     private final Collection<Note> deletedNotes;
     
     public NoteManager() {
-        notes = noteDao.searchNotes();
+        notes = noteDao.readNotes();
         deletedNotes = Lists.newArrayList();
     }
     
@@ -83,5 +84,13 @@ public class NoteManager {
                 continue;
             }
         }
+    }
+    
+    public String getFilter() {
+        return filter;
+    }
+    
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 }

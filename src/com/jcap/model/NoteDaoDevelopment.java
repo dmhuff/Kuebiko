@@ -1,15 +1,9 @@
 package com.jcap.model;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /** XXX development helper; not to be included in production code. */
@@ -45,11 +39,11 @@ public class NoteDaoDevelopment implements NoteDao {
         Preconditions.checkArgument(!note.isNew());
     }
     
-//    @Override
-//    public List<Note> searchNotes() {
-//        return searchNotes(null);
-//    }
-//
+    @Override
+    public List<Note> readNotes() {
+        return notes;
+    }
+
 //    @Override
 //    public List<Note> searchNotes(final String searchString) {
 //        if (StringUtils.isBlank(searchString)) {
