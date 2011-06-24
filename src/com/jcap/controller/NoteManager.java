@@ -1,3 +1,9 @@
+/**
+ * Kuebiko - NoteManager.java
+ * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
+ * TODO license info.
+ */
+
 package com.jcap.controller;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -13,10 +19,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.jcap.model.Note;
 import com.jcap.model.NoteDao;
-import com.jcap.model.NoteDaoFactory;
 
+/**
+ * Management class for notes. Acts as the note controller.
+ *
+ * @author davehuffman
+ */
 public class NoteManager {
-    @SuppressWarnings("unused")
     private static final Function<Note, String> TITLE_TRANSFORMER =
             new Function<Note, String>() {
                 @Override
@@ -25,6 +34,7 @@ public class NoteManager {
                 }
             };
             
+    @Deprecated
     private final Predicate<Note> searchFilter = new Predicate<Note>() {
                 @Override
                 public boolean apply(Note note) {
@@ -34,21 +44,47 @@ public class NoteManager {
                 }
             };
     
-    private final NoteDao noteDao = NoteDaoFactory.get();
+    private final NoteDao noteDao;
     
-    private final List<Note> notes;
+    private List<Note> notes = null;
+    @Deprecated
     private String filter;
 
     private final Collection<Note> deletedNotes;
     
-    public NoteManager() {
-        notes = noteDao.readNotes();
+    public NoteManager(NoteDao noteDao) {
+        this.noteDao = noteDao;
+        
         deletedNotes = Lists.newArrayList();
+        loadAllNotes();
+    }
+
+    private void loadAllNotes() {
+        notes = noteDao.readNotes();
     }
     
     public List<Note> getNotes() {
         return isBlank(filter)? Collections.unmodifiableList(notes)
                 : ImmutableList.copyOf(Collections2.filter(notes, searchFilter));
+    }
+    
+    public List<String> getNoteTitles() {
+        return Collections.unmodifiableList(Lists.transform(notes, TITLE_TRANSFORMER));
+    }
+    
+    /**
+     * @return True if there are no notes.
+     */
+    public boolean isEmpty() {
+        return notes.isEmpty();
+    }
+    
+    public int getNoteCount() {
+        return notes.size();
+    }
+    
+    public Note getNoteAt(int index) {
+        return notes.get(index);
     }
     
     public void addNote(Note newNote) {
@@ -63,6 +99,9 @@ public class NoteManager {
         deletedNotes.add(note);
     }
     
+    /**
+     * Save any changes made to the notes.
+     */
     public void saveAll() {
         for (Note note: deletedNotes) {
             noteDao.deleteNote(note);
@@ -84,12 +123,17 @@ public class NoteManager {
                 continue;
             }
         }
+        
+        // TODO may not be necessary.
+        loadAllNotes();
     }
     
+    @Deprecated
     public String getFilter() {
         return filter;
     }
     
+    @Deprecated
     public void setFilter(String filter) {
         this.filter = filter;
     }

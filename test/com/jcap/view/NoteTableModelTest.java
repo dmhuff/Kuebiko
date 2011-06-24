@@ -11,11 +11,10 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-import java.util.Collections;
-
 import org.testng.annotations.Test;
 
 import com.jcap.model.Note;
+import com.jcap.test.TestHelper;
 
 /**
  * Unit test class for NoteTableModel.
@@ -27,18 +26,17 @@ import com.jcap.model.Note;
 public class NoteTableModelTest {
     @Test
     public void emptyModelTest() {
-        NoteTableModel model = new NoteTableModel();
+        NoteTableModel model = TestHelper.newNoteTableModel();
 
         assertNull(model.getValueAt(0, 0), "Model should be empty.");
-        assertNotNull(model.getNotes(), "Model notes shoud never be null.");
+        assertTrue(model.getRowCount() == 0, "Model should not contain any rows.");
     }
 
     @Test
     public void getValueAtTest() {
         Note note = new Note();
         note.setTitle("foobar");
-        NoteTableModel model = new NoteTableModel(
-                Collections.singletonList(note));
+        NoteTableModel model = TestHelper.newNoteTableModel(note);
         final Object coordVal = model.getValueAt(0, 0);
         final Object enumVal = model.getValueAt(0, NoteTableModel.Column.TITLE);
 
@@ -50,10 +48,5 @@ public class NoteTableModelTest {
 
         assertTrue(coordVal.equals(enumVal),
                 "Both getValueAt(...) methods should return the same result.");
-    }
-
-    @Test(expectedExceptions = UnsupportedOperationException.class)
-    public void immutableNotesTest() {
-        new NoteTableModel().getNotes().add(new Note());
     }
 }

@@ -7,9 +7,9 @@
 package com.jcap.model;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import com.google.common.collect.Lists;
 
@@ -34,7 +34,7 @@ public class Note implements Serializable {
     private Date createDate;
     private Date modifiedDate;
     
-    private Collection<String> tags = Lists.newArrayList();
+    private List<String> tags = Lists.newArrayList();
     
     public Note() {
         this(0, State.NEW);
@@ -179,11 +179,11 @@ public class Note implements Serializable {
         this.modifiedDate = modifiedDate;
     }
     
-    public Collection<String> getTags() {
-        return Collections.unmodifiableCollection(tags);
+    public List<String> getTags() {
+        return Collections.unmodifiableList(tags);
     }
     
-    public void setTags(Collection<String> tags) {
+    public void setTags(List<String> tags) {
         state = State.DIRTY;
         this.tags = tags;
     }

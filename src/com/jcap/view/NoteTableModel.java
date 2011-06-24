@@ -6,13 +6,12 @@
 
 package com.jcap.view;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.jcap.controller.NoteManager;
 import com.jcap.model.Note;
 
 /**
@@ -41,14 +40,32 @@ public class NoteTableModel extends AbstractTableModel {
         }
     }
 
-    private final List<Note> notes;
+    private final NoteManager noteMngr;
+    //private List<Note> notes;
     
+    @Deprecated
     public NoteTableModel() {
-        this(new ArrayList<Note>());
+        this(null);
+        //this(new ArrayList<Note>());
     }
     
-    public NoteTableModel(List<Note> notes) {
-        this.notes = notes;
+    public NoteTableModel(NoteManager noteMngr) {
+        this.noteMngr = noteMngr;
+    }
+    
+    private List<Note> getNotes() {
+        return noteMngr.getNotes();
+    }
+    
+    public void addNewNote(String title) {
+        Note note = new Note();
+        note.setTitle(title);
+        note.setCreateDate(new Date());
+        note.setCreateDate(new Date());
+        noteMngr.addNote(note);
+        
+        int newNoteRow = noteMngr.getNoteCount() - 1;
+        fireTableRowsInserted(newNoteRow, newNoteRow);
     }
 
     @Override
@@ -63,15 +80,16 @@ public class NoteTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return notes == null? 0 : notes.size();
+        // TODO should getNotes() ever be null?
+        return getNotes() == null? 0 : noteMngr.getNoteCount();
     }
 
     @Override
     public Object getValueAt(int row, int col) {
-        if (notes == null || notes.isEmpty()) {
+        if (noteMngr.isEmpty()) {
             return null;
         }
-        final Note note = notes.get(row);
+        final Note note = noteMngr.getNoteAt(row);
         switch (col) {
         case 0:
             return note.getTitle();
@@ -97,16 +115,13 @@ public class NoteTableModel extends AbstractTableModel {
         return getValueAt(row, column.ordinal());
     }
     
-    /* (non-Javadoc)
-     * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
-     */
     @Override
     @SuppressWarnings("unchecked")
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 //        System.out.printf("setValueAt(aValue=[%s;%s], rowIndex=[%s], columnIndex=[%s])", 
 //                aValue, aValue.getClass(), rowIndex, columnIndex);
         if (columnIndex == Column.TAGS.ordinal()) {
-            notes.get(rowIndex).setTags((Collection<String>) aValue);
+            noteMngr.getNoteAt(rowIndex).setTags((List<String>) aValue);
         } else {
             throw new IllegalArgumentException(String.format(
                     "Cell (row=[%s],col=[%s]) is not editable.", 
@@ -119,10 +134,10 @@ public class NoteTableModel extends AbstractTableModel {
         return columnIndex == Column.TAGS.ordinal();
     }
     
-    /**
-     * @return An immutable view of this model's notes.
-     */
-    public List<Note> getNotes() {
-        return Collections.unmodifiableList(notes);
-    }
+//    /**
+//     * @return An immutable view of this model's notes.
+//     */
+//    public List<Note> getNotes() {
+//        return Collections.unmodifiableList(notes);
+//    }
 }

@@ -1,24 +1,28 @@
 package com.jcap.view;
 
 import java.awt.Component;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Joiner;
 import com.jcap.model.Note;
 import com.jcap.model.NoteDao;
-import com.jcap.model.NoteDaoDevelopment;
+import com.jcap.model.NoteDaoMemory;
 import com.jcap.view.NoteTableModel.Column;
 
 public class NoteTable extends JTable {
@@ -26,10 +30,13 @@ public class NoteTable extends JTable {
     
     private static class DateTimeCellRenderer extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
+        
+        private static final DateTimeCellRenderer INSTANCE = new DateTimeCellRenderer();
 
         @Override
-        public void setValue(Object value) {
-            setText((value == null)? "" : DateFormat.getDateTimeInstance().format(value));
+        protected void setValue(Object value) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            super.setValue((value == null)? "" : formatter.format(value));
         }
     }
     
@@ -76,20 +83,29 @@ public class NoteTable extends JTable {
             return super.getTableCellEditorComponent(table, tags, isSelected, row, column);
         }
     }
+    
+    private final NoteTableModel noteTableModel;
+    private final TableRowSorter<NoteTableModel> sorter;
 
-    public NoteTable() {
-        NoteDao noteDao = new NoteDaoDevelopment();
-        final List<Note> searchNotes = noteDao.readNotes();
-        NoteTableModel noteTableModel = new NoteTableModel(searchNotes);
+    NoteTable(NoteTableModel noteTableModel) {
+        this.noteTableModel = noteTableModel;
         setModel(noteTableModel);
         
-        setDefaultRenderer(Date.class, new DateTimeCellRenderer());
+        // XXX decouple from DAO.
+        NoteDao noteDao = new NoteDaoMemory();
+        final List<Note> searchNotes = noteDao.readNotes();
+        
+        sorter = new TableRowSorter<NoteTableModel>(this.noteTableModel);
+        setRowSorter(sorter);
     }
     
     @Override
     public TableCellRenderer getCellRenderer(int row, int column) {
         if (column == Column.TAGS.ordinal()) {
             return TagCellRenderer.INSTANCE;
+        } else if (column == Column.DATE_MODIFIED.ordinal()
+                    || column == Column.DATE_CREATED.ordinal()) {
+            return DateTimeCellRenderer.INSTANCE;
         }
         return super.getCellRenderer(row, column);
     }
@@ -100,5 +116,48 @@ public class NoteTable extends JTable {
             return TagCellEditor.INSTANCE;
         }
         return super.getCellEditor(row, column);
+    }
+    
+    /**
+     * Apply a filter to the table's, hiding all rows that don't match.
+     * @param filterString The string to use as a filter.
+     */
+    void filter(String filterString) {
+        // Short-circuit if we're clearing the filter.
+        if (StringUtils.isBlank(filterString)) {
+            sorter.setRowFilter(null);
+            return;
+        }
+        
+        final RowFilter<NoteTableModel, Integer> rowFilter;
+        try {
+            rowFilter = RowFilter.regexFilter(
+                    String.format(".*?%s.*", Pattern.quote(filterString)), 
+                    Column.TITLE.ordinal(), Column.TAGS.ordinal());
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Invalid filter string", e);
+        }
+        sorter.setRowFilter(rowFilter);
+    }
+    
+    void selectNote(String title) {
+        // A null title means the selection should be cleared.
+        if (title == null) {
+            clearSelection();
+            return;
+        }
+        
+        // Attempt to find an existing note by title.
+        final String trimTitle = title.trim();
+        final int titleCol = Column.TITLE.ordinal();
+        for (int r = 0; r < getRowCount(); r++) {
+            if (trimTitle.equals(getValueAt(r, titleCol))) {
+                changeSelection(r, titleCol, false, false);
+                return;
+            }
+        }
+        
+        // If no note was found, then make a new note with the passed title.
+        noteTableModel.addNewNote(title);
     }
 }
