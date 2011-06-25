@@ -5,6 +5,7 @@
       <class name="com.jcap.model.NoteTest" />
       <class name="com.jcap.view.NoteTableModelTest" />
       <class name="com.jcap.model.NoteDaoFactoryTest" />
+      <class name="com.jcap.model.NoteDaoMemoryTest" />
     </classes>
   </test>
 </suite>
