@@ -52,9 +52,9 @@ public class NoteDaoFactoryTest {
             
             assertEquals(shouldSucceed, succeed, "Should match expectation of success.");
             if (shouldSucceed) {
-                assertNotNull(dao, "Factory should return an object");
+                assertNotNull(dao, "Factory should return an object.");
                 assertTrue(dao instanceof NoteDao, 
-                        "Factory should return an instance of NoteDao");
+                        "Factory should return an instance of NoteDao.");
             }
         }
     }
