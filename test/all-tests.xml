@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="Suite" parallel="false">
-  <test name="Test">
-    <classes>
-      <class name="com.jcap.model.NoteTest" />
-      <class name="com.jcap.view.NoteTableModelTest" />
-      <class name="com.jcap.model.NoteDaoFactoryTest" />
-      <class name="com.jcap.model.NoteDaoMemoryTest" />
-    </classes>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Kuebiko" parallel="false">
+  <test name="All Tests">
+    <packages>
+      <package name="com.jcap.*" />
+    </packages>
   </test>
 </suite>

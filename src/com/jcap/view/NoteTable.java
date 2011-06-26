@@ -20,9 +20,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Joiner;
-import com.jcap.model.Note;
-import com.jcap.model.NoteDao;
-import com.jcap.model.NoteDaoMemory;
 import com.jcap.view.NoteTableModel.Column;
 
 public class NoteTable extends JTable {
@@ -90,10 +87,6 @@ public class NoteTable extends JTable {
     NoteTable(NoteTableModel noteTableModel) {
         this.noteTableModel = noteTableModel;
         setModel(noteTableModel);
-        
-        // XXX decouple from DAO.
-        NoteDao noteDao = new NoteDaoMemory();
-        final List<Note> searchNotes = noteDao.readNotes();
         
         sorter = new TableRowSorter<NoteTableModel>(this.noteTableModel);
         setRowSorter(sorter);

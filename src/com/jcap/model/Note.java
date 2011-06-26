@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
  */
 public class Note implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    
     public enum State {
         CLEAN, DELETED, DIRTY, NEW; 
     }
@@ -36,8 +36,12 @@ public class Note implements Serializable {
     
     private List<String> tags = Lists.newArrayList();
     
+    /**
+     * Create a new, unsaved note with default values.
+     */
     public Note() {
         this(0, State.NEW);
+        assignDefaults();
     }
     
     Note(int id, String title, String text, Date createDate, Date modifiedDate) {
@@ -48,10 +52,24 @@ public class Note implements Serializable {
         this.createDate = createDate;
         this.modifiedDate = modifiedDate;
     }
+    
+    /**
+     * Copy constructor.
+     * @param id The ID of the new note. 
+     * @param source The note to copy.
+     */
+    Note(int id, Note source) {
+        this(id, source.getTitle(), source.getText(), source.getCreateDate(), 
+                source.getModifiedDate());
+    }
 
     private Note(int id, State state) {
         this.id = id;
         this.state = state;
+    }
+    
+    private void assignDefaults() {
+        this.createDate = new Date();
     }
     
     /**
@@ -164,8 +182,8 @@ public class Note implements Serializable {
     public Date getCreateDate() {
         return createDate;
     }
-
-    public void setCreateDate(Date createDate) {
+    
+    void setCreateDate(Date createDate) {
         state = State.DIRTY;
         this.createDate = createDate;
     }
@@ -174,7 +192,7 @@ public class Note implements Serializable {
         return modifiedDate;
     }
 
-    public void setModifiedDate(Date modifiedDate) {
+    void setModifiedDate(Date modifiedDate) {
         state = State.DIRTY;
         this.modifiedDate = modifiedDate;
     }

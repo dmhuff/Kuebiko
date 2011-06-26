@@ -24,7 +24,7 @@ public final class TestHelper {
     private static final String DEFAULT_TEST_NOTE_DAO = "NoteDaoMemory";
 
     private TestHelper() {
-        throw new AssertionError("Cannot be instantiated");
+        throw new AssertionError("Cannot be instantiated.");
     }
     
     /**
@@ -43,10 +43,14 @@ public final class TestHelper {
         try {
             noteDao = NoteDaoFactory.get(DEFAULT_TEST_NOTE_DAO);
         } catch (BadClassException e) {
-            throw new TestException("Couldn't instantiate new note table model", e);
+            throw new TestException("Couldn't instantiate new note table mode.l", e);
         }
-        for (Note note: notes) {
-            noteDao.addNote(note);
+        try {
+            for (Note note: notes) {
+                noteDao.addNote(note);
+            }
+        } catch (Exception e) {
+            throw new TestException("Couldn't populate notes.", e);
         }
         NoteManager noteMngr = new NoteManager(noteDao);
         return noteMngr;
