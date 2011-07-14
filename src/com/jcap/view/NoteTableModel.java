@@ -42,11 +42,11 @@ public class NoteTableModel extends AbstractTableModel {
     private final NoteManager noteMngr;
     //private List<Note> notes;
     
-    @Deprecated
-    public NoteTableModel() {
-        this(null);
-        //this(new ArrayList<Note>());
-    }
+//    @Deprecated
+//    public NoteTableModel() {
+//        this(null);
+//        //this(new ArrayList<Note>());
+//    }
     
     public NoteTableModel(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
@@ -80,13 +80,21 @@ public class NoteTableModel extends AbstractTableModel {
         // TODO should getNotes() ever be null?
         return getNotes() == null? 0 : noteMngr.getNoteCount();
     }
+    
+    /**
+     * @param rowIndex
+     * @return
+     */
+    Note getNoteAtRow(int rowIndex) {
+        return noteMngr.getNoteAt(rowIndex);
+    }
 
     @Override
     public Object getValueAt(int row, int col) {
         if (noteMngr.isEmpty()) {
             return null;
         }
-        final Note note = noteMngr.getNoteAt(row);
+        final Note note = getNoteAtRow(row);
         switch (col) {
         case 0:
             return note.getTitle();
@@ -118,14 +126,14 @@ public class NoteTableModel extends AbstractTableModel {
 //        System.out.printf("setValueAt(aValue=[%s;%s], rowIndex=[%s], columnIndex=[%s])", 
 //                aValue, aValue.getClass(), rowIndex, columnIndex);
         if (columnIndex == Column.TAGS.ordinal()) {
-            noteMngr.getNoteAt(rowIndex).setTags((List<String>) aValue);
+            getNoteAtRow(rowIndex).setTags((List<String>) aValue);
         } else {
             throw new IllegalArgumentException(String.format(
                     "Cell (row=[%s],col=[%s]) is not editable.", 
                     rowIndex, columnIndex));
         }
     }
-    
+
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == Column.TAGS.ordinal();

@@ -3,7 +3,7 @@
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
-package com.jcap.view.icons;
+package com.jcap.view;
 
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
@@ -12,12 +12,13 @@ import java.awt.Image;
 
 import org.testng.annotations.Test;
 
-import com.jcap.view.icons.ImageManager.AppImage;
-import com.jcap.view.icons.ImageManager.ImageSize;
+import com.jcap.view.ImageManager;
+import com.jcap.view.ImageManager.AppImage;
+import com.jcap.view.ImageManager.ImageSize;
 
 /**
  * TestNG test class for the ImageManager class.
- * @see com.jcap.view.icons.ImageManager
+ * @see com.jcap.view.ImageManager
  *
  * @author davehuffman
  */

@@ -3,7 +3,7 @@
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
-package com.jcap.view.icons;
+package com.jcap.view;
 
 import java.awt.Image;
 import java.util.Map;
@@ -17,11 +17,15 @@ import com.google.common.collect.Maps;
  *
  * @author davehuffman
  */
-public final class ImageManager {
-    public enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
+final class ImageManager {
+    enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
     
-    public enum AppImage {
-        EDIT, SEARCH
+    enum AppImage {
+        ALIGN_CENTER, ALIGN_JUSTITY, ALIGN_LEFT, ALIGN_RIGHT, BOLD, BREAK, 
+        COLOR, EDIT, FONT_SIZE_DOWN, FONT_SIZE_UP, FONT_SIZE, 
+        HEADING_1, HEADING_2, HEADING_3, HEADING_4, HEADING_5, HEADING_6, 
+        HORIZONTAL_RULE, IMAGE, ITALIC, LINK, LIST_BULLETS, LIST_NUMBERS, SEARCH, 
+        STRIKETHROUGH, TABLE, UNDERLINE
     }
     
     private static final ImageManager INSTANCE = new ImageManager();
@@ -29,7 +33,7 @@ public final class ImageManager {
     /**
      * @return The singleton instance of the class.
      */
-    public static ImageManager get() {
+    static ImageManager get() {
         return INSTANCE;
     }
     
@@ -55,7 +59,7 @@ public final class ImageManager {
      * @param appImage Identifier for the desired image.
      * @return The requested image.
      */
-    public Image getImage(AppImage appImage) {
+    Image getImage(AppImage appImage) {
         return getImage(defaultSize, appImage);
     }
     
@@ -83,9 +87,9 @@ public final class ImageManager {
      * @return The loaded image.
      */
     private Image loadImage(ImageSize size, AppImage appImage) {
-        final String path = String.format("%s/%s.png",
+        final String path = String.format("images/%s/%s.png",
                 size.toString().toLowerCase(), 
-                appImage.toString().toLowerCase());
+                appImage.toString().toLowerCase().replaceAll("_", "-"));
         try {
             return ImageIO.read(getClass().getResource(path));
         } catch (Exception e) {
@@ -96,7 +100,7 @@ public final class ImageManager {
         }
     }
 
-    public void setDefaultSize(ImageSize defaultSize) {
+    void setDefaultSize(ImageSize defaultSize) {
         this.defaultSize = defaultSize;
     }
 }

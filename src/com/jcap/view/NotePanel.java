@@ -8,17 +8,26 @@ package com.jcap.view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -27,9 +36,12 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.StyledEditorKit;
+import javax.swing.text.html.HTMLEditorKit;
 
 import com.jcap.Main;
 import com.jcap.model.Note;
@@ -49,16 +61,47 @@ class NotePanel extends JPanel {
      */
     private enum CardId { NO_NOTE_MESSAGE, NOTE_TEXT }
     
-    /** Enumeration of supported text styles for notes. */
-    public enum TextStyle { 
-        BOLD("font-bold"),
-        ITALIC("font-italic"),
-        UNDERLINE("font-underline");
+    /** 
+     * Enumeration of supported text styles for notes. Action names are defined 
+     * in the Swing library, some of which do not have symbolic constants
+     * defined.
+     * @see javax.swing.text.DefaultEditorKit
+     * @see javax.swing.text.StyledEditorKit#defaultActions
+     * @see javax.swing.text.html.HTMLEditorKit#defaultActions
+     */
+    public enum TextAction {
+        ALIGN_CENTER("center-justify"),
+        ALIGN_JUSTIFY(""), // TODO implement.
+        ALIGN_LEFT("left-justify"),
+        ALIGN_RIGHT("right-justify"),
+
+        FONT(""), // TODO implement.
+        FONT_COLOR(HTMLEditorKit.COLOR_ACTION),
+        FONT_SIZE_BIGGER(HTMLEditorKit.FONT_CHANGE_BIGGER),
+        FONT_SIZE_SMALLER(HTMLEditorKit.FONT_CHANGE_SMALLER),
+        
+        STYLE_BOLD("font-bold"),
+        STYLE_ITALIC("font-italic"),
+        STYLE_STRIKETHROUGH("font-strikethrough"),
+        STYLE_UNDERLINE("font-underline"),
+        
+        INSERT_BREAK(DefaultEditorKit.insertBreakAction),
+        INSERT_IMAGE(""), // TODO implement.
+        INSERT_LINK(""), // TODO implement.
+        INSERT_LIST_NUMBERED("InsertOrderedListItem"),
+        INSERT_LIST_NUMBERED_ITEM("InsertOrderedList"),
+        INSERT_LIST_BULLETTED("InsertUnorderedList"),
+        INSERT_LIST_BULLETTED_ITEM("InsertUnorderedListItem"),
+        INSERT_SEPERATOR("InsertHR"),
+        INSERT_TABLE("InsertTable"),
+        INSERT_TABLE_COL("InsertTableDataCell"),
+        INSERT_TABLE_ROW("InsertTableRow")
+        ;
         
         /** Identifier of the Swing action associated with this text style. */
         private final String actionName;
         
-        private TextStyle(String actionName) {
+        private TextAction(String actionName) {
             this.actionName = actionName;
         }
     }
@@ -107,11 +150,7 @@ class NotePanel extends JPanel {
      */
     private void additionalSetup() {
         // Edit Tool Bar.
-        final ActionMap actionMap = noteTextArea.getActionMap();
-        editToolBar.add(newToolBarButton(AppImage.BOLD, actionMap.get(TextStyle.BOLD.actionName)));
-        editToolBar.add(newToolBarButton(AppImage.ITALIC, actionMap.get(TextStyle.ITALIC.actionName)));
-        editToolBar.add(newToolBarButton(AppImage.UNDERLINE, actionMap.get(TextStyle.UNDERLINE.actionName)));
-        editToolBar.add(newToolBarButton(AppImage.STRIKETHROUGH, null));
+        buildEditToolBar();
         
         // Note Editor Pane.
         noteTextArea.addCaretListener(new TextStyleCaretListener());
@@ -149,6 +188,52 @@ class NotePanel extends JPanel {
         // By default, no note should be displayed.
         setNote(null);
     }
+
+    /**
+     * 
+     */
+    private void buildEditToolBar() {
+        // Font.
+        editToolBar.add(new JComboBox(new String[] { "Font" })); // TODO implement.
+        editToolBar.add(new JComboBox(new String[] { "Size" })); // TODO implement.
+        editToolBar.add(newBtn(AppImage.FONT_SIZE_DOWN, TextAction.FONT_SIZE_SMALLER));
+        editToolBar.add(newBtn(AppImage.FONT_SIZE_UP, TextAction.FONT_SIZE_BIGGER));
+        JButton colorButton = newBtn(AppImage.COLOR, TextAction.FONT_COLOR);
+        colorButton.setAction(new StyledEditorKit.ForegroundAction(HTMLEditorKit.COLOR_ACTION, Color.GREEN));
+        editToolBar.add(colorButton);
+        editToolBar.add(new JSeparator());
+        
+        // Style.
+        editToolBar.add(newTogBtn(AppImage.BOLD, TextAction.STYLE_BOLD));
+        editToolBar.add(newTogBtn(AppImage.ITALIC, TextAction.STYLE_ITALIC));
+        editToolBar.add(newTogBtn(AppImage.UNDERLINE, TextAction.STYLE_UNDERLINE));
+        editToolBar.add(newTogBtn(AppImage.STRIKETHROUGH, TextAction.STYLE_STRIKETHROUGH)); // TODO implement.
+        editToolBar.add(new JSeparator());
+        
+        // Alignment.
+        editToolBar.add(newTogBtn(AppImage.ALIGN_LEFT, TextAction.ALIGN_LEFT));
+        editToolBar.add(newTogBtn(AppImage.ALIGN_CENTER, TextAction.ALIGN_CENTER));
+        editToolBar.add(newTogBtn(AppImage.ALIGN_RIGHT, TextAction.ALIGN_RIGHT));
+        editToolBar.add(newTogBtn(AppImage.ALIGN_JUSTITY, TextAction.ALIGN_JUSTIFY));
+        
+        // Objects.
+        editToolBar.add(newBtn(AppImage.LINK, TextAction.INSERT_LINK));
+        editToolBar.add(new JButton(new ImageAction()));
+//        editToolBar.add(newBtn(AppImage.IMAGE, TextAction.INSERT_IMAGE));
+        editToolBar.add(newBtn(AppImage.BREAK, TextAction.INSERT_BREAK));
+        editToolBar.add(newBtn(AppImage.HORIZONTAL_RULE, TextAction.INSERT_SEPERATOR));
+        editToolBar.add(newBtn(AppImage.LIST_NUMBERS, TextAction.INSERT_LIST_NUMBERED));
+        editToolBar.add(newBtn(AppImage.LIST_NUMBERS, TextAction.INSERT_LIST_NUMBERED_ITEM));
+        editToolBar.add(newBtn(AppImage.LIST_BULLETS, TextAction.INSERT_LIST_BULLETTED));
+        editToolBar.add(newBtn(AppImage.LIST_BULLETS, TextAction.INSERT_LIST_BULLETTED_ITEM));
+        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE));
+        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE_COL));
+        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE_ROW));
+        editToolBar.add(new JSeparator());
+        
+        // Paragraph.
+        editToolBar.add(new JComboBox());
+    }
     
     /**
      * Helper method. Instantiate and configure a toggle button for use in the 
@@ -157,8 +242,19 @@ class NotePanel extends JPanel {
      * @param action The action to be associated with the button.
      * @return A newly created toggle button.
      */
-    private JToggleButton newToolBarButton(AppImage image, Action action) {
-        JToggleButton button = new JToggleButton(action);
+    private JToggleButton newTogBtn(AppImage image, TextAction action) {
+        JToggleButton button = new JToggleButton(
+                noteTextArea.getActionMap().get(action.actionName));
+        button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
+        button.setText("");
+        button.setPreferredSize(new Dimension(16, 16));
+        button.setFocusable(false);
+        return button;
+    }
+    
+    private JButton newBtn(AppImage image, TextAction action) {
+        JButton button = new JButton(
+                noteTextArea.getActionMap().get(action.actionName));
         button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
         button.setText("");
         button.setPreferredSize(new Dimension(16, 16));
@@ -229,11 +325,11 @@ class NotePanel extends JPanel {
             AttributeSet set = elem.getAttributes();
 
             final ActionMap actionMap = noteTextArea.getActionMap();
-            actionMap.get(TextStyle.BOLD.actionName).putValue(
+            actionMap.get(TextAction.STYLE_BOLD.actionName).putValue(
                     Action.SELECTED_KEY, StyleConstants.isBold(set));
-            actionMap.get(TextStyle.ITALIC.actionName).putValue(
+            actionMap.get(TextAction.STYLE_ITALIC.actionName).putValue(
                     Action.SELECTED_KEY, StyleConstants.isItalic(set));
-            actionMap.get(TextStyle.UNDERLINE.actionName).putValue(
+            actionMap.get(TextAction.STYLE_UNDERLINE.actionName).putValue(
                     Action.SELECTED_KEY, StyleConstants.isUnderline(set));
 
             
@@ -263,4 +359,17 @@ class NotePanel extends JPanel {
             }
         }
     }
+    
+    static class ImageAction extends AbstractAction implements ActionListener {
+        public ImageAction() {
+            super("kueb-image-action", new ImageIcon(ImageManager.get().getImage(AppImage.IMAGE)));
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new JFileChooser().setVisible(true);
+        }
+        
+    }
 }
+
+

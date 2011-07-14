@@ -1,4 +1,13 @@
+/**
+ * Kuebiko - NoteTable.java
+ * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
+ * TODO license info.
+ */
+
 package com.jcap.view;
+
+import static com.jcap.Main.log;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.awt.Component;
 import java.text.SimpleDateFormat;
@@ -20,8 +29,15 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Joiner;
+import com.jcap.Main;
+import com.jcap.model.Note;
 import com.jcap.view.NoteTableModel.Column;
 
+/**
+ * UI table component for displaying a list of notes.
+ *
+ * @author davehuffman
+ */
 public class NoteTable extends JTable {
     private static final long serialVersionUID = 1L;
     
@@ -133,24 +149,48 @@ public class NoteTable extends JTable {
         sorter.setRowFilter(rowFilter);
     }
     
+    /**
+     * Manually select a note in the table.
+     * @param title The title of the note to select.
+     */
     void selectNote(String title) {
+        log("selectNote(%s).", title);
         // A null title means the selection should be cleared.
-        if (title == null) {
-            clearSelection();
+        if (isEmpty(title)) {
+            //clearSelection();
             return;
         }
         
         // Attempt to find an existing note by title.
         final String trimTitle = title.trim();
-        final int titleCol = Column.TITLE.ordinal();
+        final int titleCol = convertColumnIndexToView(Column.TITLE.ordinal());
         for (int r = 0; r < getRowCount(); r++) {
             if (trimTitle.equals(getValueAt(r, titleCol))) {
+                log("found @ row=[%s] col=[%s]; [%s]", r, titleCol, getValueAt(r, titleCol));
+                //changeSelection(convertRowIndexToModel(r), convertColumnIndexToModel(titleCol), false, false);
                 changeSelection(r, titleCol, false, false);
                 return;
             }
         }
         
         // If no note was found, then make a new note with the passed title.
-        noteTableModel.addNewNote(title);
+        //noteTableModel.addNewNote(title);
+    }
+    
+    @Override
+    public void clearSelection() {
+        // XXX for logging only.
+        Main.log("clearSelection().");
+        super.clearSelection();
+    }
+    
+    /**
+     * @return The currently selected note, or null if there is no selection.
+     */
+    Note getSelectedNote() {
+        final int viewSelectedRow = getSelectedRow();
+        final int modelSelectedRow = (viewSelectedRow < 0)? -1 : convertRowIndexToModel(viewSelectedRow);
+        Main.log("getSelectedNote(); v[%s] m[%s].", viewSelectedRow, modelSelectedRow);
+        return (modelSelectedRow < 0)? null : noteTableModel.getNoteAtRow(modelSelectedRow);
     }
 }

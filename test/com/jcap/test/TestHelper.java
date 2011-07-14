@@ -5,12 +5,16 @@
  */
 package com.jcap.test;
 
+import java.io.IOException;
+
 import org.testng.TestException;
 
 import com.jcap.controller.NoteManager;
 import com.jcap.model.Note;
 import com.jcap.model.NoteDao;
 import com.jcap.model.NoteDaoFactory;
+import com.jcap.model.NoteDaoMemory;
+import com.jcap.model.ValidationException;
 import com.jcap.util.BadClassException;
 import com.jcap.view.NoteTableModel;
 
@@ -43,7 +47,7 @@ public final class TestHelper {
         try {
             noteDao = NoteDaoFactory.get(DEFAULT_TEST_NOTE_DAO);
         } catch (BadClassException e) {
-            throw new TestException("Couldn't instantiate new note table mode.l", e);
+            throw new TestException("Couldn't instantiate note DAO.", e);
         }
         try {
             for (Note note: notes) {
@@ -54,5 +58,39 @@ public final class TestHelper {
         }
         NoteManager noteMngr = new NoteManager(noteDao);
         return noteMngr;
+    }
+    
+    public static NoteDao newDummyNoteDao() {
+        NoteDao noteDao;
+        try {
+            noteDao = NoteDaoFactory.get(NoteDaoMemory.class.getSimpleName());
+            fillNoteDaoWithDummyData(noteDao);
+            return noteDao;
+        } catch (Exception e) {
+            throw new TestException("Couldn't create dummy DAO.", e);
+        }
+    }
+    
+    private static void fillNoteDaoWithDummyData(NoteDao dao) 
+    throws ValidationException, IOException {
+        final String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+        dao.addNote(newDummyNote("Luke Skywalker", loremIpsum));
+        dao.addNote(newDummyNote("Han Solo", loremIpsum));
+        dao.addNote(newDummyNote("Jabba the Hutt", loremIpsum));
+        dao.addNote(newDummyNote("Princess Leia", loremIpsum));
+        dao.addNote(newDummyNote("Darth Vader", loremIpsum));
+        dao.addNote(newDummyNote("Yoda", loremIpsum));
+        dao.addNote(newDummyNote("C3PO", loremIpsum));
+        dao.addNote(newDummyNote("Chewbacca", loremIpsum));
+    }
+    
+    private static Note newDummyNote(String title, String text) {
+        Note dummyNote = new Note();
+        
+        dummyNote.setTitle(title);
+        dummyNote.setText(String.format("[%s]\n\n%s", title, text));
+        
+        return dummyNote;
     }
 }

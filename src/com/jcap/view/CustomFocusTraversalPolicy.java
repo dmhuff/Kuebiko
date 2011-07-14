@@ -18,6 +18,7 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.jcap.Main;
 
 /**
  * TODO Document.
@@ -40,12 +41,14 @@ public class CustomFocusTraversalPolicy extends FocusTraversalPolicy {
 
     @Override
     public Component getComponentAfter(Container focusCycleRoot, Component aComponent) {
+        Main.log("getComponentAfter([%s])", aComponent.getClass());
         int idx = (components.indexOf(aComponent) + 1) % components.size();
         return components.get(idx);
     }
 
     @Override
     public Component getComponentBefore(Container focusCycleRoot, Component aComponent) {
+        Main.log("getComponentBefore([%s])", aComponent.getClass());
         int idx = components.indexOf(aComponent) - 1;
         if (idx < 0) {
             idx = components.size() - 1;
