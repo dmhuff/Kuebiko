@@ -3,7 +3,7 @@
 <suite name="Kuebiko" parallel="false">
   <test name="All Tests">
     <packages>
-      <package name="com.jcap.*" />
+      <package name="dmh.kuebiko.*" />
     </packages>
   </test>
 </suite>
