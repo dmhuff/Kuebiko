@@ -92,7 +92,7 @@ public class NoteFrame extends JFrame {
     private JSeparator separator_2;
     private JMenuItem cutMenuItem;
     private JMenuItem copyMenuItem;
-    private JMenuItem pasteMenuItem;;
+    private JMenuItem pasteMenuItem;
 
     /**
      * Create the frame.

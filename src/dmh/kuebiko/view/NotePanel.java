@@ -23,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,7 +41,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.html.HTMLEditorKit;
-
 
 import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
@@ -362,9 +360,12 @@ class NotePanel extends JPanel {
     }
     
     static class ImageAction extends AbstractAction implements ActionListener {
+        private static final long serialVersionUID = 1L;
+
         public ImageAction() {
             super("kueb-image-action", new ImageIcon(ImageManager.get().getImage(AppImage.IMAGE)));
         }
+        
         @Override
         public void actionPerformed(ActionEvent e) {
             new JFileChooser().setVisible(true);
