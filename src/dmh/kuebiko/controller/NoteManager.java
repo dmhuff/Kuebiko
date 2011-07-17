@@ -29,21 +29,9 @@ import dmh.kuebiko.util.NoteTitleFunction;
  * @author davehuffman
  */
 public class NoteManager {
-    @Deprecated
-    private final Predicate<Note> searchFilter = new Predicate<Note>() {
-                @Override
-                public boolean apply(Note note) {
-                    return note.getTitle().contains(filter)
-                            || note.getTags().contains(filter)
-                            || note.getText().contains(filter);
-                }
-            };
-    
     private final NoteDao noteDao;
     
     private List<Note> notes = null;
-    @Deprecated
-    private String filter;
 
     private final Collection<Note> deletedNotes;
     
@@ -63,8 +51,7 @@ public class NoteManager {
     }
     
     public List<Note> getNotes() {
-        return isBlank(filter)? Collections.unmodifiableList(notes)
-                : ImmutableList.copyOf(Collections2.filter(notes, searchFilter));
+        return Collections.unmodifiableList(notes);
     }
     
     public List<String> getNoteTitles() {
@@ -132,15 +119,5 @@ public class NoteManager {
         
         // TODO may not be necessary.
         loadAllNotes();
-    }
-    
-    @Deprecated
-    public String getFilter() {
-        return filter;
-    }
-    
-    @Deprecated
-    public void setFilter(String filter) {
-        this.filter = filter;
     }
 }
