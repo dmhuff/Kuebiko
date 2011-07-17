@@ -153,6 +153,15 @@ public class Note implements Serializable {
         return true;
     }
     
+    /**
+     * Mark this note as dirty.
+     */
+    private void markAsDirty() {
+        if (state != State.NEW) {
+            state = State.DIRTY;
+        }
+    }
+    
     public State getState() {
         return state;
     }
@@ -166,7 +175,7 @@ public class Note implements Serializable {
     }
 
     public void setTitle(String title) {
-        state = State.DIRTY;
+        markAsDirty();
         this.title = title;
     }
 
@@ -175,7 +184,7 @@ public class Note implements Serializable {
     }
 
     public void setText(String text) {
-        state = State.DIRTY;
+        markAsDirty();
         this.text = text;
     }
 
@@ -184,7 +193,7 @@ public class Note implements Serializable {
     }
     
     void setCreateDate(Date createDate) {
-        state = State.DIRTY;
+        markAsDirty();
         this.createDate = createDate;
     }
 
@@ -193,7 +202,7 @@ public class Note implements Serializable {
     }
 
     void setModifiedDate(Date modifiedDate) {
-        state = State.DIRTY;
+        markAsDirty();
         this.modifiedDate = modifiedDate;
     }
     
@@ -202,7 +211,7 @@ public class Note implements Serializable {
     }
     
     public void setTags(List<String> tags) {
-        state = State.DIRTY;
+        markAsDirty();
         this.tags = tags;
     }
 }
