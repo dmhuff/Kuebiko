@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-
 import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
 
@@ -41,13 +40,6 @@ public class NoteTableModel extends AbstractTableModel {
     }
 
     private final NoteManager noteMngr;
-    //private List<Note> notes;
-    
-//    @Deprecated
-//    public NoteTableModel() {
-//        this(null);
-//        //this(new ArrayList<Note>());
-//    }
     
     public NoteTableModel(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
@@ -57,14 +49,63 @@ public class NoteTableModel extends AbstractTableModel {
         return noteMngr.getNotes();
     }
     
-    public void addNewNote(String title) {
-        Note note = new Note();
-        note.setTitle(title);
-        noteMngr.addNote(note);
-        
+    /**
+     * Add a new note to the stack with a default title.
+     * @return The title of the new note.
+     */
+    String addNewNote() {
+        final String title = noteMngr.addNewNote();
+        onNoteAdded();
+        return title;
+    }
+    
+    /**
+     * Add a new note to the stack with a particular title.
+     * @param title The new note's title.
+     */
+    void addNewNote(String title) {
+        noteMngr.addNewNote(title);
+        onNoteAdded();
+    }
+
+    /**
+     * Handler for when a note is added to the stack.
+     */
+    private void onNoteAdded() {
         int newNoteRow = noteMngr.getNoteCount() - 1;
         fireTableRowsInserted(newNoteRow, newNoteRow);
     }
+    
+    /*private String genUniqueNoteTitle() { // TODO unit test.
+        // Get a list of default note titles.
+        final Collection<String> defaultTitles = 
+                Collections2.filter(noteMngr.getNoteTitles(), 
+                        new Predicate<String>(){
+                            @Override
+                            public boolean apply(String input) {
+                                return input.startsWith(DEFAULT_NOTE_TITLE);
+                            }
+                        });
+        
+        if (defaultTitles.size() == 0) {
+            return DEFAULT_NOTE_TITLE;
+        }
+        
+        // Default note titles exist; work thought the list and create a new, 
+        // unique default note title.
+        Pattern titleRegex = Pattern.compile(DEFAULT_NOTE_TITLE + " (/d+)?");
+        int maxSuffix = 1;
+        for (String title: defaultTitles) {
+            Matcher matcher = titleRegex.matcher(title);
+            if (matcher.matches()) {
+                int suffix = Integer.parseInt(matcher.group(1));
+                if (suffix > maxSuffix) {
+                    maxSuffix = suffix;
+                }
+            }
+        }
+        return String.format("%s %d", DEFAULT_NOTE_TITLE, maxSuffix + 1);
+    }*/
 
     @Override
     public int getColumnCount() {
@@ -140,10 +181,4 @@ public class NoteTableModel extends AbstractTableModel {
         return columnIndex == Column.TAGS.ordinal();
     }
     
-//    /**
-//     * @return An immutable view of this model's notes.
-//     */
-//    public List<Note> getNotes() {
-//        return Collections.unmodifiableList(notes);
-//    }
 }
