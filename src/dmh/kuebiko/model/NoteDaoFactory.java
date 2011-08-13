@@ -28,11 +28,6 @@ public final class NoteDaoFactory {
         OFFICIAL_DAOS.add(NoteDaoMemory.class);
     }
     
-    @Deprecated
-    public static NoteDao get() {
-        return new NoteDaoMemory();
-    }
-    
     /**
      * Retrieve an instance of a note DAO.
      * @param className The name of the note DAO's class.
@@ -57,7 +52,7 @@ public final class NoteDaoFactory {
         
         // Now try reflection to find the class, and throw a checked exception 
         // if it cannot be instantiated (which should indicate a configuration 
-        // issue, which may be fixable).
+        // issue, and may be fixable).
         try {
             @SuppressWarnings("unchecked")
             Class<? extends NoteDao> clazz = 
@@ -70,6 +65,13 @@ public final class NoteDaoFactory {
         }
     }
     
+    /**
+     * Helper method. Instantiates and instance of a NoteDao class and wraps 
+     * any resulting errors in a custom checked exception.
+     * @param clazz The NoteDao class to instantiate.
+     * @return An instance of the passed class.
+     * @throws BadClassException If there in an instantiation error. 
+     */
     private static <T extends NoteDao> T get(Class<T> clazz) 
     throws BadClassException {
         try {
