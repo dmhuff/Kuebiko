@@ -1,5 +1,5 @@
 /**
- * jCap - CustomTraversalPolicy.java
+ * Kuebiko - CustomTraversalPolicy.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * 
  * Derived from Sun's Focus Traversal Demo:
@@ -22,7 +22,9 @@ import com.google.common.collect.Iterables;
 import dmh.kuebiko.Main;
 
 /**
- * TODO Document.
+ * TODO there's nothing Kuebiko specific here. consider moving to a util package.
+ * Custom focus traversal policy; allows for the traversal of a set of 
+ * components in order.
  * 
  * @author davehuffman
  */
