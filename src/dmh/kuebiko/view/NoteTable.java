@@ -194,4 +194,8 @@ public class NoteTable extends JTable {
         Main.log("getSelectedNote(); v[%s] m[%s].", viewSelectedRow, modelSelectedRow);
         return (modelSelectedRow < 0)? null : noteTableModel.getNoteAtRow(modelSelectedRow);
     }
+    
+    public NoteTableModel getNoteTableModel() {
+        return noteTableModel;
+    }
 }
