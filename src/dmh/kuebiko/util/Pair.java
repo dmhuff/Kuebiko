@@ -3,6 +3,7 @@
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
+
 package dmh.kuebiko.util;
 
 import java.io.Serializable;

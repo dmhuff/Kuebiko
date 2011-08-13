@@ -14,7 +14,7 @@ import dmh.kuebiko.model.Note;
  *
  * @author davehuffman
  */
-public class NoteTitleFunction implements Function<Note, String> {
+public final class NoteTitleFunction implements Function<Note, String> {
     /** Singleton instance of this class. */
     private static final NoteTitleFunction INSTANCE = new NoteTitleFunction();
     
