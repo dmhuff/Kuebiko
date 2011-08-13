@@ -60,7 +60,6 @@ public class NoteDaoMemory implements NoteDao {
                         newNote.getTitle())) {
             throw new ValidationException(String.format(
                     "A note with title [%s] already exists.", newNote.getTitle()));
-            
         }
         
         Note addedNote = new Note(++noteCount, newNote);

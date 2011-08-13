@@ -6,7 +6,7 @@
 package dmh.kuebiko.model;
 
 /**
- * Exception thrown validation of an entity fails.
+ * Exception thrown when validation of an entity fails.
  *
  * @author davehuffman
  */
