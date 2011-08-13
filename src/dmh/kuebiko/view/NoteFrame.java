@@ -13,7 +13,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
@@ -46,7 +45,6 @@ import javax.swing.text.DefaultEditorKit;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-
 import dmh.kuebiko.Main;
 import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
@@ -66,12 +64,12 @@ public class NoteFrame extends JFrame {
     
     private Mode mode;
     
+    private final ActionManager actionMngr = new ActionManager();
+    
     private JSplitPane splitPane;
     JTextField searchText;
     private JScrollPane noteTableScroll;
     NoteTable noteTable;
-//    private JTextArea noteTextArea;
-//    private JScrollPane noteScroll;
     NotePanel notePanel;
     private final JLabel stateImageLabel = new JLabel();
     private Component horizontalStrut;
@@ -100,15 +98,15 @@ public class NoteFrame extends JFrame {
     public NoteFrame(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
         
+        actionMngr.putAction(new NewNoteAction(this));
+        
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         
         fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
         
-        newNoteMenuItem = new JMenuItem("New Note");
-        newNoteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.META_MASK));
-        newNoteMenuItem.setMnemonic(KeyEvent.VK_N);
+        newNoteMenuItem = new JMenuItem(actionMngr.getAction(NewNoteAction.class));
         fileMenu.add(newNoteMenuItem);
         
         newStackMenuItem = new JMenuItem("New Stack");
@@ -155,7 +153,8 @@ public class NoteFrame extends JFrame {
         separator_2 = new JSeparator();
         editMenu.add(separator_2);
         
-        cutMenuItem = new JMenuItem(new DefaultEditorKit.CutAction());
+//        cutMenuItem = new JMenuItem(new DefaultEditorKit.CutAction());
+        cutMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CutAction.class));
         cutMenuItem.setText("Cut");
         cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.META_MASK));
         editMenu.add(cutMenuItem);
@@ -165,7 +164,8 @@ public class NoteFrame extends JFrame {
         copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_MASK));
         editMenu.add(copyMenuItem);
         
-        pasteMenuItem = new JMenuItem("Paste");
+        pasteMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.PasteAction.class));
+        pasteMenuItem.setText("Paste");
         pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.META_MASK));
         editMenu.add(pasteMenuItem);
         
@@ -342,13 +342,7 @@ public class NoteFrame extends JFrame {
                 noteTable.selectNote(searchText.getText());
             }
         });
-        searchText.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //selectNote(title);
-                Main.log("searchText.addActionListener");
-            }
-        });
+        searchText.addActionListener(actionMngr.getAction(NewNoteAction.class));
         
         // Note Table.
         noteTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -414,5 +408,25 @@ public class NoteFrame extends JFrame {
                 }
             });
         }
+    }
+    
+    boolean isInSearchMode() {
+        return (mode == Mode.SEARCH);
+    }
+
+    boolean isInEditMode() {
+        return (mode == Mode.EDIT);
+    }
+    
+    JTextField getSearchText() {
+        return searchText;
+    }
+    
+    NoteTable getNoteTable() {
+        return noteTable;
+    }
+    
+    NotePanel getNotePanel() {
+        return notePanel;
     }
 }
