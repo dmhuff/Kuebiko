@@ -20,6 +20,8 @@ import com.google.common.collect.Maps;
 final class ImageManager {
     enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
     
+    /** XXX This is unmanageable. Change to just lookup images by name (i.e. a String). */
+    @Deprecated
     enum AppImage {
         ALIGN_CENTER, ALIGN_JUSTITY, ALIGN_LEFT, ALIGN_RIGHT, BOLD, BREAK, 
         COLOR, EDIT, FONT_SIZE_DOWN, FONT_SIZE_UP, FONT_SIZE, 
