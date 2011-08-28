@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.util.Observable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -48,10 +49,13 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import dmh.kuebiko.Main;
 import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
+import dmh.kuebiko.util.ActionManager;
+import dmh.kuebiko.util.ActionObserverUtil;
 import dmh.kuebiko.view.ImageManager.AppImage;
 
 /**
  * UI frame for displaying and editing notes.
+ * XXX consider changing this class to be a POJO with a JFrame field.
  *
  * @author davehuffman
  */
@@ -59,12 +63,30 @@ public class NoteFrame extends JFrame {
     private static final long serialVersionUID = 1L;
     
     private static enum Mode { SEARCH, EDIT }
+    
+    /** XXX consider moving to a utility class. */
+    private class NoteFrameObservable extends Observable {
+        private void setChangedAndNotify() {
+            setChangedAndNotify(null);
+        }
+        
+        private void setChangedAndNotify(final Object arg) {
+            setChanged();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    notifyObservers(arg);
+                }});
+        }
+    }
 
     private final NoteManager noteMngr;
     
     private Mode mode;
     
     private final ActionManager actionMngr = new ActionManager();
+    
+    private final NoteFrameObservable observable = new NoteFrameObservable();
     
     private JSplitPane splitPane;
     JTextField searchText;
@@ -91,6 +113,9 @@ public class NoteFrame extends JFrame {
     private JMenuItem cutMenuItem;
     private JMenuItem copyMenuItem;
     private JMenuItem pasteMenuItem;
+    private JSeparator separator_3;
+    private JMenuItem deleteNoteMenuItem;
+    private JMenuItem renameNoteMenuItem;
 
     /**
      * Create the frame.
@@ -98,7 +123,10 @@ public class NoteFrame extends JFrame {
     public NoteFrame(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
         
-        actionMngr.putAction(new NewNoteAction(this));
+        ActionObserverUtil.registerEnMass(actionMngr, observable, 
+                new NewNoteAction(this), 
+                new DeleteNoteAction(this), 
+                new RenameNoteAction(this));
         
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -108,6 +136,15 @@ public class NoteFrame extends JFrame {
         
         newNoteMenuItem = new JMenuItem(actionMngr.getAction(NewNoteAction.class));
         fileMenu.add(newNoteMenuItem);
+        
+        deleteNoteMenuItem = new JMenuItem(actionMngr.getAction(DeleteNoteAction.class));
+        fileMenu.add(deleteNoteMenuItem);
+        
+        renameNoteMenuItem = new JMenuItem(actionMngr.getAction(RenameNoteAction.class));
+        fileMenu.add(renameNoteMenuItem);
+        
+        separator_3 = new JSeparator();
+        fileMenu.add(separator_3);
         
         newStackMenuItem = new JMenuItem("New Stack");
         newStackMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
@@ -172,7 +209,7 @@ public class NoteFrame extends JFrame {
         initialize();
         additionalSetup();
     }
-    
+
     private NoteTable newNoteTable() {
         return new NoteTable(new NoteTableModel(noteMngr));
     }
@@ -384,6 +421,7 @@ public class NoteFrame extends JFrame {
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage(AppImage.SEARCH)));
         noteTable.clearSelection();
+        observable.setChangedAndNotify();
     }
     
     private void setModeToEdit() {
@@ -391,6 +429,20 @@ public class NoteFrame extends JFrame {
         mode = Mode.EDIT;
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage(AppImage.EDIT)));
+        observable.setChangedAndNotify();
+    }
+    
+    public boolean isNoteSelected() {
+        return (noteTable == null? false : (noteTable.getSelectedRow() != -1));
+    }
+    
+    void deleteSelectedNote() {
+        if (!isNoteSelected()) {
+            throw new IllegalStateException("No note currently selected.");
+        }
+        
+        noteTable.deleteSelectedNote();
+        searchText.setText("");
     }
     
     /**
@@ -428,5 +480,9 @@ public class NoteFrame extends JFrame {
     
     NotePanel getNotePanel() {
         return notePanel;
+    }
+    
+    NoteManager getNoteMngr() {
+        return noteMngr;
     }
 }
