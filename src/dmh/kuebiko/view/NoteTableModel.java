@@ -76,6 +76,11 @@ public class NoteTableModel extends AbstractTableModel {
         fireTableRowsInserted(newNoteRow, newNoteRow);
     }
     
+    void deleteNote(Note note) {
+        noteMngr.deleteNote(note);
+        fireTableDataChanged();
+    }
+    
     /*private String genUniqueNoteTitle() { // TODO unit test.
         // Get a list of default note titles.
         final Collection<String> defaultTitles = 
@@ -119,7 +124,7 @@ public class NoteTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        // TODO should getNotes() ever be null?
+        // XXX should getNotes() ever be null?
         return getNotes() == null? 0 : noteMngr.getNoteCount();
     }
     
@@ -180,5 +185,4 @@ public class NoteTableModel extends AbstractTableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == Column.TAGS.ordinal();
     }
-    
 }
