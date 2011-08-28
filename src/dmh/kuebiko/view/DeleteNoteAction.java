@@ -12,7 +12,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.util.AbstractActionObserver;
 
 /**
