@@ -12,15 +12,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
-import dmh.kuebiko.Main;
-import dmh.kuebiko.util.AbstractActionObserver;
-
 /**
- * TODO Document.
+ * Swing action for renaming the current note.
  *
  * @author davehuffman
  */
-public class RenameNoteAction extends AbstractActionObserver {
+public class RenameNoteAction extends UnimplementedAction {
     private static final long serialVersionUID = 1L;
     
     private final NoteFrame noteFrame;
@@ -37,8 +34,7 @@ public class RenameNoteAction extends AbstractActionObserver {
     
     @Override
     public void actionPerformed(ActionEvent event) {
-        // TODO Auto-generated method stub
-        //Main.log("RenameNoteAction.actionPerformed(%s).", event);
+        super.actionPerformed(event);
     }
 
     @Override
