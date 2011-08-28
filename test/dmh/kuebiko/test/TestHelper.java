@@ -86,7 +86,7 @@ public final class TestHelper {
         dao.addNote(newDummyNote("Chewbacca", loremIpsum));
     }
     
-    private static Note newDummyNote(String title, String text) {
+    public static Note newDummyNote(String title, String text) {
         Note dummyNote = new Note();
         
         dummyNote.setTitle(title);

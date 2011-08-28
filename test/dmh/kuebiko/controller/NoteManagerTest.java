@@ -111,4 +111,29 @@ public class NoteManagerTest {
         noteMngr.addNewNote(title);
         noteMngr.saveAll();
     }
+    
+    @Test
+    public void deleteNoteTest() {
+        final String title = "foobar";
+        final NoteManager noteMngr = TestHelper.newNoteManager(
+                TestHelper.newDummyNote(title, ""));
+        
+        assertEquals(1, noteMngr.getNotes().size(), 
+                "There should be only one note in the stack.");
+        
+        final Note onlyNote = getOnlyElement(noteMngr.getNotes());
+        assertEquals(title, onlyNote.getTitle(),
+                "The only note in the stack should be the original note.");
+        
+        noteMngr.deleteNote(onlyNote);
+        
+        assertEquals(0, noteMngr.getNotes().size(), "TThe stack should be empty.");
+    }
+    
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void deleteNonexistantNoteTest() {
+        final NoteManager noteMngr = TestHelper.newNoteManager(
+                TestHelper.newDummyNote("foo", ""));
+        noteMngr.deleteNote(TestHelper.newDummyNote("bar", ""));
+    }
 }
