@@ -163,9 +163,6 @@ public class NoteManager {
             
             for (Note note: notes) {
                 switch (note.getState()) {
-//            case DELETED:
-//                noteDao.deleteNote(note);
-//                break;
                 case DIRTY:
                     noteDao.updateNote(note);
                     break;
