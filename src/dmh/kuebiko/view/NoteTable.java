@@ -185,6 +185,11 @@ public class NoteTable extends JTable {
         super.clearSelection();
     }
     
+    void deleteSelectedNote() {
+        noteTableModel.deleteNote(getSelectedNote());
+        clearSelection();
+    }
+    
     /**
      * @return The currently selected note, or null if there is no selection.
      */
