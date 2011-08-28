@@ -126,7 +126,8 @@ public class NoteFrame extends JFrame {
         ActionObserverUtil.registerEnMass(actionMngr, observable, 
                 new NewNoteAction(this), 
                 new DeleteNoteAction(this), 
-                new RenameNoteAction(this));
+                new RenameNoteAction(this),
+                new SaveStackAction(this));
         
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -146,12 +147,10 @@ public class NoteFrame extends JFrame {
         separator_3 = new JSeparator();
         fileMenu.add(separator_3);
         
-        newStackMenuItem = new JMenuItem("New Stack");
-        newStackMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        newStackMenuItem = new JMenuItem(actionMngr.getAction(NewStackAction.class));
         fileMenu.add(newStackMenuItem);
         
-        openStackMenuItem = new JMenuItem("Open Stack");
-        openStackMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.META_MASK));
+        openStackMenuItem = new JMenuItem(actionMngr.getAction(OpenStackAction.class));
         fileMenu.add(openStackMenuItem);
         
         separator = new JSeparator();
@@ -159,21 +158,23 @@ public class NoteFrame extends JFrame {
         
         closeMenuItem = new JMenuItem("Close");
         closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK));
+        closeMenuItem.setEnabled(false);
         fileMenu.add(closeMenuItem);
         
         closeAllMenuItem = new JMenuItem("Close All");
         closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        closeAllMenuItem.setEnabled(false);
         fileMenu.add(closeAllMenuItem);
         
         separator_1 = new JSeparator();
         fileMenu.add(separator_1);
         
-        saveMenuItem = new JMenuItem("Save");
-        saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.META_MASK));
+        saveMenuItem = new JMenuItem(actionMngr.getAction(SaveStackAction.class));
         fileMenu.add(saveMenuItem);
         
         saveAllMenuItem = new JMenuItem("Save All");
         saveAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        saveAllMenuItem.setEnabled(false);
         fileMenu.add(saveAllMenuItem);
         
         editMenu = new JMenu("Edit");
@@ -205,6 +206,9 @@ public class NoteFrame extends JFrame {
         pasteMenuItem.setText("Paste");
         pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.META_MASK));
         editMenu.add(pasteMenuItem);
+        
+        JMenu windowMenu = new JMenu("Window");
+        menuBar.add(windowMenu);
         
         initialize();
         additionalSetup();
