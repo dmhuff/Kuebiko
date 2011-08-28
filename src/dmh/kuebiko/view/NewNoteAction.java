@@ -12,23 +12,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
-import java.util.Observer;
 
-import javax.swing.AbstractAction;
-
-import dmh.kuebiko.Main;
+import dmh.kuebiko.util.AbstractActionObserver;
 
 /**
  * Swing action for creating a new note in the current stack.
  *
  * @author davehuffman
  */
-class NewNoteAction extends AbstractAction implements Observer {
+class NewNoteAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
     
     private final NoteFrame noteFrame;
     
-    public NewNoteAction(NoteFrame noteFrame) {
+    NewNoteAction(NoteFrame noteFrame) {
         super("New Note"); // TODO i18n.
         this.noteFrame = noteFrame;
         
@@ -40,8 +37,6 @@ class NewNoteAction extends AbstractAction implements Observer {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Main.log("NewNoteAction.actionPerformed(%s).", e);
-        
         final NoteTable noteTable = noteFrame.getNoteTable();
 
         // Determine note title.
@@ -66,6 +61,6 @@ class NewNoteAction extends AbstractAction implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        Main.log("NewNoteAction.update(o=[%s], arg=[%s]).", o, arg);
+        // Do nothing for now; there's no need for this action to handle updates.
     }
 }
