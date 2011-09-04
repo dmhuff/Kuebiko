@@ -7,17 +7,19 @@
 package dmh.kuebiko;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import dmh.kuebiko.controller.NoteManager;
+import dmh.kuebiko.model.InMemoryNoteDao;
 import dmh.kuebiko.test.TestHelper;
 import dmh.kuebiko.view.NoteFrame;
 
 /**
- * Main class for the Kuebiko application.
+ * Main class for launching Kuebiko as a Swing application.
  *
  * @author davehuffman
  */
@@ -52,7 +54,7 @@ public class Main {
         }
     }
     
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Thread.setDefaultUncaughtExceptionHandler(new KuebikoUncaughtExceptionHandler());
         
         try {
@@ -70,11 +72,30 @@ public class Main {
             @Override
             public void run() {
                 /** XXX scaffolding. */
-                NoteManager noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
+                getPrefs().put(Preference.CURRENT_STACK_LOCATION.toString(), "");
+                getPrefs().put(Preference.CURRENT_STACK_DAO.toString(), InMemoryNoteDao.class.getName());
+                
+                final NoteManager noteMngr;
+                
+                if (args.length > 0) {
+                    final String stackDir = args[0];
+                    noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
+                } else {
+                    noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
+                }
+                
                 NoteFrame noteFrame = new NoteFrame(noteMngr);
                 noteFrame.setVisible(true);
             }
         });
+    }
+    
+    enum Preference {
+        CURRENT_STACK_LOCATION, CURRENT_STACK_DAO
+    }
+    
+    public static Preferences getPrefs() {
+        return Preferences.userNodeForPackage(Main.class);
     }
     
     private static int logCount = 0;
