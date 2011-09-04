@@ -28,4 +28,9 @@ public final class Pair<E1, E2> implements Serializable {
         this.first = first;
         this.second = second;
     }
+
+    @Override
+    public String toString() {
+        return "Pair [first=" + first + ", second=" + second + "]";
+    }
 }
