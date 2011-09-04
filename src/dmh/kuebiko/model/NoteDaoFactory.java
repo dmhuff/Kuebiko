@@ -25,7 +25,7 @@ public final class NoteDaoFactory {
     private static final List<Class<? extends NoteDao>> OFFICIAL_DAOS = 
             Lists.newArrayList();
     static {
-        OFFICIAL_DAOS.add(NoteDaoMemory.class);
+        OFFICIAL_DAOS.add(InMemoryNoteDao.class);
     }
     
     /**

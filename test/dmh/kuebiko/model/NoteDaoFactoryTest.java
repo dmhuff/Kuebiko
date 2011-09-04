@@ -29,7 +29,7 @@ public class NoteDaoFactoryTest {
     @Factory
     public Object[] testFactory() {
         return new Object[] { 
-            new InstantiationTest("NoteDaoMemory", true),
+            new InstantiationTest("InMemoryNoteDao", true),
             new InstantiationTest("not a real dao", false)
         };
     }
