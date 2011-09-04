@@ -1,103 +1,78 @@
 /**
- * Kuebiko - AbstractNoteDaoTest.java
+ * Kuebiko - InMemoryNoteDao.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
+
 package dmh.kuebiko.model;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import dmh.kuebiko.util.NoteTitleFunction;
-import dmh.kuebiko.util.Pair;
-
 /**
- * Note data access object for storing notes in memory.
+ * Note data access object (DAO) for storing notes in memory.
  *
  * @author davehuffman
  */
-public class InMemoryNoteDao implements NoteDao {
+public class InMemoryNoteDao extends AbstractNoteDao {
+    /** A list of notes, which acts as a data store for note. */
     private final List<Note> notes = Lists.newArrayList();
-    private int noteCount = 0;
     
-    /**
-     * Find a note and its index by the note's ID.
-     * @param id The ID of the note to find.
-     * @return A pair value object for found note, where the first value is the 
-     *         note's index and the second is the note, or null if the note 
-     *         does not exist.
-     */
-    private Pair<Integer, Note> findNoteWithIndex(int id) {
-        int index = 0;
+    @Override
+    protected Note findNote(int id) {
         for (Note note: notes) {
             if (id == note.getId()) {
-                return Pair.of(index, note);
+                return note;
             }
-            index++;
         }
         return null;
     }
     
-    /**
-     * Find a note by its ID.
-     * @param id The ID of the note to find.
-     * @return The found note, or null if it does not exist.
-     */
-    private Note findNote(int id) {
-        Pair<Integer, Note> found = findNoteWithIndex(id);
-        return (found == null)? null : found.second;
-    }
-    
     @Override
-    public Note addNote(Note newNote) throws ValidationException {
-        Preconditions.checkArgument(newNote.isNew());
-        
-        if (Lists.transform(notes, NoteTitleFunction.getInstance()).contains(
-                        newNote.getTitle())) {
-            throw new ValidationException(String.format(
-                    "A note with title [%s] already exists.", newNote.getTitle()));
+    protected Note findNote(String title) {
+        for (Note note: notes) {
+            if (title.equals(note.getTitle())) {
+                return note;
+            }
         }
-        
-        Note addedNote = new Note(++noteCount, newNote);
-        addedNote.setModifiedDate(new Date());
-        addedNote.reset();
+        return null;
+    }
+
+    @Override
+    public Note persistActionAdd(Note addedNote) {
         notes.add(addedNote);
         return addedNote;
     }
     
     @Override
-    public void deleteNote(Note deletedNote) {
-        Preconditions.checkArgument(!deletedNote.isNew());
-        
-        final Note foundNote = findNote(deletedNote.getId());
-        if (foundNote == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Passed note [%s] does not exist.", deletedNote));
-        }
-        notes.remove(foundNote);
+    public void persistActionDelete(Note deletedNote) {
+        notes.remove(deletedNote);
     }
 
     @Override
-    public Note updateNote(Note note) {
-        Preconditions.checkArgument(!note.isNew());
-        Preconditions.checkArgument(note.isDirty());
-        
-        Pair<Integer, Note> foundNotePair = findNoteWithIndex(note.getId());
-        if (foundNotePair == null) {
-            throw new IllegalArgumentException(
-                    String.format("Note [%s] not found.", note));
-        }
-        notes.remove(foundNotePair.first.intValue());
-        final Note updatedNote = new Note(foundNotePair.second.getId(), note);
-        updatedNote.setModifiedDate(new Date());
-        updatedNote.reset();
-        notes.add(foundNotePair.first, updatedNote);
-        
+    public Note persistActionUpdate(Note updatedNote) {
+        notes.set(findNoteIndex(updatedNote), updatedNote);
         return updatedNote;
+    }
+    
+    /**
+     * Helper method. Find the index of a particular note within the internal 
+     * note list ({@link InMemoryNoteDao#notes}).
+     * @param noteToFind The note to find. Must exist in the internal note list.
+     * @return The index of the found note.
+     */
+    private int findNoteIndex(Note noteToFind) {
+        int index = 0;
+        for (Note note: notes) {
+            if (noteToFind.getId() == note.getId()) {
+                return index;
+            }
+            index++;
+        }
+        throw new IllegalArgumentException(String.format(
+                "Note [%s] does not exist.", noteToFind));
     }
     
     @Override
