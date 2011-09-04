@@ -55,6 +55,15 @@ public class Note implements Serializable {
     
     /**
      * Copy constructor.
+     * @param source The note to copy.
+     */
+    Note(Note source) {
+        this(source.getId(), source.getTitle(), source.getText(), 
+                source.getCreateDate(), source.getModifiedDate());
+    }
+
+    /**
+     * Copy constructor.
      * @param id The ID of the new note. 
      * @param source The note to copy.
      */
