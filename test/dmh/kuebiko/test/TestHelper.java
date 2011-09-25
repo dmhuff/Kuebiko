@@ -26,7 +26,7 @@ import dmh.kuebiko.view.NoteTableModel;
  */
 public final class TestHelper {
     /** Class name of the default note DAO for use in testing. */
-    private static final String DEFAULT_TEST_NOTE_DAO = "InMemoryNoteDao";
+    private static final String DEFAULT_TEST_NOTE_DAO = InMemoryNoteDao.class.getName();
 
     private TestHelper() {
         throw new AssertionError("Cannot be instantiated.");
@@ -64,7 +64,7 @@ public final class TestHelper {
     public static NoteDao newDummyNoteDao() {
         NoteDao noteDao;
         try {
-            noteDao = NoteDaoFactory.get(InMemoryNoteDao.class.getSimpleName());
+            noteDao = NoteDaoFactory.get(InMemoryNoteDao.class.getName());
             fillNoteDaoWithDummyData(noteDao);
             return noteDao;
         } catch (Exception e) {

@@ -5,9 +5,7 @@
  */
 package dmh.kuebiko.model;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
+import com.google.common.base.Preconditions;
 
 import dmh.kuebiko.util.BadClassException;
 
@@ -21,11 +19,16 @@ public final class NoteDaoFactory {
         throw new AssertionError("Cannot be instantiated.");
     }
     
-    /** A list of all official and supported note DAOs.  */
-    private static final List<Class<? extends NoteDao>> OFFICIAL_DAOS = 
-            Lists.newArrayList();
-    static {
-        OFFICIAL_DAOS.add(InMemoryNoteDao.class);
+    /** Enumeration of all official and supported note DAOs.  */
+    public static enum OfficialDao {
+        IN_MEMORY(InMemoryNoteDao.class),
+        FILE_SYSTEM(FileSystemNoteDao.class);
+        
+        private final Class<? extends NoteDao> clazz;
+        
+        private OfficialDao(Class<? extends NoteDao> clazz) {
+            this.clazz = clazz;
+        }
     }
     
     /**
@@ -36,33 +39,41 @@ public final class NoteDaoFactory {
      *                           supported DAO and it cannot be instantiated.
      */
     public static NoteDao get(String className) throws BadClassException {
+        Preconditions.checkNotNull(className);
+        
         // First try to find the class among the official DAOs.
         try {
-            for (Class<? extends NoteDao> clazz: OFFICIAL_DAOS) {
-                if (className.equals(clazz.getSimpleName())) {
-                    return get(clazz);
-                }
-            }
-        } catch (BadClassException e) {
+            return get(Enum.valueOf(OfficialDao.class, className));
+        } catch (BadClassException bce) {
             // This indicates a programming error, so throw an unchecked exception.
             throw new IllegalArgumentException(String.format(
                     "Class [%s] is a known class, but it cannot be instantiated.", 
-                    className), e);
+                    className), bce);
+        } catch (Exception ignore) {
+            // There was a problem getting an official DAO from the enumeration. 
+            // Now try reflection to find the class, and throw a checked 
+            // exception if it cannot be instantiated (which should indicate a 
+            // configuration issue, and may be fixable).
+            try {
+                @SuppressWarnings("unchecked")
+                Class<? extends NoteDao> clazz = 
+                        (Class<? extends NoteDao>) Class.forName(className);
+                return get(clazz);
+            } catch (BadClassException bce) {
+                throw bce;
+            } catch (Exception e) {
+                throw new BadClassException(e);
+            }
         }
-        
-        // Now try reflection to find the class, and throw a checked exception 
-        // if it cannot be instantiated (which should indicate a configuration 
-        // issue, and may be fixable).
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends NoteDao> clazz = 
-                    (Class<? extends NoteDao>) Class.forName(className);
-            return get(clazz);
-        } catch (BadClassException bce) {
-            throw bce;
-        } catch (Exception e) {
-            throw new BadClassException(e);
-        }
+    }
+    
+    /**
+     * Retrieve an instance of an official note DAO.
+     * @param daoEnum Enumeration value of the requested DAO.
+     * @return An instance of the desired note DAO.
+     */
+    public static NoteDao get(OfficialDao daoEnum) throws BadClassException {
+        return get(daoEnum.clazz);
     }
     
     /**

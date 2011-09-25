@@ -3,8 +3,8 @@
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
-package dmh.kuebiko.model;
 
+package dmh.kuebiko.model;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -105,7 +105,7 @@ public abstract class AbstractNoteDaoTest {
     /**
      * Test the note DAO's behavior when adding a new note.
      */
-    @Test(dependsOnMethods = "readNotesEmptyTest")
+    @Test
     public void addNoteTest() throws Exception {
         final NoteDao noteDao = newNoteDao();
         final Note dummyNote = newDummyNote(DUMMY_NOTE_TITLE);
@@ -129,8 +129,7 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when adding two separate notes with the
      * same title. This is not allowed and should fail.
      */
-    @Test(dependsOnMethods = {"readNotesEmptyTest", "addNoteTest"}, 
-            expectedExceptions = ValidationException.class)
+    @Test(expectedExceptions = ValidationException.class)
     public void addTwoNotesWithSameTitleTest() throws Exception {
         final NoteDao noteDao = newNoteDao();
         
@@ -141,7 +140,7 @@ public abstract class AbstractNoteDaoTest {
     /**
      * Test the note DAO's behavior when deleting an existing note.
      */
-    @Test(dependsOnMethods = {"addNoteTest", "readNotesTest"})
+    @Test
     public void deleteNoteTest() throws ValidationException, IOException {
         final int noteCount = 5;
         final NoteDao noteDao = saveDummyNotes(noteCount);
@@ -172,7 +171,7 @@ public abstract class AbstractNoteDaoTest {
     /**
      * Test the note DAO's behavior when updating an existing note.
      */
-    @Test(dependsOnMethods = {"addNoteTest", "readNotesTest"})
+    @Test
     public void updateNoteTest() throws Exception {
         List<Pair<String, String>> changes = Lists.newArrayList();
         changes.add(Pair.of("A New Hope", "The Death Star blows up."));
@@ -236,7 +235,7 @@ public abstract class AbstractNoteDaoTest {
     /**
      * Test the note DAO's behavior when reading all existing notes.
      */
-    @Test(dependsOnMethods = {"addNoteTest", "readNotesEmptyTest"})
+    @Test
     public void readNotesTest() throws ValidationException, IOException {
         int noteCount = 10;
         NoteDao noteDao = saveDummyNotes(noteCount);

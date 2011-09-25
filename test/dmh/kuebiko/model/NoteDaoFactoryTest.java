@@ -29,7 +29,8 @@ public class NoteDaoFactoryTest {
     @Factory
     public Object[] testFactory() {
         return new Object[] { 
-            new InstantiationTest("InMemoryNoteDao", true),
+            new InstantiationTest(InMemoryNoteDao.class.getName(), true),
+            new InstantiationTest(FileSystemNoteDao.class.getName(), true),
             new InstantiationTest("not a real dao", false)
         };
     }
