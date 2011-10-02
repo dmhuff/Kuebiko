@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.model.NoteDao;
+import dmh.kuebiko.model.PersistenceException;
 import dmh.kuebiko.model.ValidationException;
 import dmh.kuebiko.util.NoteTitleFunction;
 
@@ -174,6 +175,8 @@ public class NoteManager {
                 }
             }
         } catch (IOException e) {
+            throw new DataStoreException("Could not read/write notes.", e);
+        } catch (PersistenceException e) {
             throw new DataStoreException("Could not read/write notes.", e);
         } catch (ValidationException e) {
             throw new DataStoreException("Invalid note.", e);

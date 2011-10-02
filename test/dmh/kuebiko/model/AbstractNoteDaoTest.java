@@ -57,7 +57,7 @@ public abstract class AbstractNoteDaoTest {
      * @return A DAO for accessing the created notes.
      */
     private final NoteDao saveDummyNotes(int noteCount)
-    throws ValidationException, IOException {
+    throws ValidationException, PersistenceException {
         final NoteDao noteDao = newNoteDao();
         for (int i = 0; i < noteCount; i++) {
             noteDao.addNote(
@@ -141,7 +141,8 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when deleting an existing note.
      */
     @Test
-    public void deleteNoteTest() throws ValidationException, IOException {
+    public void deleteNoteTest() 
+    throws ValidationException, PersistenceException, IOException {
         final int noteCount = 5;
         final NoteDao noteDao = saveDummyNotes(noteCount);
         
@@ -236,7 +237,8 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when reading all existing notes.
      */
     @Test
-    public void readNotesTest() throws ValidationException, IOException {
+    public void readNotesTest() 
+    throws ValidationException, PersistenceException, IOException {
         int noteCount = 10;
         NoteDao noteDao = saveDummyNotes(noteCount);
         

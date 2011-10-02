@@ -5,18 +5,15 @@
  */
 package dmh.kuebiko.test;
 
-import java.io.IOException;
-
 import org.testng.TestException;
 
-
 import dmh.kuebiko.controller.NoteManager;
+import dmh.kuebiko.model.InMemoryNoteDao;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.model.NoteDao;
 import dmh.kuebiko.model.NoteDaoFactory;
-import dmh.kuebiko.model.InMemoryNoteDao;
+import dmh.kuebiko.model.PersistenceException;
 import dmh.kuebiko.model.ValidationException;
-import dmh.kuebiko.util.BadClassException;
 import dmh.kuebiko.view.NoteTableModel;
 
 /**
@@ -47,7 +44,7 @@ public final class TestHelper {
         final NoteDao noteDao;
         try {
             noteDao = NoteDaoFactory.get(DEFAULT_TEST_NOTE_DAO);
-        } catch (BadClassException e) {
+        } catch (Exception e) {
             throw new TestException("Couldn't instantiate note DAO.", e);
         }
         try {
@@ -73,7 +70,7 @@ public final class TestHelper {
     }
     
     private static void fillNoteDaoWithDummyData(NoteDao dao) 
-    throws ValidationException, IOException {
+    throws ValidationException, PersistenceException {
         final String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
         dao.addNote(newDummyNote("Luke Skywalker", loremIpsum));

@@ -7,6 +7,8 @@
 package dmh.kuebiko.model;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
@@ -19,6 +21,45 @@ import com.google.common.base.Preconditions;
  */
 abstract class AbstractNoteDao implements NoteDao {
     private int noteCount = 0;
+    
+    @Override
+    public Set<DaoParameter> getRequiredParameters() {
+        return null;
+    }
+    
+    /**
+     * Ensure that this DAO's required parameters have been supplied.
+     * @param params The parameters to check.
+     */
+    final void checkParameters(Map<String, String> params) 
+    throws DaoConfigurationException {
+        final Set<DaoParameter> reqParams = getRequiredParameters();
+        if (reqParams == null) {
+            // If nothing is required, then there's no need to go forward.
+            return;
+        }
+        
+        if (params == null) {
+            throw new DaoConfigurationException(
+                    "Parameters are required but none were provided.");
+        }
+        
+        for (DaoParameter reqParam: reqParams) {
+            if (DaoParameter.getParam(params, reqParam) == null) {
+                throw new DaoConfigurationException(
+                        String.format("Parameter [%s] may not be null.", reqParam));
+            }
+        }
+    }
+    
+    @Override
+    public void initialize(Map<String, String> params) throws DaoConfigurationException {
+        if (params != null) {
+            // This indicates a programming error.
+            throw new IllegalArgumentException(String.format(
+                    "Default initialization cannot use parameters [%s].", params));
+        }
+    }
     
     /**
      * Find a note by its ID.
@@ -44,7 +85,8 @@ abstract class AbstractNoteDao implements NoteDao {
     }
     
     @Override
-    public final Note addNote(Note newNote) throws ValidationException {
+    public final Note addNote(Note newNote) 
+    throws ValidationException, PersistenceException {
         Preconditions.checkArgument(newNote.isNew());
         
         if (!isTitleUnique(newNote.getTitle())) {
@@ -63,8 +105,9 @@ abstract class AbstractNoteDao implements NoteDao {
      * Persist a new note to the data store.
      * @param addedNote The new note to persist.
      * @return The added note.
+     * @throws PersistenceException 
      */
-    protected abstract Note persistActionAdd(Note addedNote);
+    protected abstract Note persistActionAdd(Note addedNote) throws PersistenceException;
 
     @Override
     public final void deleteNote(Note deletedNote) {

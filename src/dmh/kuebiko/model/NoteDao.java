@@ -7,6 +7,8 @@ package dmh.kuebiko.model;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for all note data access objects. Exposes basic CRUD operations 
@@ -16,11 +18,24 @@ import java.util.List;
  */
 public interface NoteDao {
     /**
+     * @return A set of parameters that this DAO requires to function. May be null.
+     */
+    public Set<DaoParameter> getRequiredParameters();
+    
+    /**
+     * Initialize the DAO.
+     * @param params A map of parameters that will be used to configure the DAO. 
+     *               The set of needed parameters should be defined by 
+     *               {@link #getRequiredParameters}.
+     */
+    public void initialize(Map<String, String> params) throws DaoConfigurationException;
+    
+    /**
      * Add (create) a new note to the data store.
      * @param newNote The note to add.
      * @return The added note.
      */
-    public Note addNote(Note newNote) throws ValidationException, IOException;
+    public Note addNote(Note newNote) throws ValidationException, PersistenceException;
 
     /**
      * Delete a note from the data store.

@@ -21,9 +21,25 @@ import com.google.common.collect.Lists;
 public class Note implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    /**
+     * Enumeration of possible entity states.
+     */
     public enum State {
-        CLEAN, DELETED, DIRTY, NEW; 
+        /** The entity is an exact and unsullied representation of the data it 
+         *  represents in the data store. */
+        CLEAN, 
+        /** The entity has been marked for deletion. */
+        DELETED, 
+        /** The entity contains data that does not exist in the data store. */
+        DIRTY, 
+        /** The entity has been partially loaded and does not contain all of the
+         *  data in the data store. */
+        HOLLOW, 
+        /** The entity does not exist in the data store. */
+        NEW; 
     }
+
+    private NoteTextLazyLoader loader;
 
     private final int id;
     
@@ -44,6 +60,16 @@ public class Note implements Serializable {
         assignDefaults();
     }
     
+    Note(int id, String title, Date createDate, Date modifiedDate, NoteTextLazyLoader loader) {
+        this(id, State.HOLLOW);
+        this.text = null;
+        
+        this.title = title;
+        this.createDate = createDate;
+        this.modifiedDate = modifiedDate;
+        this.loader = loader;
+    }
+
     Note(int id, String title, String text, Date createDate, Date modifiedDate) {
         this(id, State.CLEAN);
         
@@ -87,15 +113,26 @@ public class Note implements Serializable {
      * the model layer.
      */
     void reset() {
-        state = State.CLEAN;
+        state = State.CLEAN; // XXX should be hollow?
     }
 
     public boolean isNew() {
         return (id == 0 || state == State.NEW);
     }
     
+    public boolean isClean() {
+        return state == State.CLEAN;
+    }
+    
     public boolean isDirty() {
         return state == State.DIRTY;
+    }
+    
+    /**
+     * @return True if this note is {@link Note.State#HOLLOW}.
+     */
+    boolean isHollow() {
+        return state == State.HOLLOW;
     }
 
     @Override
@@ -166,6 +203,11 @@ public class Note implements Serializable {
      * Mark this note as dirty.
      */
     private void markAsDirty() {
+        if (isHollow()) {
+            throw new IllegalStateException(
+                    "Hollow entities cannot be marked as dirty.");
+        }
+        
         if (state != State.NEW) {
             state = State.DIRTY;
         }
@@ -189,10 +231,18 @@ public class Note implements Serializable {
     }
 
     public String getText() {
+        if (isHollow()) {
+            text = loader.loadText(this);
+            state = State.CLEAN;
+        }
         return text;
     }
 
     public void setText(String text) {
+        if (isHollow()) {
+            throw new IllegalStateException("Note is hollow.");
+        }
+        
         markAsDirty();
         this.text = text;
     }

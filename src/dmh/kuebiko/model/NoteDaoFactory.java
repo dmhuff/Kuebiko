@@ -5,6 +5,8 @@
  */
 package dmh.kuebiko.model;
 
+import java.util.Map;
+
 import com.google.common.base.Preconditions;
 
 import dmh.kuebiko.util.BadClassException;
@@ -31,24 +33,33 @@ public final class NoteDaoFactory {
         }
     }
     
+    public static NoteDao get(String className) 
+    throws BadClassException, DaoConfigurationException {
+        return get(className, null);
+    }
+    
     /**
      * Retrieve an instance of a note DAO.
      * @param className The name of the note DAO's class.
+     * @param params A map containing configuration parameters for the DAO.
      * @return An instance of the desired note DAO.
      * @throws BadClassException If the requested class is not an officially 
      *                           supported DAO and it cannot be instantiated.
      */
-    public static NoteDao get(String className) throws BadClassException {
+    public static NoteDao get(String className, Map<String, String> params) 
+    throws BadClassException, DaoConfigurationException {
         Preconditions.checkNotNull(className);
         
         // First try to find the class among the official DAOs.
         try {
-            return get(Enum.valueOf(OfficialDao.class, className));
+            return get(Enum.valueOf(OfficialDao.class, className), params);
         } catch (BadClassException bce) {
             // This indicates a programming error, so throw an unchecked exception.
             throw new IllegalArgumentException(String.format(
                     "Class [%s] is a known class, but it cannot be instantiated.", 
                     className), bce);
+        } catch (DaoConfigurationException dce) {
+            throw dce;
         } catch (Exception ignore) {
             // There was a problem getting an official DAO from the enumeration. 
             // Now try reflection to find the class, and throw a checked 
@@ -58,9 +69,11 @@ public final class NoteDaoFactory {
                 @SuppressWarnings("unchecked")
                 Class<? extends NoteDao> clazz = 
                         (Class<? extends NoteDao>) Class.forName(className);
-                return get(clazz);
+                return get(clazz, params);
             } catch (BadClassException bce) {
                 throw bce;
+            } catch (DaoConfigurationException dce) {
+                throw dce;
             } catch (Exception e) {
                 throw new BadClassException(e);
             }
@@ -72,8 +85,9 @@ public final class NoteDaoFactory {
      * @param daoEnum Enumeration value of the requested DAO.
      * @return An instance of the desired note DAO.
      */
-    public static NoteDao get(OfficialDao daoEnum) throws BadClassException {
-        return get(daoEnum.clazz);
+    private static NoteDao get(OfficialDao daoEnum, Map<String, String> params) 
+    throws BadClassException, DaoConfigurationException {
+        return get(daoEnum.clazz, params);
     }
     
     /**
@@ -81,16 +95,18 @@ public final class NoteDaoFactory {
      * any resulting errors in a custom checked exception.
      * @param clazz The NoteDao class to instantiate.
      * @return An instance of the passed class.
-     * @throws BadClassException If there in an instantiation error. 
      */
-    private static <T extends NoteDao> T get(Class<T> clazz) 
-    throws BadClassException {
+    private static <T extends NoteDao> T get(Class<T> clazz,  Map<String, String> params) 
+    throws BadClassException, DaoConfigurationException {
+        final T dao;
         try {
-            return clazz.newInstance();
+            dao = clazz.newInstance();
+            dao.initialize(params);
         } catch (InstantiationException e) {
             throw new BadClassException(e);
         } catch (IllegalAccessException e) {
             throw new BadClassException(e);
         }
+        return dao;
     }
 }

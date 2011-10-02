@@ -24,7 +24,7 @@ public class InMemoryNoteDaoTest extends AbstractNoteDaoTest {
             Assert.assertTrue(inMemNoteDao instanceof InMemoryNoteDao, 
                     "Factory should return DAO of expected type.");
             return inMemNoteDao;
-        } catch (BadClassException e) {
+        } catch (Exception e) {
             throw new TestException("Couldn't instantiate note DAO.", e);
         }
     }
