@@ -113,7 +113,14 @@ public class Note implements Serializable {
      * the model layer.
      */
     void reset() {
-        state = State.CLEAN; // XXX should be hollow?
+        state = isLazy()? State.HOLLOW : State.CLEAN;
+    }
+    
+    /**
+     * @return True if this entity supports lazy loading.
+     */
+    boolean isLazy() {
+        return (loader != null);
     }
 
     public boolean isNew() {
@@ -232,7 +239,11 @@ public class Note implements Serializable {
 
     public String getText() {
         if (isHollow()) {
-            text = loader.loadText(this);
+            try {
+                text = loader.loadText(this);
+            } catch (PersistenceException e) {
+                throw new RuntimeException(e); // XXX determine what to do with this exception.
+            }
             state = State.CLEAN;
         }
         return text;

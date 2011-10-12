@@ -52,7 +52,7 @@ public class NoteManager {
     private void loadAllNotes() {
         try {
             notes = Lists.newArrayList(noteDao.readNotes());
-        } catch (IOException e) {
+        } catch (PersistenceException e) {
             throw new DataStoreException("Could not read notes.", e);
         }
     }
@@ -174,8 +174,6 @@ public class NoteManager {
                     continue;
                 }
             }
-        } catch (IOException e) {
-            throw new DataStoreException("Could not read/write notes.", e);
         } catch (PersistenceException e) {
             throw new DataStoreException("Could not read/write notes.", e);
         } catch (ValidationException e) {

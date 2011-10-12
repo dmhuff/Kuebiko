@@ -107,13 +107,15 @@ abstract class AbstractNoteDao implements NoteDao {
      * @return The added note.
      * @throws PersistenceException 
      */
-    protected abstract Note persistActionAdd(Note addedNote) throws PersistenceException;
+    protected abstract Note persistActionAdd(Note addedNote) 
+    throws PersistenceException;
 
     @Override
-    public final void deleteNote(Note deletedNote) {
+    public final void deleteNote(Note deletedNote) 
+    throws PersistenceException {
         Preconditions.checkArgument(!deletedNote.isNew());
         
-        final Note foundNote = findNote(deletedNote.getId());
+        final Note foundNote = findNote(deletedNote.getTitle());
         if (foundNote == null) {
             throw new IllegalArgumentException(String.format(
                     "Passed note [%s] does not exist.", deletedNote));
@@ -124,15 +126,18 @@ abstract class AbstractNoteDao implements NoteDao {
     /**
      * Delete a note from the data store.
      * @param deletedNote The note to delete.
+     * @throws PersistenceException 
      */
-    protected abstract void persistActionDelete(Note deletedNote);
+    protected abstract void persistActionDelete(Note deletedNote) 
+    throws PersistenceException;
 
     @Override
-    public final Note updateNote(Note note) {
+    public final Note updateNote(Note note) throws PersistenceException {
         Preconditions.checkArgument(!note.isNew());
         Preconditions.checkArgument(note.isDirty());
         
         Note foundNote = findNote(note.getId());
+//        Note foundNote = findNote(note.getTitle());
         if (foundNote == null) {
             throw new IllegalArgumentException(
                     String.format("Note [%s] not found.", note));
@@ -149,5 +154,6 @@ abstract class AbstractNoteDao implements NoteDao {
      * @param updatedNote The note to update.
      * @return The updated note.
      */
-    protected abstract Note persistActionUpdate(Note updatedNote);
+    protected abstract Note persistActionUpdate(Note updatedNote)
+    throws PersistenceException;
 }

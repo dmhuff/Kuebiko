@@ -23,10 +23,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import dmh.kuebiko.model.Note;
-import dmh.kuebiko.model.NoteDao;
-import dmh.kuebiko.model.ValidationException;
-import dmh.kuebiko.model.Note.State;
 import dmh.kuebiko.util.Pair;
 
 /**
@@ -74,22 +70,22 @@ public abstract class AbstractNoteDaoTest {
      * @return All of the notes in the data store.
      */
     private final List<Note> checkIntegrity(NoteDao noteDao, int expectedNoteCount) 
-    throws IOException {
+    throws PersistenceException {
         final List<Note> allNotes = noteDao.readNotes();
         assertNotNull(allNotes, "Result of readNotes() should never be null.");
         assertEquals(allNotes.size(), expectedNoteCount,
                 "Note count should equal expected value.");
         
-        boolean allClean = true;
+        boolean statesOk = true;
         Set<Integer> ids = Sets.newHashSet();
         Set<String> titles = Sets.newHashSet();
         for (Note note: allNotes) {
-            allClean = (allClean && note.getState() == State.CLEAN);
+            statesOk = (statesOk && (note.isLazy()? note.isHollow() : note.isClean()));
             ids.add(note.getId());
             titles.add(note.getTitle());
         }
         
-        assertTrue(allClean, "Notes should be clean.");
+        assertTrue(statesOk, "Note states should all be clean or hollow.");
         assertEquals(ids.size(), allNotes.size(), "Notes should have unique IDs.");
         assertFalse(ids.contains(0), "No note should have an ID of zero.");
         assertEquals(allNotes.size(), titles.size(), 
@@ -151,7 +147,7 @@ public abstract class AbstractNoteDaoTest {
         final List<Note> allNotes = noteDao.readNotes();
         int deletedNotes = 0;
         for (Note note: ImmutableList.copyOf(allNotes)) {
-            final int deletedId = note.getId();
+            final String deletedTitle = note.getTitle();
             noteDao.deleteNote(note);
             deletedNotes++;
             
@@ -160,7 +156,7 @@ public abstract class AbstractNoteDaoTest {
             assertEquals(remainingNotes.size(), noteCount - deletedNotes, 
                     "Number of notes should be decreased after deletion.");
             for (Note remainingNote: remainingNotes) {
-                assertFalse(deletedId == remainingNote.getId(),
+                assertFalse(deletedTitle.equals(remainingNote.getTitle()),
                         "Deleted note should no longer exist.");
             }
         }
@@ -229,7 +225,7 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when no notes exist.
      */
     @Test
-    public void readNotesEmptyTest() throws IOException {
+    public void readNotesEmptyTest() throws PersistenceException {
         checkIntegrity(newNoteDao(), 0);
     }
 
@@ -237,8 +233,7 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when reading all existing notes.
      */
     @Test
-    public void readNotesTest() 
-    throws ValidationException, PersistenceException, IOException {
+    public void readNotesTest() throws ValidationException, PersistenceException {
         int noteCount = 10;
         NoteDao noteDao = saveDummyNotes(noteCount);
         

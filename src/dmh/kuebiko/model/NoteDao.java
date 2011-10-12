@@ -41,17 +41,17 @@ public interface NoteDao {
      * Delete a note from the data store.
      * @param note The note to delete.
      */
-    public void deleteNote(Note deletedNote) throws IOException;
+    public void deleteNote(Note deletedNote) throws PersistenceException;
 
     /**
      * Update a note in the data store with new data.
      * @param note The new note data.
      * @return The updated note.
      */
-    public Note updateNote(Note updatedNote) throws IOException;
+    public Note updateNote(Note updatedNote) throws PersistenceException;
 
     /**
      * @return A list of all notes in the data store.
      */
-    public List<Note> readNotes() throws IOException;
+    public List<Note> readNotes() throws PersistenceException;
 }
