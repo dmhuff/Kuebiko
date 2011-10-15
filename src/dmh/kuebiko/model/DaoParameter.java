@@ -20,8 +20,8 @@ public enum DaoParameter {
     
     /**
      * Retrieve a string parameter value from a parameter map.
-     * @param paramMap The map containing the desired value. May not be null.
-     * @param paramKey The key of the desired value. May not be null.
+     * @param paramMap The map containing the desired value.
+     * @param paramKey The key of the desired value.
      * @return The requested value, or null if it does not exist.
      */
     public static String getParam(Map<String, String> paramMap, DaoParameter paramKey) {
