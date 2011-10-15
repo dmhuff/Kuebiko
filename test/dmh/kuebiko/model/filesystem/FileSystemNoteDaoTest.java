@@ -4,7 +4,7 @@
  * TODO license info.
  */
 
-package dmh.kuebiko.model;
+package dmh.kuebiko.model.filesystem;
 
 import static dmh.kuebiko.test.TestHelper.newDummyNote;
 import static org.testng.Assert.assertEquals;
@@ -27,6 +27,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
+import dmh.kuebiko.model.AbstractNoteDaoTest;
+import dmh.kuebiko.model.DaoConfigurationException;
+import dmh.kuebiko.model.DaoParameter;
+import dmh.kuebiko.model.Note;
+import dmh.kuebiko.model.NoteDao;
+import dmh.kuebiko.model.NoteDaoFactory;
+import dmh.kuebiko.model.filesystem.FileSystemNoteDao;
+import dmh.kuebiko.model.filesystem.NoteFileUtil;
 import dmh.kuebiko.test.TestHelper;
 import dmh.kuebiko.util.BadClassException;
 
@@ -66,7 +74,7 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
     }
 
     @Override
-    NoteDao newNoteDao() {
+    protected NoteDao newNoteDao() {
         try {
             NoteDao noteDao = NoteDaoFactory.get(FileSystemNoteDao.class.getName(), params);
             Assert.assertTrue(noteDao instanceof FileSystemNoteDao, 
@@ -111,7 +119,7 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
         final File[] dataFiles = tempDir.listFiles();
         assertEquals(dataFiles.length, 1, "One note should exist.");
         assertEquals(dataFiles[0].getName(), 
-                String.format("%s.%s", dummyTitle, FileSystemNoteDao.FILE_EXTENSION), 
+                String.format("%s.%s", dummyTitle, NoteFileUtil.FILE_EXTENSION), 
                 "Note's name should use expected title.");
         
         // Test reading and lazy loading.

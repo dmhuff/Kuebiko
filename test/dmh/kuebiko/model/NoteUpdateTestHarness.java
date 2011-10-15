@@ -61,24 +61,35 @@ abstract class NoteUpdateTestHarness {
         }
     }
 
+    /**
+     * Perform validations on a note after it has been updated.
+     * @param updatedNote The updated note to validate.
+     */
     void afterUpdate(Note updatedNote) {
+        // Validate the note's state.
         assertNotNull(updatedNote, "Note cannot be null.");
         assertEquals(updatedNote.getState(), State.CLEAN, "Note should be clean.");
         assertFalse(updatedNote.isNew(), "Note should not be new.");
+        
+        // Validate the note's audit dates (note: create date is not universally
+        // supported, in which case the create date value will be null).
         assertEquals(updatedNote.getCreateDate(), origCreateDate, 
                 "Create date should not change.");
+        assertNotNull(updatedNote.getModifiedDate(), "Modified date should be set.");
+        
+        if (updatedNote.getCreateDate() != null) {
+            assertTrue(updatedNote.getModifiedDate().after(updatedNote.getCreateDate()), 
+                    "Modified date should be after create date.");
+        }
+        
         if (origIsNew) {
             assertFalse(updatedNote.getId() == origId, 
                     "Note should have different ID assigned.");
-            assertNotNull(updatedNote.getModifiedDate(), 
-                    "Modified date should be set.");
         } else {
             assertEquals(updatedNote.getId(), origId, "Note should have same ID.");
             assertTrue(updatedNote.getModifiedDate().after(origModifiedDate), 
                     "Modified date should be after original.");
         }
-        assertTrue(updatedNote.getModifiedDate().after(updatedNote.getCreateDate()), 
-                "Modified date should be after create date.");
     }
 
     abstract Note performUpdate(Note testNote) throws Exception;

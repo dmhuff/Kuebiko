@@ -19,6 +19,8 @@ import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import dmh.kuebiko.model.filesystem.FileSystemNoteDao;
+
 /**
  * Test class for NoteDaoFactory.
  * @see NoteDaoFactory

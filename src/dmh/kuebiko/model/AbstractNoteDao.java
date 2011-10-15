@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
  *
  * @author davehuffman
  */
-abstract class AbstractNoteDao implements NoteDao {
+public abstract class AbstractNoteDao implements NoteDao {
     private int noteCount = 0;
     
     @Override
@@ -31,7 +31,7 @@ abstract class AbstractNoteDao implements NoteDao {
      * Ensure that this DAO's required parameters have been supplied.
      * @param params The parameters to check.
      */
-    final void checkParameters(Map<String, String> params) 
+    protected final void checkParameters(Map<String, String> params) 
     throws DaoConfigurationException {
         final Set<DaoParameter> reqParams = getRequiredParameters();
         if (reqParams == null) {
@@ -50,6 +50,19 @@ abstract class AbstractNoteDao implements NoteDao {
                         String.format("Parameter [%s] may not be null.", reqParam));
             }
         }
+    }
+    
+    /**
+     * Note entity factory.
+     * @param id The note's ID.
+     * @param title The note's title.
+     * @param createDate The note's create date.
+     * @param modifiedDate The note's modified date.
+     * @param loader A lazy loader for the note data.
+     * @return A new note from the passed data.
+     */
+    protected final Note newNote(int id, String title, Date createDate, Date modifiedDate, NoteTextLazyLoader loader) {
+        return new Note(id++, title, createDate, modifiedDate, loader);
     }
     
     @Override

@@ -18,7 +18,7 @@ import dmh.kuebiko.util.BadClassException;
  */
 public class InMemoryNoteDaoTest extends AbstractNoteDaoTest {
     @Override
-    NoteDao newNoteDao() {
+    protected NoteDao newNoteDao() {
         try {
             NoteDao inMemNoteDao = NoteDaoFactory.get(InMemoryNoteDao.class.getName());
             Assert.assertTrue(inMemNoteDao instanceof InMemoryNoteDao, 

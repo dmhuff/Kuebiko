@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.google.common.base.Preconditions;
 
+import dmh.kuebiko.model.filesystem.FileSystemNoteDao;
 import dmh.kuebiko.util.BadClassException;
 
 /**

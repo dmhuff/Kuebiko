@@ -96,7 +96,7 @@ public abstract class AbstractNoteDaoTest {
     /**
      * @return A new instance of a note DAO.
      */
-    abstract NoteDao newNoteDao();
+    protected abstract NoteDao newNoteDao();
 
     /**
      * Test the note DAO's behavior when adding a new note.
