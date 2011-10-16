@@ -88,18 +88,6 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         return noteCache.getNotes();
     }
 
-    /**
-     * Retrieve all of the IDs for notes in the cache, reloading the cache if 
-     * it has been reset.
-     * @return IDs for all known notes.
-     */
-    private Set<Integer> getNoteIdsFromCache() {
-        if (noteCache == null) {
-            loadNotes();
-        }
-        return noteCache.getIds();
-    }
-
     @Override
     public List<Note> readNotes() throws PersistenceException {
         try {

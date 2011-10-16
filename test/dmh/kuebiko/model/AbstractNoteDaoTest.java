@@ -11,7 +11,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -196,8 +195,7 @@ public abstract class AbstractNoteDaoTest {
      * Test the note DAO's behavior when deleting an existing note.
      */
     @Test
-    public void deleteNoteTest() 
-    throws ValidationException, PersistenceException, IOException {
+    public void deleteNoteTest() throws ValidationException, PersistenceException {
         final int noteCount = 5;
         final NoteDao noteDao = saveDummyNotes(noteCount);
         

@@ -7,8 +7,8 @@ package dmh.kuebiko.model.filesystem;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -23,25 +23,12 @@ import dmh.kuebiko.model.Note;
  */
 class FileSystemNoteCache {
     /**
-     * The state of the data in the cache.
-     */
-    private static enum State { 
-        /** The cache is up-to-date with the data in the file system. */
-        CURRENT, 
-        /** The cache is empty and has not been loaded with data (the initial state). */
-        EMPTY, 
-        /** The cache has been reset, meaning it once contained data but needs 
-         *  to be reloaded from the file system. */
-        RESET
-    }
-    
-    /**
      * Immutable value object for representing a note and its corresponding 
      * storage file in the cache.
      */
     private static class CacheItem {
-        final File file;
-        final Note note;
+        private final File file;
+        private final Note note;
         
         public CacheItem(File file, Note note) {
             this.file = file;
@@ -49,6 +36,7 @@ class FileSystemNoteCache {
         }
     }
     
+    /** Function for extracting a note from a cache item. */
     private final static Function<CacheItem, Note> NOTE_FN = 
             new Function<CacheItem, Note>() {
                 @Override
@@ -56,7 +44,6 @@ class FileSystemNoteCache {
                     return input.note;
                 }};
     
-    private State state = State.EMPTY;
     private final Map<Integer, CacheItem> data;
     
     /**
@@ -68,34 +55,12 @@ class FileSystemNoteCache {
     }
 
     /**
-     * Reset the data in the cache. Subsequent calls to read data from the cache
-     * will cause it to be refilled with data from the file system.
-     */
-//    void reset() {
-//        state = State.RESET;
-//        data.clear();
-//    }
-    
-//    boolean isEmpty() {
-//        // Don't rely on the number of items in the cache, as it could by 
-//        // physically empty after a client calls reset().
-//        return state == State.EMPTY;
-//    }
-
-    /**
      * Add a note to the cache. 
-//     * This method may not be called after resetting 
-//     * the cache and before reloading its contents.
      * @param id The note's unique ID.
      * @param noteFile The file representing the note.
      * @param note The note itself.
      */
     void put(int id, File noteFile, Note note) {
-//        if (state == State.RESET) {
-//            throw new IllegalStateException(
-//                    "Data cannot be added immediately after a reset");
-//        }
-        
         data.put(id, new CacheItem(noteFile, note));
     }
     
@@ -105,10 +70,6 @@ class FileSystemNoteCache {
      */
     public void remove(int id) {
         data.remove(id);
-    }
-    
-    public Set<Integer> getIds() {
-        return data.keySet();
     }
     
     /**
@@ -122,11 +83,10 @@ class FileSystemNoteCache {
     }
 
     /**
-//     * Retrieve all of the notes in the cache. If the cache has been reset, 
-//     * the notes will be loaded from the file system.
-     * @return All of the notes in the cache.
+     * @return An immutable view of the notes in the cache.
      */
     Collection<Note> getNotes() {
-        return Collections2.transform(data.values(), NOTE_FN);
+        return Collections.unmodifiableCollection(
+                Collections2.transform(data.values(), NOTE_FN));
     }
 }

@@ -65,7 +65,7 @@ public class NoteFrame extends JFrame {
     private static enum Mode { SEARCH, EDIT }
     
     /** XXX consider moving to a utility class. */
-    private class NoteFrameObservable extends Observable {
+    private static class NoteFrameObservable extends Observable {
         private void setChangedAndNotify() {
             setChangedAndNotify(null);
         }
@@ -84,7 +84,7 @@ public class NoteFrame extends JFrame {
     
     private Mode mode;
     
-    private final ActionManager actionMngr = new ActionManager();
+    private final transient ActionManager actionMngr = new ActionManager();
     
     private final NoteFrameObservable observable = new NoteFrameObservable();
     

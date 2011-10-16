@@ -39,7 +39,7 @@ public class Note implements Serializable {
         NEW; 
     }
 
-    private NoteTextLazyLoader loader;
+    private transient NoteTextLazyLoader loader;
 
     private final int id;
     

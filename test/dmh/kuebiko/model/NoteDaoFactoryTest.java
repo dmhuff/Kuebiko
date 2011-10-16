@@ -48,7 +48,7 @@ public class NoteDaoFactoryTest {
         @Test
         public void getTest() {
             boolean succeed = true;
-            Object dao = null;
+            NoteDao dao = null;
             try {
                 dao = ignoreParams? NoteDaoFactory.get(className) 
                         : NoteDaoFactory.get(className, params);
@@ -59,8 +59,6 @@ public class NoteDaoFactoryTest {
             assertEquals(shouldSucceed, succeed, "Should match expectation of success.");
             if (shouldSucceed) {
                 assertNotNull(dao, "Factory should return an object.");
-                assertTrue(dao instanceof NoteDao, 
-                        "Factory should return an instance of NoteDao.");
             }
         }
     }
