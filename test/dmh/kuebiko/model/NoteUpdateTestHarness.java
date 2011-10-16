@@ -68,8 +68,11 @@ abstract class NoteUpdateTestHarness {
     void afterUpdate(Note updatedNote) {
         // Validate the note's state.
         assertNotNull(updatedNote, "Note cannot be null.");
-        assertEquals(updatedNote.getState(), State.CLEAN, "Note should be clean.");
         assertFalse(updatedNote.isNew(), "Note should not be new.");
+        
+        State expectedState = updatedNote.isLazy()? State.HOLLOW : State.CLEAN;
+        assertEquals(updatedNote.getState(), expectedState, 
+                String.format("Note should be [%s].", expectedState));
         
         // Validate the note's audit dates (note: create date is not universally
         // supported, in which case the create date value will be null).

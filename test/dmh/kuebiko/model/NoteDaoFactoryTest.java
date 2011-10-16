@@ -16,7 +16,6 @@ import java.util.Map;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import dmh.kuebiko.model.filesystem.FileSystemNoteDao;
@@ -66,19 +65,15 @@ public class NoteDaoFactoryTest {
         }
     }
     
-    
-    
     @Factory
     public Object[] testFactory() {
         final Map<String, String> emptyParamMap = Maps.newHashMap();
         return new Object[] { 
             new InstantiationTest(InMemoryNoteDao.class.getName(), true),
-            new InstantiationTest(InMemoryNoteDao.class.getName(), emptyParamMap, false),
+            new InstantiationTest(InMemoryNoteDao.class.getName(), emptyParamMap, true),
 
             new InstantiationTest(FileSystemNoteDao.class.getName(), false),
             new InstantiationTest(FileSystemNoteDao.class.getName(), emptyParamMap, false),
-//            new InstantiationTest(FileSystemNoteDao.class.getName(), 
-//                    ImmutableMap.of(DaoParameter.DIRECTORY.toString(), "foobar"), false),
             
             new InstantiationTest("not a real dao", false)
         };

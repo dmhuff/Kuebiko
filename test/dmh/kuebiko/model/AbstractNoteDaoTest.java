@@ -13,6 +13,8 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.testng.TestException;
@@ -21,6 +23,7 @@ import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import dmh.kuebiko.util.Pair;
@@ -62,6 +65,19 @@ public abstract class AbstractNoteDaoTest {
         return noteDao;
     }
     
+    @Test
+    public final void getUniqueIdTest() {
+        final AbstractNoteDao noteDao = newNoteDao();
+        final int expectedSize = 10;
+
+        Set<Integer> ids = Sets.newHashSetWithExpectedSize(10);
+        for (int i = 0; i < expectedSize; i++) {
+            ids.add(noteDao.getUniqueId());
+        }
+        
+        assertEquals(ids.size(), expectedSize, "All IDs must be unique.");
+    }
+    
     /**
      * Helper method; reads all of the notes in the data store and insures the 
      * integrity of the data.
@@ -69,13 +85,14 @@ public abstract class AbstractNoteDaoTest {
      * @param expectedNoteCount The expected number of notes in the data store.
      * @return All of the notes in the data store.
      */
-    private final List<Note> checkIntegrity(NoteDao noteDao, int expectedNoteCount) 
+    protected final List<Note> checkIntegrity(NoteDao noteDao, int expectedNoteCount) 
     throws PersistenceException {
         final List<Note> allNotes = noteDao.readNotes();
         assertNotNull(allNotes, "Result of readNotes() should never be null.");
         assertEquals(allNotes.size(), expectedNoteCount,
                 "Note count should equal expected value.");
         
+        // Loop through the notes and collect data.
         boolean statesOk = true;
         Set<Integer> ids = Sets.newHashSet();
         Set<String> titles = Sets.newHashSet();
@@ -83,6 +100,10 @@ public abstract class AbstractNoteDaoTest {
             statesOk = (statesOk && (note.isLazy()? note.isHollow() : note.isClean()));
             ids.add(note.getId());
             titles.add(note.getTitle());
+        }
+        
+        if (noteDao instanceof AbstractNoteDao) {
+            checkIds((AbstractNoteDao) noteDao);
         }
         
         assertTrue(statesOk, "Note states should all be clean or hollow.");
@@ -93,10 +114,24 @@ public abstract class AbstractNoteDaoTest {
         return allNotes;
     }
     
+    protected final void checkIds(AbstractNoteDao noteDao) throws PersistenceException {
+        final List<Note> allNotes = noteDao.readNotes();
+        
+        Map<Integer, Note> noteMap = Maps.newHashMap();
+        for (Note note: allNotes) {
+            noteMap.put(note.getId(), note);
+        }
+        
+        for (Entry<Integer, Note> noteEntry: noteMap.entrySet()) {
+            assertEquals(noteEntry.getValue(), noteDao.findNote(noteEntry.getKey()),
+                    "Note IDs should match.");
+        }
+    }
+    
     /**
      * @return A new instance of a note DAO.
      */
-    protected abstract NoteDao newNoteDao();
+    protected abstract AbstractNoteDao newNoteDao();
 
     /**
      * Test the note DAO's behavior when adding a new note.
@@ -110,7 +145,8 @@ public abstract class AbstractNoteDaoTest {
             @Override
             Note performUpdate(Note testNote) throws Exception {
                 return noteDao.addNote(testNote);
-            }}.runTest();
+            }
+        }.runTest();
         
         final List<Note> allNotes = noteDao.readNotes();
         assertNotNull(allNotes, "Result of readNotes() should never be null.");
@@ -119,6 +155,29 @@ public abstract class AbstractNoteDaoTest {
         final Note onlyNote = Iterables.getOnlyElement(allNotes);
         assertEquals(onlyNote.getTitle(), DUMMY_NOTE_TITLE,
                 "Only note should be the one added.");
+    }
+    
+    /**
+     * Test the note DAO's behavior when adding several notes.
+     */
+    @Test
+    public void addMultipleNotesTest() throws Exception {
+        final int noteCount = 5;
+        final NoteDao noteDao = newNoteDao();
+        
+        for (int i = 0; i < noteCount; i++) {
+            new NoteUpdateTestHarness(newDummyNote("foobar_" + i)) {
+                @Override
+                Note performUpdate(Note testNote) throws Exception {
+                    return noteDao.addNote(testNote);
+                }
+            }.runTest();
+        }
+        
+        final List<Note> allNotes = noteDao.readNotes();
+        assertNotNull(allNotes, "Result of readNotes() should never be null.");
+        assertEquals(allNotes.size(), noteCount, 
+                "There should the expected number of notes.");
     }
     
     /**
@@ -196,7 +255,8 @@ public abstract class AbstractNoteDaoTest {
                 @Override
                 Note performUpdate(Note testNote) throws Exception {
                     return noteDao.updateNote(origNote);
-                }}.runTest();
+                }
+            }.runTest();
             
             Note updatedNote = null;
             for (Note note: noteDao.readNotes()) {

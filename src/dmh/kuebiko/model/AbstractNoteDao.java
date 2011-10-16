@@ -20,21 +20,43 @@ import com.google.common.base.Preconditions;
  * @author davehuffman
  */
 public abstract class AbstractNoteDao implements NoteDao {
-    private int noteCount = 0;
+    private final Set<DaoParameter> requiredParameters;
     
-    @Override
-    public Set<DaoParameter> getRequiredParameters() {
-        return null;
+    protected Map<String, String> params;
+    
+    protected AbstractNoteDao() {
+        this(null);
     }
     
+    protected AbstractNoteDao(Set<DaoParameter> requiredParameters) {
+        this.requiredParameters = requiredParameters;
+    }
+    
+    @Override
+    public final void initialize(Map<String, String> params) 
+    throws DaoConfigurationException {
+        this.params = params;
+        checkParameters();
+        
+        postInitialize();
+    }
+    
+    /**
+     * Perform any custom initialization that needs to happen after 
+     * {@link #initialize(Map)}.
+     * @throws DaoConfigurationException May be thrown by client subclasses.
+     */
+    protected void postInitialize() throws DaoConfigurationException {
+        // By default, do nothing.
+    }
+
     /**
      * Ensure that this DAO's required parameters have been supplied.
      * @param params The parameters to check.
      */
-    protected final void checkParameters(Map<String, String> params) 
+    protected final void checkParameters() 
     throws DaoConfigurationException {
-        final Set<DaoParameter> reqParams = getRequiredParameters();
-        if (reqParams == null) {
+        if (requiredParameters == null || requiredParameters.isEmpty()) {
             // If nothing is required, then there's no need to go forward.
             return;
         }
@@ -44,36 +66,47 @@ public abstract class AbstractNoteDao implements NoteDao {
                     "Parameters are required but none were provided.");
         }
         
-        for (DaoParameter reqParam: reqParams) {
-            if (DaoParameter.getParam(params, reqParam) == null) {
+        for (DaoParameter reqParam: requiredParameters) {
+            if (getParameter(reqParam) == null) {
                 throw new DaoConfigurationException(
-                        String.format("Parameter [%s] may not be null.", reqParam));
+                        String.format("Parameter [%s] is required.", reqParam));
             }
         }
     }
     
     /**
-     * Note entity factory.
-     * @param id The note's ID.
+     * Retrieve a parameter value by its key.
+     * @param paramKey A parameter key.
+     * @return The parameter mapped to the passed key, or null if none exists.
+     */
+    protected final String getParameter(DaoParameter paramKey) {
+        return DaoParameter.getParameter(params, paramKey);
+    }
+    
+    /**
+     * Note entity factory. Creates a new note.
      * @param title The note's title.
      * @param createDate The note's create date.
      * @param modifiedDate The note's modified date.
      * @param loader A lazy loader for the note data.
      * @return A new note from the passed data.
      */
-    protected final Note newNote(int id, String title, Date createDate, Date modifiedDate, NoteTextLazyLoader loader) {
-        return new Note(id++, title, createDate, modifiedDate, loader);
+    protected final Note newNote(String title, Date createDate, Date modifiedDate, 
+            NoteTextLazyLoader loader) {
+        return new Note(getUniqueId(), title, createDate, modifiedDate, loader);
     }
     
-    @Override
-    public void initialize(Map<String, String> params) throws DaoConfigurationException {
-        if (params != null) {
-            // This indicates a programming error.
-            throw new IllegalArgumentException(String.format(
-                    "Default initialization cannot use parameters [%s].", params));
-        }
+    /**
+     * Note entity factory. Makes a hollow copy of a source note.
+     * @param source The note to copy.
+     * @param loader A lazy loader for the new hollow note.
+     * @return A hollow copy of the passed note.
+     */
+    protected final Note copyNote(Note source, NoteTextLazyLoader loader) {
+        return new Note(source.getId(), source.getTitle(), 
+                source.getCreateDate(), source.getModifiedDate(), loader);
     }
-    
+
     /**
      * Find a note by its ID.
      * @param id The ID of the note to find.
@@ -107,13 +140,18 @@ public abstract class AbstractNoteDao implements NoteDao {
                     "A note with title [%s] already exists.", newNote.getTitle()));
         }
         
-        Note addedNote = new Note(++noteCount, newNote);
+        Note addedNote = new Note(getUniqueId(), newNote);
         addedNote.setModifiedDate(new Date());
         addedNote.reset();
         
         return persistActionAdd(addedNote);
     }
     
+    /**
+     * @return An ID that is unused by any existing note.
+     */
+    protected abstract int getUniqueId();
+
     /**
      * Persist a new note to the data store.
      * @param addedNote The new note to persist.
@@ -128,7 +166,7 @@ public abstract class AbstractNoteDao implements NoteDao {
     throws PersistenceException {
         Preconditions.checkArgument(!deletedNote.isNew());
         
-        final Note foundNote = findNote(deletedNote.getTitle());
+        final Note foundNote = findNote(deletedNote.getId());
         if (foundNote == null) {
             throw new IllegalArgumentException(String.format(
                     "Passed note [%s] does not exist.", deletedNote));

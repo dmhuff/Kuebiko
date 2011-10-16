@@ -8,6 +8,7 @@ package dmh.kuebiko.model.filesystem;
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -104,6 +105,10 @@ class FileSystemNoteCache {
      */
     public void remove(int id) {
         data.remove(id);
+    }
+    
+    public Set<Integer> getIds() {
+        return data.keySet();
     }
     
     /**

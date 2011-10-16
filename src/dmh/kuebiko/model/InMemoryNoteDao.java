@@ -17,7 +17,8 @@ import com.google.common.collect.Lists;
  * @author davehuffman
  */
 public class InMemoryNoteDao extends AbstractNoteDao {
-    /** A list of notes, which acts as a data store for note. */
+    private int noteCount = 0;
+    /** A list of notes, which acts as a data store for notes. */
     private final List<Note> notes = Lists.newArrayList();
     
     @Override
@@ -38,6 +39,11 @@ public class InMemoryNoteDao extends AbstractNoteDao {
             }
         }
         return null;
+    }
+    
+    @Override
+    protected int getUniqueId() {
+        return ++noteCount;
     }
 
     @Override

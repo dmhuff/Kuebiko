@@ -9,8 +9,6 @@ package dmh.kuebiko.model;
 import org.testng.Assert;
 import org.testng.TestException;
 
-import dmh.kuebiko.util.BadClassException;
-
 /**
  * TestNG test class for {@link InMemoryNoteDao}.
  *
@@ -18,12 +16,12 @@ import dmh.kuebiko.util.BadClassException;
  */
 public class InMemoryNoteDaoTest extends AbstractNoteDaoTest {
     @Override
-    protected NoteDao newNoteDao() {
+    protected AbstractNoteDao newNoteDao() {
         try {
             NoteDao inMemNoteDao = NoteDaoFactory.get(InMemoryNoteDao.class.getName());
             Assert.assertTrue(inMemNoteDao instanceof InMemoryNoteDao, 
                     "Factory should return DAO of expected type.");
-            return inMemNoteDao;
+            return (AbstractNoteDao) inMemNoteDao;
         } catch (Exception e) {
             throw new TestException("Couldn't instantiate note DAO.", e);
         }
