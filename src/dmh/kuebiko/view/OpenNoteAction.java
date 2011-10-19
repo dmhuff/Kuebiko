@@ -1,46 +1,47 @@
 /**
- * Kuebiko - SaveStackAction.java
+ * Kuebiko - OpenNoteAction.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
 package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import dmh.kuebiko.util.AbstractActionObserver;
+
 /**
- * Swing action for saving a stack of notes.
+ * Swing action for opening a note in the current stack.
  *
  * @author davehuffman
  */
-public class SaveStackAction extends UnimplementedAction {
+class OpenNoteAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
     
     private final NoteFrame noteFrame;
     
-    public SaveStackAction(NoteFrame noteFrame) {
-        super("Save Stack"); // TODO i18n.
+    OpenNoteAction(NoteFrame noteFrame) {
+        super("Open Note"); // TODO i18n.
         this.noteFrame = noteFrame;
         
-        putValue(SHORT_DESCRIPTION, "Save a stack of notes."); // TODO i18n.
+        putValue(SHORT_DESCRIPTION, "Open a note in the stack."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_S, InputEvent.META_MASK));
-        putValue(MNEMONIC_KEY, KeyEvent.VK_S);
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_L, InputEvent.META_MASK));
+        putValue(MNEMONIC_KEY, KeyEvent.VK_L);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Synchronize the current note before saving.
-        noteFrame.getNotePanel().syncNote();
-        noteFrame.getNoteMngr().saveAll();
+        noteFrame.getSearchText().requestFocus();
     }
-    
+
     @Override
     public void update(Observable o, Object arg) {
-        // Do noting.
+        // Do nothing for now; there's no need for this action to handle updates.
     }
 }

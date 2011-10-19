@@ -16,7 +16,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.model.NoteDao;
 import dmh.kuebiko.model.PersistenceException;
@@ -77,6 +76,10 @@ public class NoteManager {
         return notes.isEmpty();
     }
     
+    public boolean doesNoteExist(String title) {
+        return getNoteTitles().contains(title);
+    }
+    
     public int getNoteCount() {
         return notes.size();
     }
@@ -111,7 +114,7 @@ public class NoteManager {
                             }
                         });
         
-        if (defaultTitles.size() == 0) {
+        if (defaultTitles.isEmpty()) {
             return DEFAULT_NOTE_TITLE;
         }
         
@@ -129,7 +132,7 @@ public class NoteManager {
             }
         }
         String title = String.format("%s %d", DEFAULT_NOTE_TITLE, maxSuffix + 1);
-        Main.log("genUniqueNoteTitle(); #=> [%s].", title);
+//        Main.log("genUniqueNoteTitle(); #=> [%s].", title);
         return title;
     }
     

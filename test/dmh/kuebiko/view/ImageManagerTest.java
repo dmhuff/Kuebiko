@@ -9,16 +9,23 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 
 import java.awt.Image;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
+import org.apache.commons.io.FilenameUtils;
 import org.testng.annotations.Test;
 
-import dmh.kuebiko.view.ImageManager;
-import dmh.kuebiko.view.ImageManager.AppImage;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+
 import dmh.kuebiko.view.ImageManager.ImageSize;
 
 /**
- * TestNG test class for the ImageManager class.
- * @see dmh.kuebiko.view.ImageManager
+ * TestNG test class for {@link dmh.kuebiko.view.ImageManager}
  *
  * @author davehuffman
  */
@@ -30,10 +37,13 @@ public class ImageManagerTest {
     }
     
     @Test
-    public void getImageTest() {
+    public void getImageTest() throws Exception {
         for (ImageSize size: ImageSize.values()) {
             ImageManager.get().setDefaultSize(size);
-            for (AppImage imageId: AppImage.values()) {
+            
+            Collection<String> imageIds = getImageIds(size);
+            
+            for (String imageId: imageIds) {
                 final Image image = ImageManager.get().getImage(imageId);
 
                 assertNotNull(image, "Return value should not be null.");
@@ -41,5 +51,31 @@ public class ImageManagerTest {
                         "Buffering should return same object for same ID.");
             }
         }
+    }
+
+    /**
+     * Retrieve a list of all known image ID strings of a particular size.
+     * @param size The size of the requested images.
+     * @return A list of valid image IDs.
+     */
+    private Collection<String> getImageIds(ImageSize size)
+    throws URISyntaxException {
+        String path = String.format("images/%s/",
+                size.toString().toLowerCase());
+        File imageDir = new File(getClass().getResource(path).toURI());
+        
+        Collection<String> imageIds = Lists.newArrayList(Collections2.transform(
+                Arrays.asList(imageDir.list()), 
+                new Function<String, String>() {
+                    @Override
+                    public String apply(String input) {
+                        return "png".equals(FilenameUtils.getExtension(input))? 
+                                FilenameUtils.removeExtension(input)
+                                : "";
+                    }
+                }));
+        imageIds.removeAll(Collections.singleton(""));
+        
+        return imageIds;
     }
 }

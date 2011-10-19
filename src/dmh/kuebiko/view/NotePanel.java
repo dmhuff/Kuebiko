@@ -26,7 +26,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -40,11 +39,11 @@ import javax.swing.text.Element;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
-import dmh.kuebiko.view.ImageManager.AppImage;
 
 /**
  * UI panel for displaying and editing notes.
@@ -106,7 +105,6 @@ class NotePanel extends JPanel {
     }
     
     private final CardLayout cardLayout = new CardLayout();
-    private final JToolBar editToolBar = new JToolBar();
     private final JEditorPane noteTextArea = new JEditorPane("text/html", "");
     
     /** The currently selected note. */
@@ -138,9 +136,8 @@ class NotePanel extends JPanel {
         noteTextScrollPane.setBorder(null);
         noteTextScrollPane.setViewportView(noteTextArea);
         
-        editToolBar.setFocusable(false);
-        editToolBar.setFloatable(false);
-        editNotePanel.add(editToolBar, BorderLayout.NORTH);
+        // Edit Tool Bar.
+        editNotePanel.add(buildEditToolBar(), BorderLayout.NORTH);
     }
     
     /**
@@ -148,8 +145,6 @@ class NotePanel extends JPanel {
      * initialize() method so that the GUI builder doesn't mess with it.
      */
     private void additionalSetup() {
-        // Edit Tool Bar.
-        buildEditToolBar();
         
         // Note Editor Pane.
         noteTextArea.addCaretListener(new TextStyleCaretListener());
@@ -183,6 +178,7 @@ class NotePanel extends JPanel {
                     }
                 });
         
+        noteTextArea.setDocument(new HTMLDocument());
         
         // By default, no note should be displayed.
         setNote(null);
@@ -191,47 +187,67 @@ class NotePanel extends JPanel {
     /**
      * 
      */
-    private void buildEditToolBar() {
+    private JToolBar buildEditToolBar() {
+        JToolBar editToolBar = new JToolBar();
+        editToolBar.setFocusable(false);
+        editToolBar.setFloatable(false);
+        
         // Font.
-        editToolBar.add(new JComboBox(new String[] { "Font" })); // TODO implement.
-        editToolBar.add(new JComboBox(new String[] { "Size" })); // TODO implement.
-        editToolBar.add(newBtn(AppImage.FONT_SIZE_DOWN, TextAction.FONT_SIZE_SMALLER));
-        editToolBar.add(newBtn(AppImage.FONT_SIZE_UP, TextAction.FONT_SIZE_BIGGER));
-        JButton colorButton = newBtn(AppImage.COLOR, TextAction.FONT_COLOR);
-        colorButton.setAction(new StyledEditorKit.ForegroundAction(HTMLEditorKit.COLOR_ACTION, Color.GREEN));
-        editToolBar.add(colorButton);
-        editToolBar.add(new JSeparator());
+        if (Main.POST_0_1_RELEASE) {
+            editToolBar.add(new JComboBox(new String[] { "Font" })); // TODO implement.
+            editToolBar.add(new JComboBox(new String[] { "Size" })); // TODO implement.
+        }
+        editToolBar.add(newBtn("FONT_SIZE_DOWN", TextAction.FONT_SIZE_SMALLER));
+        editToolBar.add(newBtn("FONT_SIZE_UP", TextAction.FONT_SIZE_BIGGER));
+        if (Main.POST_0_1_RELEASE) {
+            JButton colorButton = newBtn("COLOR", TextAction.FONT_COLOR);
+            colorButton.setAction(new StyledEditorKit.ForegroundAction(HTMLEditorKit.COLOR_ACTION, Color.GREEN));
+            editToolBar.add(colorButton);
+        }
+        editToolBar.addSeparator();
         
         // Style.
-        editToolBar.add(newTogBtn(AppImage.BOLD, TextAction.STYLE_BOLD));
-        editToolBar.add(newTogBtn(AppImage.ITALIC, TextAction.STYLE_ITALIC));
-        editToolBar.add(newTogBtn(AppImage.UNDERLINE, TextAction.STYLE_UNDERLINE));
-        editToolBar.add(newTogBtn(AppImage.STRIKETHROUGH, TextAction.STYLE_STRIKETHROUGH)); // TODO implement.
-        editToolBar.add(new JSeparator());
+        editToolBar.add(newTogBtn("bold", TextAction.STYLE_BOLD));
+        editToolBar.add(newTogBtn("italic", TextAction.STYLE_ITALIC));
+        editToolBar.add(newTogBtn("underline", TextAction.STYLE_UNDERLINE));
+        if (Main.POST_0_1_RELEASE) {
+            editToolBar.add(newTogBtn("strikethrough", TextAction.STYLE_STRIKETHROUGH)); // TODO implement.
+        }
+        editToolBar.addSeparator();
         
         // Alignment.
-        editToolBar.add(newTogBtn(AppImage.ALIGN_LEFT, TextAction.ALIGN_LEFT));
-        editToolBar.add(newTogBtn(AppImage.ALIGN_CENTER, TextAction.ALIGN_CENTER));
-        editToolBar.add(newTogBtn(AppImage.ALIGN_RIGHT, TextAction.ALIGN_RIGHT));
-        editToolBar.add(newTogBtn(AppImage.ALIGN_JUSTITY, TextAction.ALIGN_JUSTIFY));
+        editToolBar.add(newTogBtn("align-left", TextAction.ALIGN_LEFT));
+        editToolBar.add(newTogBtn("align-center", TextAction.ALIGN_CENTER));
+        editToolBar.add(newTogBtn("align-right", TextAction.ALIGN_RIGHT));
+        if (Main.POST_0_1_RELEASE) {
+            editToolBar.add(newTogBtn("align-justity", TextAction.ALIGN_JUSTIFY));
+        }
         
         // Objects.
-        editToolBar.add(newBtn(AppImage.LINK, TextAction.INSERT_LINK));
+        if (Main.POST_0_1_RELEASE) {
+        editToolBar.add(newBtn("link", TextAction.INSERT_LINK));
         editToolBar.add(new JButton(new ImageAction()));
-//        editToolBar.add(newBtn(AppImage.IMAGE, TextAction.INSERT_IMAGE));
-        editToolBar.add(newBtn(AppImage.BREAK, TextAction.INSERT_BREAK));
-        editToolBar.add(newBtn(AppImage.HORIZONTAL_RULE, TextAction.INSERT_SEPERATOR));
-        editToolBar.add(newBtn(AppImage.LIST_NUMBERS, TextAction.INSERT_LIST_NUMBERED));
-        editToolBar.add(newBtn(AppImage.LIST_NUMBERS, TextAction.INSERT_LIST_NUMBERED_ITEM));
-        editToolBar.add(newBtn(AppImage.LIST_BULLETS, TextAction.INSERT_LIST_BULLETTED));
-        editToolBar.add(newBtn(AppImage.LIST_BULLETS, TextAction.INSERT_LIST_BULLETTED_ITEM));
-        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE));
-        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE_COL));
-        editToolBar.add(newBtn(AppImage.TABLE, TextAction.INSERT_TABLE_ROW));
-        editToolBar.add(new JSeparator());
+//        editToolBar.add(newBtn("IMAGE", TextAction.INSERT_IMAGE));
+        }
+        editToolBar.add(newBtn("break", TextAction.INSERT_BREAK));
+        if (Main.POST_0_1_RELEASE) {
+            editToolBar.add(newBtn("horizontal-rule", TextAction.INSERT_SEPERATOR));
+        }
+        editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED));
+        editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED_ITEM));
+        editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED));
+        editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED_ITEM));
+        editToolBar.add(newBtn("table", TextAction.INSERT_TABLE));
+        editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_COL));
+        editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_ROW));
+        editToolBar.addSeparator();
         
         // Paragraph.
-        editToolBar.add(new JComboBox());
+        if (Main.POST_0_1_RELEASE) {
+            editToolBar.add(new JComboBox());
+        }
+        
+        return editToolBar;
     }
     
     /**
@@ -241,7 +257,7 @@ class NotePanel extends JPanel {
      * @param action The action to be associated with the button.
      * @return A newly created toggle button.
      */
-    private JToggleButton newTogBtn(AppImage image, TextAction action) {
+    private JToggleButton newTogBtn(String image, TextAction action) {
         JToggleButton button = new JToggleButton(
                 noteTextArea.getActionMap().get(action.actionName));
         button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
@@ -251,7 +267,7 @@ class NotePanel extends JPanel {
         return button;
     }
     
-    private JButton newBtn(AppImage image, TextAction action) {
+    private JButton newBtn(String image, TextAction action) {
         JButton button = new JButton(
                 noteTextArea.getActionMap().get(action.actionName));
         button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
@@ -259,6 +275,21 @@ class NotePanel extends JPanel {
         button.setPreferredSize(new Dimension(16, 16));
         button.setFocusable(false);
         return button;
+    }
+    
+    /**
+     * Synchronize the current note with data from the UI.
+     */
+    void syncNote() {
+        syncNote(note);
+    }
+    
+    /**
+     * Synchronize a note with data from the UI.
+     * @param syncNote The note to synchronize.
+     */
+    private void syncNote(Note syncNote) {
+        syncNote.setText(noteTextArea.getText());
     }
 
     /**
@@ -270,9 +301,8 @@ class NotePanel extends JPanel {
         
         // Save any changes made to the previously selected note.
         if (prevNote != null && noteChanged) {
-            prevNote.setText(noteTextArea.getText());
+            syncNote(prevNote);
         }
-        
         noteChanged = false;
         
         if (note == null) {
@@ -294,16 +324,24 @@ class NotePanel extends JPanel {
     public Note getNote() {
         return note;
     }
-
+    
     /**
      * Assign a note to be displayed in the panel.
      * @param note The note to be displayed, or null if no note is to be 
      *             displayed.
      */
     public void setNote(Note note) {
-        final Note prevNote = this.note;
+        Note prevNote = this.note;
+        
+//        Main.log("setNote; prevNote=[%s], note=[%s]", prevNote, note);
+        
         this.note = note;
-        onNoteSelected(prevNote);
+        
+        // Don't run the selection logic if the client is just ensuring that 
+        // the selected note is null.
+        if (this.note != null || prevNote != null) {
+            onNoteSelected(prevNote);
+        }
     }
 
     /**
@@ -363,7 +401,8 @@ class NotePanel extends JPanel {
         private static final long serialVersionUID = 1L;
 
         public ImageAction() {
-            super("kueb-image-action", new ImageIcon(ImageManager.get().getImage(AppImage.IMAGE)));
+            super("kueb-image-action", 
+                    new ImageIcon(ImageManager.get().getImage("image")));
         }
         
         @Override

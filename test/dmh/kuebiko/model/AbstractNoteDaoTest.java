@@ -64,19 +64,6 @@ public abstract class AbstractNoteDaoTest {
         return noteDao;
     }
     
-    @Test
-    public final void getUniqueIdTest() {
-        final AbstractNoteDao noteDao = newNoteDao();
-        final int expectedSize = 10;
-
-        Set<Integer> ids = Sets.newHashSetWithExpectedSize(10);
-        for (int i = 0; i < expectedSize; i++) {
-            ids.add(noteDao.getUniqueId());
-        }
-        
-        assertEquals(ids.size(), expectedSize, "All IDs must be unique.");
-    }
-    
     /**
      * Helper method; reads all of the notes in the data store and insures the 
      * integrity of the data.
@@ -131,6 +118,19 @@ public abstract class AbstractNoteDaoTest {
      * @return A new instance of a note DAO.
      */
     protected abstract AbstractNoteDao newNoteDao();
+    
+    @Test
+    public final void getUniqueIdTest() {
+        final AbstractNoteDao noteDao = newNoteDao();
+        final int expectedSize = 10;
+
+        Set<Integer> ids = Sets.newHashSetWithExpectedSize(10);
+        for (int i = 0; i < expectedSize; i++) {
+            ids.add(noteDao.getUniqueId());
+        }
+        
+        assertEquals(ids.size(), expectedSize, "All IDs must be unique.");
+    }
 
     /**
      * Test the note DAO's behavior when adding a new note.
@@ -189,6 +189,31 @@ public abstract class AbstractNoteDaoTest {
         
         noteDao.addNote(newDummyNote(DUMMY_NOTE_TITLE));
         noteDao.addNote(newDummyNote(DUMMY_NOTE_TITLE));
+    }
+    
+    /**
+     * Test the note DAO's behavior when adding a new note with no text.
+     */
+    @Test
+    public void addNoteWithNullTextTest() throws Exception {
+        final NoteDao noteDao = newNoteDao();
+        final Note dummyNote = newDummyNote(DUMMY_NOTE_TITLE);
+        dummyNote.setText(null);
+        
+        new NoteUpdateTestHarness(dummyNote) {
+            @Override
+            Note performUpdate(Note testNote) throws Exception {
+                return noteDao.addNote(testNote);
+            }
+        }.runTest();
+        
+        final List<Note> allNotes = noteDao.readNotes();
+        assertNotNull(allNotes, "Result of readNotes() should never be null.");
+        assertEquals(allNotes.size(), 1, "There should only be one note.");
+        
+        final Note onlyNote = Iterables.getOnlyElement(allNotes);
+        assertEquals(onlyNote.getTitle(), DUMMY_NOTE_TITLE,
+                "Only note should be the one added.");
     }
     
     /**

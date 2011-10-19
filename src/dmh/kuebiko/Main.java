@@ -7,15 +7,19 @@
 package dmh.kuebiko;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.google.common.collect.Maps;
+
 import dmh.kuebiko.controller.NoteManager;
-import dmh.kuebiko.model.InMemoryNoteDao;
-import dmh.kuebiko.test.TestHelper;
+import dmh.kuebiko.model.DaoParameter;
+import dmh.kuebiko.model.NoteDaoFactory;
+import dmh.kuebiko.model.NoteDaoFactory.OfficialDao;
 import dmh.kuebiko.view.NoteFrame;
 
 /**
@@ -24,6 +28,11 @@ import dmh.kuebiko.view.NoteFrame;
  * @author davehuffman
  */
 public class Main {
+    private static final String PARAM_DAO_CLASS = "kueb.dao"; 
+    
+    /** Temporary constant for disabling code that is not a part of the 0.1 release. */
+    public static final boolean POST_0_1_RELEASE = false;
+    
     /**
      * Exception handler for Kuebiko.
      */
@@ -35,12 +44,12 @@ public class Main {
                 handleException(exception);
             } else {
                 SwingUtilities.invokeLater(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                handleException(exception);
-                            }
-                        });
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            handleException(exception);
+                        }
+                    });
             }
         }
 
@@ -67,21 +76,28 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /** XXX scaffolding. */
-                getPrefs().put(Preference.CURRENT_STACK_LOCATION.toString(), "");
-                getPrefs().put(Preference.CURRENT_STACK_DAO.toString(), InMemoryNoteDao.class.getName());
+//                getPrefs().put(Preference.CURRENT_STACK_LOCATION.toString(), "");
+//                getPrefs().put(Preference.CURRENT_STACK_DAO.toString(), InMemoryNoteDao.class.getName());
                 
-                final NoteManager noteMngr;
+                String daoClassName = System.getProperty(
+                        PARAM_DAO_CLASS, OfficialDao.IN_MEMORY.toString());
+                Map<String, String> daoParams = Maps.newHashMap();
+                for (DaoParameter daoParam: DaoParameter.values()) {
+                    String key = daoParam.toString();
+                    daoParams.put(key, System.getProperty("kueb." + key)); 
+                }
                 
-                if (args.length > 0) {
-                    final String stackDir = args[0];
-                    noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
-                } else {
-                    noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
+                NoteManager noteMngr;
+                try {
+                    noteMngr = new NoteManager(
+                            NoteDaoFactory.get(daoClassName, daoParams));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
                 
                 NoteFrame noteFrame = new NoteFrame(noteMngr);

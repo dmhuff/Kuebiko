@@ -39,11 +39,16 @@ class NewNoteAction extends AbstractActionObserver {
     public void actionPerformed(ActionEvent e) {
         final NoteTable noteTable = noteFrame.getNoteTable();
 
-        // Determine note title.
+        // Check the note's title.
         String noteTitle = noteFrame.getSearchText().getText();
         if (isBlank(noteTitle) || noteFrame.isInEditMode()) {
+            // Make a new note with a default title.
             noteTitle = noteTable.getNoteTableModel().addNewNote();
+        } else if (noteFrame.getNoteMngr().doesNoteExist(noteTitle)) {
+            // A note with the current title already exists; select it and exit.
+            noteTable.selectNote(noteTitle);
         } else {
+            // Make a new note with the current title.
             noteTable.getNoteTableModel().addNewNote(noteTitle);
         }
         noteFrame.getSearchText().setText(noteTitle);

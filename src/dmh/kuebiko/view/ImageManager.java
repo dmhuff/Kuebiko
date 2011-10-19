@@ -20,16 +20,6 @@ import com.google.common.collect.Maps;
 final class ImageManager {
     enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
     
-    /** XXX This is unmanageable. Change to just lookup images by name (i.e. a String). */
-    @Deprecated
-    enum AppImage {
-        ALIGN_CENTER, ALIGN_JUSTITY, ALIGN_LEFT, ALIGN_RIGHT, BOLD, BREAK, 
-        COLOR, EDIT, FONT_SIZE_DOWN, FONT_SIZE_UP, FONT_SIZE, 
-        HEADING_1, HEADING_2, HEADING_3, HEADING_4, HEADING_5, HEADING_6, 
-        HORIZONTAL_RULE, IMAGE, ITALIC, LINK, LIST_BULLETS, LIST_NUMBERS, SEARCH, 
-        STRIKETHROUGH, TABLE, UNDERLINE
-    }
-    
     private static final ImageManager INSTANCE = new ImageManager();
     
     /**
@@ -39,7 +29,7 @@ final class ImageManager {
         return INSTANCE;
     }
     
-    private final Map<ImageSize, Map<AppImage, Image>> images;
+    private final Map<ImageSize, Map<String, Image>> images;
     private ImageSize defaultSize;
     
     /**
@@ -49,7 +39,7 @@ final class ImageManager {
     private ImageManager() {
         images = Maps.newHashMap();
         for (ImageSize size: ImageSize.values()) {
-            Map<AppImage, Image> sizeMap = Maps.newHashMap();
+            Map<String, Image> sizeMap = Maps.newHashMap();
             images.put(size, sizeMap);
         }
         
@@ -61,7 +51,7 @@ final class ImageManager {
      * @param appImage Identifier for the desired image.
      * @return The requested image.
      */
-    Image getImage(AppImage appImage) {
+    Image getImage(String appImage) {
         return getImage(defaultSize, appImage);
     }
     
@@ -71,7 +61,7 @@ final class ImageManager {
      * @param appImage The image to load.
      * @return The requested image.
      */
-    private Image getImage(ImageSize size, AppImage appImage) {
+    private Image getImage(ImageSize size, String appImage) {
         Image image = images.get(size).get(appImage);
         if (image == null) {
             // If this is the first time the client has requested this image, 
@@ -88,7 +78,7 @@ final class ImageManager {
      * @param appImage The image to load.
      * @return The loaded image.
      */
-    private Image loadImage(ImageSize size, AppImage appImage) {
+    private Image loadImage(ImageSize size, String appImage) {
         final String path = String.format("images/%s/%s.png",
                 size.toString().toLowerCase(), 
                 appImage.toString().toLowerCase().replaceAll("_", "-"));

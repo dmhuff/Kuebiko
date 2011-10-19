@@ -155,7 +155,7 @@ public class NoteTable extends JTable {
      * @param title The title of the note to select.
      */
     void selectNote(String title) {
-        log("selectNote(%s).", title);
+//        log("selectNote(%s).", title);
         // A null title means the selection should be cleared.
         if (isEmpty(title)) {
             //clearSelection();
@@ -167,7 +167,7 @@ public class NoteTable extends JTable {
         final int titleCol = convertColumnIndexToView(Column.TITLE.ordinal());
         for (int r = 0; r < getRowCount(); r++) {
             if (trimTitle.equals(getValueAt(r, titleCol))) {
-                log("found @ row=[%s] col=[%s]; [%s]", r, titleCol, getValueAt(r, titleCol));
+//                log("found @ row=[%s] col=[%s]; [%s]", r, titleCol, getValueAt(r, titleCol));
                 //changeSelection(convertRowIndexToModel(r), convertColumnIndexToModel(titleCol), false, false);
                 changeSelection(r, titleCol, false, false);
                 return;
@@ -181,7 +181,7 @@ public class NoteTable extends JTable {
     @Override
     public void clearSelection() {
         // XXX for logging only.
-        Main.log("clearSelection().");
+//        Main.log("clearSelection().");
         super.clearSelection();
     }
     
@@ -196,7 +196,7 @@ public class NoteTable extends JTable {
     Note getSelectedNote() {
         final int viewSelectedRow = getSelectedRow();
         final int modelSelectedRow = (viewSelectedRow < 0)? -1 : convertRowIndexToModel(viewSelectedRow);
-        Main.log("getSelectedNote(); v[%s] m[%s].", viewSelectedRow, modelSelectedRow);
+//        Main.log("getSelectedNote(); v[%s] m[%s].", viewSelectedRow, modelSelectedRow);
         return (modelSelectedRow < 0)? null : noteTableModel.getNoteAtRow(modelSelectedRow);
     }
     

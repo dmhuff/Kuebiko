@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -145,7 +147,8 @@ public class Note implements Serializable {
     @Override
     public String toString() {
         return "Note [state=" + state + ", id=" + id + ", title=" + title
-                + ", text=" + text + ", createDate=" + createDate
+//                + ", text=" + text 
+                + ", createDate=" + createDate
                 + ", modifiedDate=" + modifiedDate + ", tags=" + tags + "]";
     }
     
@@ -255,6 +258,9 @@ public class Note implements Serializable {
         }
         
         markAsDirty();
+        
+        System.out.printf("set text: %s%n", StringUtils.difference(this.text, text));
+        
         this.text = text;
     }
 

@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import dmh.kuebiko.model.AbstractNoteDao;
@@ -132,12 +135,15 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
      * @return The note's file.
      */
     private File writeNoteToFile(Note note) throws PersistenceException {
+        Preconditions.checkNotNull(note);
+        
         File noteFile = NoteFileUtil.getNoteFile(noteDir, note);
 
         Writer out = null;
         try {
             out = new OutputStreamWriter(new FileOutputStream(noteFile));
-            out.write(note.getText());
+            String noteText = note.getText();
+            out.write(noteText == null? "" : noteText);
         } catch (FileNotFoundException fnfe) {
             throw new PersistenceException(fnfe);
         } catch (IOException ioe) {
