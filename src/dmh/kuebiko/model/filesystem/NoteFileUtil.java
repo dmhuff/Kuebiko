@@ -52,11 +52,17 @@ final class NoteFileUtil {
         return new File(noteDir, noteTitleToFileName(note.getTitle()));
     }
     
+    /**
+     * Retrieve a list of note files in a particular directory.
+     * @param noteDir The directory to scan.
+     * @return An array of files within the passed directory.
+     */
     static File[] listNoteFilesInDir(File noteDir) {
         return noteDir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 return pathname.getName().matches(".+?\\." + FILE_EXTENSION);
-            }});
+            }
+        });
     }
 }

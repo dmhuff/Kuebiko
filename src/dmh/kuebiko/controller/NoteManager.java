@@ -132,7 +132,6 @@ public class NoteManager {
             }
         }
         String title = String.format("%s %d", DEFAULT_NOTE_TITLE, maxSuffix + 1);
-//        Main.log("genUniqueNoteTitle(); #=> [%s].", title);
         return title;
     }
     
@@ -182,7 +181,7 @@ public class NoteManager {
             throw new DataStoreException("Invalid note.", e);
         }
         
-        // TODO may not be necessary.
+        // XXX may not be necessary.
         loadAllNotes();
     }
 }

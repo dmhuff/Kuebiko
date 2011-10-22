@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -59,10 +57,8 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         }
     }
     
-//    private List<Note> loadNotes() {
     private void loadNotes() {
         File[] noteFiles = NoteFileUtil.listNoteFilesInDir(noteDir);
-        //        List<Note> notes = Lists.newArrayListWithCapacity(noteCount);
         
         // Reset the internal data structures.
         noteCache = new FileSystemNoteCache(noteFiles.length);
@@ -70,13 +66,12 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
 
         for (File noteFile: noteFiles) {
             String name = NoteFileUtil.fileNameToNoteTitle(noteFile.getName());
-            Date createDate = null; // XXX the file API doesn't have a way to get this because not all platforms support it. I'll have to embed the information in the file itself.
+            Date createDate = null; // TODO the file API doesn't have a way to get this because not all platforms support it. I'll have to embed the information in the file itself.
             Note note = newNote(name, createDate, 
                     new Date(noteFile.lastModified()), this); 
             
             noteCache.put(note.getId(), noteFile, note);
         }
-//        return notes;
     }
 
     /**
@@ -160,14 +155,18 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         return noteFile;
     }
     
-    /**
-     * TODO consider merging this method with {@link #persistActionDelete()}.
-     * Delete a note from the file system and the cache.
-     * @param note The note to delete.
-     */
-    private void eradicateNote(Note note) throws PersistenceException {
+    @Override
+    protected Note persistActionAdd(Note addedNote) throws PersistenceException {
+        File noteFile = writeNoteToFile(addedNote);
+        noteCache.put(addedNote.getId(), noteFile, addedNote);
+        
+        return addedNote;
+    }
+
+    @Override
+    protected void persistActionDelete(Note deletedNote) throws PersistenceException {
         // Find the note in the cache.
-        final int noteId = note.getId();
+        final int noteId = deletedNote.getId();
         File noteFile = noteCache.getFile(noteId);
         if (noteFile == null) {
             throw new PersistenceException(
@@ -179,7 +178,7 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         if (!success) {
             throw new PersistenceException(
                     String.format("Unable to delete note [%d:%s].", 
-                            noteId, note.getTitle()));
+                            noteId, deletedNote.getTitle()));
         }
         
         // Update the cache.
@@ -187,49 +186,12 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
     }
 
     @Override
-    protected Note persistActionAdd(Note addedNote) throws PersistenceException {
-//        writeNoteToFile(addedNote);
-//        // Reset the note cache.
-//        noteCache = null;
-        
-        File noteFile = writeNoteToFile(addedNote);
-//        Note hollowCopyNote = newNote(addedNote, this);
-//        noteCache.put(hollowCopyNote.getId(), noteFile, hollowCopyNote);
-        noteCache.put(addedNote.getId(), noteFile, addedNote);
-        
-        return addedNote;
-    }
-
-    @Override
-    protected void persistActionDelete(Note deletedNote) throws PersistenceException {
-//        boolean success = NoteFileUtil.getNoteFile(noteDir, deletedNote).delete();
-//        if (success) {
-//            // Reset the note cache.
-//            noteCache = null;
-//        } else {
-//            throw new PersistenceException(
-//                    String.format("Unable to delete note [%s].", deletedNote.getTitle()));
-//        }
-        eradicateNote(deletedNote);
-    }
-
-    @Override
     protected Note persistActionUpdate(Note updatedNote) throws PersistenceException {
-//        // Delete the existing note file. xXXX use file map
-//        if (!NoteFileUtil.getNoteFile(noteDir, updatedNote).delete()) {
-//            throw new PersistenceException(
-//                    String.format("Unable to delete note [%s].", updatedNote.getTitle()));
-//        }
-        
         // Perform the update by replacing the old data.
         persistActionDelete(updatedNote);
         persistActionAdd(updatedNote);
         
-        // Write the note data to the file system and update the cache.
-//        File noteFile = writeNoteToFile(updatedNote);
-//        noteCache.put(updatedNote.getId(), noteFile, updatedNote);
-        
-        return updatedNote; // XXX consider refreshing the note prior to returning it.
+        return updatedNote;
     }
 
     @Override

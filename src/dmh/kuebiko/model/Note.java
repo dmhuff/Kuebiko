@@ -245,7 +245,7 @@ public class Note implements Serializable {
             try {
                 text = loader.loadText(this);
             } catch (PersistenceException e) {
-                throw new RuntimeException(e); // XXX determine what to do with this exception.
+                throw new RuntimeException(e); // TODO determine what to do with this exception.
             }
             state = State.CLEAN;
         }
@@ -258,9 +258,6 @@ public class Note implements Serializable {
         }
         
         markAsDirty();
-        
-        System.out.printf("set text: %s%n", StringUtils.difference(this.text, text));
-        
         this.text = text;
     }
 

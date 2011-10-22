@@ -21,12 +21,13 @@ import dmh.kuebiko.model.Note;
 public class NoteTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
     
-    // TODO i18n.
-    public enum Column {
+    /** Enumeration of all columns supported by this table model.  
+     *  TODO i18n. */
+    public static enum Column {
         TITLE("Title"), 
-        TAGS("Tags"), 
-        DATE_MODIFIED("Date Modified"), 
-        DATE_CREATED("Date Created");
+//        TAGS("Tags"), 
+        DATE_MODIFIED("Date Modified"); 
+//        DATE_CREATED("Date Created");
         
         private final String label;
         
@@ -81,37 +82,6 @@ public class NoteTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
     
-    /*private String genUniqueNoteTitle() { // TODO unit test.
-        // Get a list of default note titles.
-        final Collection<String> defaultTitles = 
-                Collections2.filter(noteMngr.getNoteTitles(), 
-                        new Predicate<String>(){
-                            @Override
-                            public boolean apply(String input) {
-                                return input.startsWith(DEFAULT_NOTE_TITLE);
-                            }
-                        });
-        
-        if (defaultTitles.size() == 0) {
-            return DEFAULT_NOTE_TITLE;
-        }
-        
-        // Default note titles exist; work thought the list and create a new, 
-        // unique default note title.
-        Pattern titleRegex = Pattern.compile(DEFAULT_NOTE_TITLE + " (/d+)?");
-        int maxSuffix = 1;
-        for (String title: defaultTitles) {
-            Matcher matcher = titleRegex.matcher(title);
-            if (matcher.matches()) {
-                int suffix = Integer.parseInt(matcher.group(1));
-                if (suffix > maxSuffix) {
-                    maxSuffix = suffix;
-                }
-            }
-        }
-        return String.format("%s %d", DEFAULT_NOTE_TITLE, maxSuffix + 1);
-    }*/
-
     @Override
     public int getColumnCount() {
         return Column.values().length;
@@ -124,7 +94,6 @@ public class NoteTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        // XXX should getNotes() ever be null?
         return getNotes() == null? 0 : noteMngr.getNoteCount();
     }
     
@@ -141,20 +110,21 @@ public class NoteTableModel extends AbstractTableModel {
         if (noteMngr.isEmpty()) {
             return null;
         }
-        final Note note = getNoteAtRow(row);
-        switch (col) {
-        case 0:
+        
+        Note note = getNoteAtRow(row);
+        switch (Column.values()[col]) {
+        case TITLE:
             return note.getTitle();
-        case 1:
-            return note.getTags();
-        case 2:
+//        case TAGS:
+//            return note.getTags();
+        case DATE_MODIFIED:
             return note.getModifiedDate();
-        case 3:
-            return note.getCreateDate();
-        default:
-            throw new IllegalArgumentException(
-                    String.format("Invalid column index [%d].", col));
+//        case DATE_CREATED:
+//            return note.getCreateDate();
         }
+        
+        throw new IllegalArgumentException(
+                String.format("Invalid column index [%d].", col));
     }
     
     /**
@@ -170,19 +140,18 @@ public class NoteTableModel extends AbstractTableModel {
     @Override
     @SuppressWarnings("unchecked")
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-//        System.out.printf("setValueAt(aValue=[%s;%s], rowIndex=[%s], columnIndex=[%s])", 
-//                aValue, aValue.getClass(), rowIndex, columnIndex);
-        if (columnIndex == Column.TAGS.ordinal()) {
-            getNoteAtRow(rowIndex).setTags((List<String>) aValue);
-        } else {
+//        if (columnIndex == Column.TAGS.ordinal()) {
+//            getNoteAtRow(rowIndex).setTags((List<String>) aValue);
+//        } else {
             throw new IllegalArgumentException(String.format(
                     "Cell (row=[%s],col=[%s]) is not editable.", 
                     rowIndex, columnIndex));
-        }
+//        }
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == Column.TAGS.ordinal();
+        return false;
+//        return columnIndex == Column.TAGS.ordinal();
     }
 }

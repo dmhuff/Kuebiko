@@ -98,20 +98,16 @@ public class NoteFrame extends JFrame {
     private JMenu fileMenu;
     private JMenuItem newStackMenuItem;
     private JMenuItem openStackMenuItem;
-    private JSeparator separator;
     private JMenuItem closeMenuItem;
     private JMenuItem closeAllMenuItem;
-    private JSeparator separator_1;
     private JMenuItem saveMenuItem;
     private JMenuItem saveAllMenuItem;
     private JMenu editMenu;
     private JMenuItem undoMenuItem;
     private JMenuItem redoMenuItem;
-    private JSeparator separator_2;
     private JMenuItem cutMenuItem;
     private JMenuItem copyMenuItem;
     private JMenuItem pasteMenuItem;
-    private JSeparator separator_3;
     private JMenuItem deleteNoteMenuItem;
     private JMenuItem renameNoteMenuItem;
 
@@ -147,8 +143,7 @@ public class NoteFrame extends JFrame {
         renameNoteMenuItem = new JMenuItem(actionMngr.getAction(RenameNoteAction.class));
         fileMenu.add(renameNoteMenuItem);
         
-        separator_3 = new JSeparator();
-        fileMenu.add(separator_3);
+        fileMenu.addSeparator();
         
         newStackMenuItem = new JMenuItem(actionMngr.getAction(NewStackAction.class));
         fileMenu.add(newStackMenuItem);
@@ -191,13 +186,13 @@ public class NoteFrame extends JFrame {
         
         editMenu.addSeparator();
         
-//        cutMenuItem = new JMenuItem(new DefaultEditorKit.CutAction());
         cutMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CutAction.class));
         cutMenuItem.setText("Cut");
         cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.META_MASK));
         editMenu.add(cutMenuItem);
         
-        copyMenuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
+//        copyMenuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
+        copyMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CopyAction.class));
         copyMenuItem.setText("Copy");
         copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_MASK));
         editMenu.add(copyMenuItem);
@@ -274,17 +269,8 @@ public class NoteFrame extends JFrame {
         gbc_splitPane.gridy = 1;
         getContentPane().add(splitPane, gbc_splitPane);
 
-//        noteScroll = new JScrollPane();
-//        noteScroll.setBorder(null);
-//        splitPane.setRightComponent(noteScroll);
-  
         notePanel = new NotePanel();
         splitPane.setRightComponent(notePanel);
-
-//        noteTextArea = new JTextArea();
-//        noteTextArea.setLineWrap(true);
-//        noteTextArea.setTabSize(4);
-//        noteScroll.setViewportView(noteTextArea);
 
         noteTableScroll = new JScrollPane();
         noteTableScroll.setMinimumSize(new Dimension(23, 100));
@@ -294,51 +280,46 @@ public class NoteFrame extends JFrame {
         noteTableScroll.setViewportView(noteTable);
     }
     
-    static class FocusVetoableChangeListener implements VetoableChangeListener {
-        @Override
-        public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-            Component oldComp = (Component)evt.getOldValue();
-            Component newComp = (Component)evt.getNewValue();
-            
-//            Main.log("focus change; old=[%s] new=[%s]", 
-//                    oldComp == null? null : oldComp.getClass(), 
-//                    newComp == null? null : newComp.getClass());
-
-            if ("focusOwner".equals(evt.getPropertyName())) {
-                if (oldComp == null) {
-                    // the newComp component will gain the focus
-                } else {
-                    // the oldComp component will lose the focus
-                }
-            } 
-//            else if ("focusedWindow".equals(evt.getPropertyName())) {
+//    static class FocusVetoableChangeListener implements VetoableChangeListener {
+//        @Override
+//        public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+//            Component oldComp = (Component)evt.getOldValue();
+//            Component newComp = (Component)evt.getNewValue();
+//            
+//            if ("focusOwner".equals(evt.getPropertyName())) {
 //                if (oldComp == null) {
-//                    // the newComp window will gain the focus
+//                    // the newComp component will gain the focus
 //                } else {
-//                    // the oldComp window will lose the focus
+//                    // the oldComp component will lose the focus
 //                }
+//            } 
+////            else if ("focusedWindow".equals(evt.getPropertyName())) {
+////                if (oldComp == null) {
+////                    // the newComp window will gain the focus
+////                } else {
+////                    // the oldComp window will lose the focus
+////                }
+////            }
+//
+//            boolean vetoFocusChange = false;
+//            if (vetoFocusChange) {
+//                throw new PropertyVetoException("message", evt);
 //            }
-
-            boolean vetoFocusChange = false;
-            if (vetoFocusChange) {
-                throw new PropertyVetoException("message", evt);
-            }
-        }
-    }
+//        }
+//    }
     
     /**
      * Perform additional setup to the frame. This is separate from the 
      * initialize() method so that the GUI builder doesn't mess with it.
      */
     private void additionalSetup() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addVetoableChangeListener(new FocusVetoableChangeListener());
+//        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+//                .addVetoableChangeListener(new FocusVetoableChangeListener());
         
         mode = Mode.SEARCH;
         
         setFocusTraversalPolicy(
                 new CustomFocusTraversalPolicy(searchText, notePanel));
-//        searchText, notePanel.getNoteTextArea()));
         
         // Search Text Field.
         AutoCompleteDecorator.decorate(searchText, noteMngr.getNoteTitles(), false);
@@ -347,17 +328,14 @@ public class NoteFrame extends JFrame {
                 new DocumentListener() {
                     @Override
                     public void changedUpdate(DocumentEvent e) {
-//                        Main.log("search doc changed. [%s]", mode);
                         onSearchTextChanged();
                     }
                     @Override
                     public void insertUpdate(DocumentEvent e) {
-//                        Main.log("search doc insert. [%s]", mode);
                         onSearchTextChanged();
                     }
                     @Override
                     public void removeUpdate(DocumentEvent e) {
-//                        Main.log("search doc remove. [%s]", mode);
                         onSearchTextChanged();
                     }
                 });
@@ -366,20 +344,17 @@ public class NoteFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-//                Main.log("search text cleared.");
                 searchText.setText(null);
             }});
         
         searchText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-//                Main.log("search text focus gained.");
                 setModeToSearch();
                 searchText.selectAll();
             }
             @Override
             public void focusLost(FocusEvent e) {
-//                Main.log("search text focus lost.");
                 noteTable.selectNote(searchText.getText());
             }
         });
@@ -389,17 +364,8 @@ public class NoteFrame extends JFrame {
         noteTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
-                final int rowIndex = ((ListSelectionModel) event.getSource()).getMaxSelectionIndex();
-//                Main.log("note table selection changed [%s][%s].", rowIndex, mode);
-//                if (rowIndex < 0) {
-//                    // A negative index indicates no selection.
-//                    searchText.setText(null);
-//                    notePanel.setNote(null);
-//                    return;
-//                }
-                
                 final Note selectedNote = noteTable.getSelectedNote();
-//                Main.log("selectedNote=[%s].", selectedNote);
+
                 if (selectedNote == null) {
                     setModeToSearch();
                 } else {
@@ -407,20 +373,11 @@ public class NoteFrame extends JFrame {
                     notePanel.setNote(selectedNote);
                     searchText.setText(selectedNote.getTitle());
                 }
-//                searchText.setText((selectedNote == null)? null : selectedNote.getTitle());
-                
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Note selectedNote = noteMngr.getNoteAt(rowIndex);
-//                        searchText.setText(selectedNote.getTitle());
-//                        noteTextArea.setText(selectedNote.getText());
-//                    }});
-            }});
+            }
+        });
     }
     
     private void setModeToSearch() {
-//        Main.log("setModeToSearch().");
         mode = Mode.SEARCH;
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage("search")));
@@ -429,7 +386,6 @@ public class NoteFrame extends JFrame {
     }
     
     private void setModeToEdit() {
-//        Main.log("setModeToEdit().");
         mode = Mode.EDIT;
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage("edit")));
@@ -453,7 +409,6 @@ public class NoteFrame extends JFrame {
      * Handler for when the contents of the search text field changes.
      */
     private void onSearchTextChanged() {
-//        Main.log("onSearchTextChanged(); [%s][%s]", searchText.getText(), mode);
         // Only update the UI if the user actively searching.
         if (mode == Mode.SEARCH) {
             SwingUtilities.invokeLater(new Runnable() {

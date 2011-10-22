@@ -8,7 +8,7 @@ package dmh.kuebiko.util;
 import java.util.Observable;
 
 /**
- * TODO Document.
+ * Utility for working with action observer objects.
  *
  * @author davehuffman
  */
@@ -17,7 +17,7 @@ public final class ActionObserverUtil {
         throw new AssertionError("Cannot be instantiated.");
     }
     
-   public  static void registerEnMass(ActionManager actionMngr, Observable observable, 
+   public static void registerEnMass(ActionManager actionMngr, Observable observable, 
             AbstractActionObserver... actions) {
         for (AbstractActionObserver action: actions) {
             actionMngr.addAction(action);

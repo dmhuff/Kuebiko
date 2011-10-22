@@ -6,7 +6,6 @@
 
 package dmh.kuebiko.view;
 
-import static dmh.kuebiko.Main.log;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.awt.Component;
@@ -30,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Joiner;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.view.NoteTableModel.Column;
 
@@ -78,7 +76,6 @@ public class NoteTable extends JTable {
 
         @Override
         public Object getCellEditorValue() {
-//            System.out.println("getCellEditorValue() #=> " + super.getCellEditorValue());
             Object cellEditorValue = super.getCellEditorValue();
             return Arrays.asList(ObjectUtils.toString(cellEditorValue).split(" "));
         }
@@ -86,12 +83,7 @@ public class NoteTable extends JTable {
         @Override
         public Component getTableCellEditorComponent(JTable table,
                 Object value, boolean isSelected, int row, int column) {
-//            System.out.printf("getTableCellEditorComponent(table=[%s], "
-//                + "value = [%s], isSelected = [%s], row = [%s], column = [%s])%n", 
-//                table.getClass(), value, isSelected, row, column);
-            
             List<?> tagList = (List<?>) value;
-            
             String tags = Joiner.on(" ").join(tagList);
             
             return super.getTableCellEditorComponent(table, tags, isSelected, row, column);
@@ -111,10 +103,13 @@ public class NoteTable extends JTable {
     
     @Override
     public TableCellRenderer getCellRenderer(int row, int column) {
-        if (column == Column.TAGS.ordinal()) {
-            return TagCellRenderer.INSTANCE;
-        } else if (column == Column.DATE_MODIFIED.ordinal()
-                    || column == Column.DATE_CREATED.ordinal()) {
+//        if (column == Column.TAGS.ordinal()) {
+//            return TagCellRenderer.INSTANCE;
+//        } else if (column == Column.DATE_MODIFIED.ordinal()
+//                    || column == Column.DATE_CREATED.ordinal()) {
+//            return DateTimeCellRenderer.INSTANCE;
+//        }
+        if (column == Column.DATE_MODIFIED.ordinal()) {
             return DateTimeCellRenderer.INSTANCE;
         }
         return super.getCellRenderer(row, column);
@@ -122,9 +117,9 @@ public class NoteTable extends JTable {
     
     @Override
     public TableCellEditor getCellEditor(int row, int column) {
-        if (column == Column.TAGS.ordinal()) {
-            return TagCellEditor.INSTANCE;
-        }
+//        if (column == Column.TAGS.ordinal()) {
+//            return TagCellEditor.INSTANCE;
+//        }
         return super.getCellEditor(row, column);
     }
     
@@ -143,7 +138,7 @@ public class NoteTable extends JTable {
         try {
             rowFilter = RowFilter.regexFilter(
                     String.format(".*?%s.*", Pattern.quote(filterString)), 
-                    Column.TITLE.ordinal(), Column.TAGS.ordinal());
+                    Column.TITLE.ordinal()/*, Column.TAGS.ordinal()*/);
         } catch (PatternSyntaxException e) {
             throw new IllegalArgumentException("Invalid filter string", e);
         }
@@ -155,10 +150,7 @@ public class NoteTable extends JTable {
      * @param title The title of the note to select.
      */
     void selectNote(String title) {
-//        log("selectNote(%s).", title);
-        // A null title means the selection should be cleared.
         if (isEmpty(title)) {
-            //clearSelection();
             return;
         }
         
@@ -167,22 +159,10 @@ public class NoteTable extends JTable {
         final int titleCol = convertColumnIndexToView(Column.TITLE.ordinal());
         for (int r = 0; r < getRowCount(); r++) {
             if (trimTitle.equals(getValueAt(r, titleCol))) {
-//                log("found @ row=[%s] col=[%s]; [%s]", r, titleCol, getValueAt(r, titleCol));
-                //changeSelection(convertRowIndexToModel(r), convertColumnIndexToModel(titleCol), false, false);
                 changeSelection(r, titleCol, false, false);
                 return;
             }
         }
-        
-        // If no note was found, then make a new note with the passed title.
-        //noteTableModel.addNewNote(title);
-    }
-    
-    @Override
-    public void clearSelection() {
-        // XXX for logging only.
-//        Main.log("clearSelection().");
-        super.clearSelection();
     }
     
     void deleteSelectedNote() {
@@ -196,7 +176,6 @@ public class NoteTable extends JTable {
     Note getSelectedNote() {
         final int viewSelectedRow = getSelectedRow();
         final int modelSelectedRow = (viewSelectedRow < 0)? -1 : convertRowIndexToModel(viewSelectedRow);
-//        Main.log("getSelectedNote(); v[%s] m[%s].", viewSelectedRow, modelSelectedRow);
         return (modelSelectedRow < 0)? null : noteTableModel.getNoteAtRow(modelSelectedRow);
     }
     

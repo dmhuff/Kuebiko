@@ -188,7 +188,6 @@ public abstract class AbstractNoteDao implements NoteDao {
         Preconditions.checkArgument(note.isDirty());
         
         Note foundNote = findNote(note.getId());
-//        Note foundNote = findNote(note.getTitle());
         if (foundNote == null) {
             throw new IllegalArgumentException(
                     String.format("Note [%s] not found.", note));

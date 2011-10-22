@@ -19,8 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
-import dmh.kuebiko.Main;
-
 /**
  * TODO there's nothing Kuebiko specific here. consider moving to a util package.
  * Custom focus traversal policy; allows for the traversal of a set of 
@@ -44,14 +42,12 @@ public class CustomFocusTraversalPolicy extends FocusTraversalPolicy {
 
     @Override
     public Component getComponentAfter(Container focusCycleRoot, Component aComponent) {
-//        Main.log("getComponentAfter([%s])", aComponent.getClass());
         int idx = (components.indexOf(aComponent) + 1) % components.size();
         return components.get(idx);
     }
 
     @Override
     public Component getComponentBefore(Container focusCycleRoot, Component aComponent) {
-//        Main.log("getComponentBefore([%s])", aComponent.getClass());
         int idx = components.indexOf(aComponent) - 1;
         if (idx < 0) {
             idx = components.size() - 1;

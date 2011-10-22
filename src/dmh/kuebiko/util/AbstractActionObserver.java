@@ -11,7 +11,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
 /**
- * TODO Document.
+ * Superclass for UI actions that may also observe events.
  *
  * @author davehuffman
  */
