@@ -7,6 +7,7 @@ package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -26,7 +27,7 @@ public class NewStackAction extends UnimplementedAction {
         putValue(SHORT_DESCRIPTION, "Create a new stack of notes."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
         putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N, 
-                InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+                InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_T);
     }
 

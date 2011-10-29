@@ -7,6 +7,7 @@ package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,7 @@ private static final long serialVersionUID = 1L;
         putValue(SHORT_DESCRIPTION, "Delete the selected note from the stack."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
         putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_D, 
-                InputEvent.META_MASK | InputEvent.SHIFT_DOWN_MASK));
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK));
         putValue(MNEMONIC_KEY, KeyEvent.VK_E);
     }
     

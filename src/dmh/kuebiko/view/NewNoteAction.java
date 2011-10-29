@@ -8,8 +8,8 @@ package dmh.kuebiko.view;
 import static javax.swing.KeyStroke.getKeyStroke;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
@@ -31,7 +31,8 @@ class NewNoteAction extends AbstractActionObserver {
         
         putValue(SHORT_DESCRIPTION, "Add a new note to the stack."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N, InputEvent.META_MASK));
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_N);
     }
 

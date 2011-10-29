@@ -7,8 +7,8 @@ package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
@@ -28,7 +28,8 @@ public class SaveStackAction extends UnimplementedAction {
         
         putValue(SHORT_DESCRIPTION, "Save a stack of notes."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_S, InputEvent.META_MASK));
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_S, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_S);
     }
 

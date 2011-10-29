@@ -7,8 +7,8 @@ package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
@@ -25,7 +25,8 @@ public class OpenStackAction extends UnimplementedAction {
         
         putValue(SHORT_DESCRIPTION, "Open a stack of notes."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_O, InputEvent.META_MASK));
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_O, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
     }
 

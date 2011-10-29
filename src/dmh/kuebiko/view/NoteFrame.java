@@ -11,15 +11,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.Observable;
 
 import javax.swing.AbstractAction;
@@ -31,7 +28,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -154,12 +150,14 @@ public class NoteFrame extends JFrame {
         fileMenu.addSeparator();
         
         closeMenuItem = new JMenuItem("Close");
-        closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK));
+        closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeMenuItem.setEnabled(false);
         fileMenu.add(closeMenuItem);
         
         closeAllMenuItem = new JMenuItem("Close All");
-        closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
+                InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeAllMenuItem.setEnabled(false);
         fileMenu.add(closeAllMenuItem);
         
@@ -169,7 +167,8 @@ public class NoteFrame extends JFrame {
         fileMenu.add(saveMenuItem);
         
         saveAllMenuItem = new JMenuItem("Save All");
-        saveAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        saveAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
+                InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAllMenuItem.setEnabled(false);
         fileMenu.add(saveAllMenuItem);
         
@@ -177,29 +176,34 @@ public class NoteFrame extends JFrame {
         menuBar.add(editMenu);
         
         undoMenuItem = new JMenuItem("Undo");
-        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.META_MASK));
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(undoMenuItem);
         
         redoMenuItem = new JMenuItem("Redo");
-        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.SHIFT_MASK | InputEvent.META_MASK));
+        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
+                InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(redoMenuItem);
         
         editMenu.addSeparator();
         
         cutMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CutAction.class));
         cutMenuItem.setText("Cut");
-        cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.META_MASK));
+        cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(cutMenuItem);
         
 //        copyMenuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
         copyMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CopyAction.class));
         copyMenuItem.setText("Copy");
-        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_MASK));
+        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(copyMenuItem);
         
         pasteMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.PasteAction.class));
         pasteMenuItem.setText("Paste");
-        pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.META_MASK));
+        pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(pasteMenuItem);
         
         JMenu windowMenu = new JMenu("Window");

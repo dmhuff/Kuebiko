@@ -7,8 +7,8 @@ package dmh.kuebiko.view;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
@@ -28,7 +28,8 @@ public class RenameNoteAction extends UnimplementedAction {
         
         putValue(SHORT_DESCRIPTION, "Rename a note."); // TODO i18n.
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_R, InputEvent.META_MASK));
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_R, 
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_R);
     }
     
