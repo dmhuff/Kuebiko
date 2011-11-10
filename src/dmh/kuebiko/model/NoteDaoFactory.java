@@ -32,11 +32,27 @@ public final class NoteDaoFactory {
         private OfficialDao(Class<? extends NoteDao> clazz) {
             this.clazz = clazz;
         }
+        
+        @Override
+        public String toString() {
+            return String.format("%s [%s]", super.toString(), clazz);
+        }
     }
     
     public static NoteDao get(String className) 
     throws BadClassException, DaoConfigurationException {
         return get(className, null);
+    }
+    
+    /**
+     * Retrieve an instance of a note DAO.
+     * @param params A map containing configuration parameters for the DAO.
+     * @return An instance of the desired note DAO.
+     */
+    public static NoteDao get(Map<String, String> params) 
+    throws BadClassException, DaoConfigurationException {
+        String className = DaoParameter.getParameter(params, DaoParameter.CLASS_NAME);
+        return get(className, params);
     }
     
     /**
