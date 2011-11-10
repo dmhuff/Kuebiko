@@ -84,19 +84,25 @@ public class Main {
 //                getPrefs().put(Preference.CURRENT_STACK_LOCATION.toString(), "");
 //                getPrefs().put(Preference.CURRENT_STACK_DAO.toString(), InMemoryNoteDao.class.getName());
                 
-                String daoClassName = System.getProperty(
-                        PARAM_DAO_CLASS, OfficialDao.IN_MEMORY.toString());
                 Map<String, String> daoParams = Maps.newHashMap();
                 for (DaoParameter daoParam: DaoParameter.values()) {
-                    String key = daoParam.toString();
-                    daoParams.put(key, System.getProperty("kueb." + key)); 
+                    String key = "kueb." + daoParam.toString();
+                    String property = System.getProperty(key);
+                    
+                    System.out.printf("[CONFIG] Parameter [%s] = [%s].%n", key, property);
+                    
+                    daoParams.put(daoParam.toString(), property); 
                 }
                 
                 NoteManager noteMngr;
                 try {
-                    noteMngr = new NoteManager(
-                            NoteDaoFactory.get(daoClassName, daoParams));
+                    noteMngr = new NoteManager(NoteDaoFactory.get(daoParams));
                 } catch (Exception e) {
+                    System.err.printf("Invalid parameters [%s].%n", daoParams);
+                    System.err.println("Valid DAOs:");
+                    for (OfficialDao officialDao: OfficialDao.values()) {
+                        System.err.println(officialDao);
+                    }
                     throw new RuntimeException(e);
                 }
                 
