@@ -17,6 +17,7 @@ import javax.swing.Box;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -139,7 +140,11 @@ public class HuxleyUiManager {
      */
     private class TextStyleCaretListener implements CaretListener {
         @Override
-        public void caretUpdate(CaretEvent event) {
+        public void caretUpdate(final CaretEvent event) {
+//            SwingUtilities.invokeLater(new Runnable() {
+//                @Override
+//                public void run() {
+                
             StyledDocument document = (StyledDocument) textArea.getDocument();
             int dot = event.getDot();
 //            dot = dot > 0 ? dot - 1 : dot;
@@ -167,7 +172,7 @@ public class HuxleyUiManager {
             
             ParagraphType paragraphType = ParagraphType.lookup(paragraph);
             
-            actionMap.get("huxley-paragraph").putValue(MasterEnumSelectAction.SELECTED_VALUE_KEY, paragraphType);
+//            actionMap.get("huxley-paragraph").putValue(MasterEnumSelectAction.SELECTED_VALUE_KEY, paragraphType);
             
             AttributeSet attributes = htmlElem.getAttributes();
             attributes.containsAttribute(CSS.Attribute.FONT_WEIGHT, "bold");
@@ -187,6 +192,8 @@ public class HuxleyUiManager {
                 actionMap.get(setAlignment.actionName)
                         .putValue(Action.SELECTED_KEY, true);
             }
+//                }
+//            });
         }
     }
 }

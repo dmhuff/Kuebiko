@@ -38,6 +38,7 @@ import javax.swing.text.html.HTMLDocument;
 
 import dmh.swing.html.SwingHtmlUtil;
 
+@Deprecated
 public class FormatAction extends StyledTextAction implements Observer {
     // adapted from metaphase editor.
     

@@ -35,4 +35,22 @@ extends JComboBox implements Observer {
     public void update(Observable o, Object arg) {
         setSelectedItem(arg);
     }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.JComboBox#setSelectedIndex(int)
+     */
+    @Override
+    public void setSelectedIndex(int anIndex) {
+        System.out.println("setSelectedIndex " + anIndex);
+        super.setSelectedIndex(anIndex);
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.JComboBox#setSelectedItem(java.lang.Object)
+     */
+    @Override
+    public void setSelectedItem(Object anObject) {
+        System.out.println("setSelectedItem " + anObject);
+        super.setSelectedItem(anObject);
+    }
 }

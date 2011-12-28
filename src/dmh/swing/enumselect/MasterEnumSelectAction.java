@@ -119,6 +119,7 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        System.out.println("### action performed");
         Object source = e.getSource();
         if (source instanceof JComboBox) {
             JComboBox sourceComboBox = (JComboBox) source;

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Observable;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -29,6 +30,7 @@ import dmh.swing.html.SwingHtmlUtil;
 public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
     
+    @Deprecated
     public static final String KEY_SELECTION = "huxley-selection";
 
     public AbstractHtmlStyleAction() {}
@@ -45,17 +47,19 @@ public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
         performStyleChange(textComponent, tag, null);
     }
     
-    protected void performStyleChange(JTextComponent textComponent, 
+    protected void performStyleChange(final JTextComponent textComponent, 
                 HTML.Tag tag, Map<String, String> attributes) {  
-        HTMLDocument htmlDocument = (HTMLDocument) textComponent.getDocument();
+        final HTMLDocument htmlDocument = (HTMLDocument) textComponent.getDocument();
 
-        int start = textComponent.getSelectionStart();
-        int end = textComponent.getSelectionEnd();
+        final int start = textComponent.getSelectionStart();
+        final int end = textComponent.getSelectionEnd();
 
         Element element = htmlDocument.getParagraphElement(start);
-        MutableAttributeSet newAttrs = new SimpleAttributeSet(element.getAttributes());
+        final MutableAttributeSet newAttrs = new SimpleAttributeSet(element.getAttributes());
         if (tag != null) {
             newAttrs.addAttribute(StyleConstants.NameAttribute, tag);
+        } else {
+            newAttrs.removeAttribute(StyleConstants.NameAttribute);
         }
         if (attributes != null) {
             for (Map.Entry<String, String> entry: attributes.entrySet()) {
@@ -63,8 +67,13 @@ public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
             }
         }
 
-        htmlDocument.setParagraphAttributes(start, end - start, newAttrs, true);
-        SwingHtmlUtil.refreshJTextComponent(textComponent);
+//        SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+                htmlDocument.setParagraphAttributes(start, end - start, newAttrs, true);
+                SwingHtmlUtil.refreshJTextComponent(textComponent);
+//            }
+//        });
     }
 
 }

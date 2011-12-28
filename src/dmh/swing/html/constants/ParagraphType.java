@@ -22,16 +22,16 @@ import dmh.swing.html.HasHtmlTag;
  * @author davehuffman
  */
 public enum ParagraphType implements HasHtmlTag {
-    PARAGRAPH_FORMAT("Format", null),
-    NORMAL("Normal", Tag.P),
+    PARAGRAPH_FORMAT("Normal", null),
+//    NORMAL("Normal", Tag.P),
     HEADING_1("Heading 1", Tag.H1),
     HEADING_2("Heading 2", Tag.H2),
     HEADING_3("Heading 3", Tag.H3),
     HEADING_4("Heading 4", Tag.H4),
     HEADING_5("Heading 5", Tag.H5),
     HEADING_6("Heading 6", Tag.H6),
-    FORMATTED("Formatted", Tag.PRE),
-    ADDRESS("Address", Tag.ADDRESS);
+    FORMATTED("Formatted", Tag.PRE);
+//    ADDRESS("Address", Tag.ADDRESS);
     
     public static List<HTML.Tag> getTags() {
         return Lists.transform(Arrays.asList(values()), 

@@ -6,52 +6,15 @@
 
 package dmh.kuebiko.view;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.Arrays;
-import java.util.Collection;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Element;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.StyledEditorKit;
-import javax.swing.text.html.CSS;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.HTMLEditorKit.HTMLTextAction;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
+import dmh.swing.huxley.HuxleyUiManager;
 
 /**
  * UI panel for displaying and editing notes.
@@ -67,54 +30,55 @@ class NotePanel extends JPanel {
      */
     private enum CardId { NO_NOTE_MESSAGE, NOTE_TEXT }
     
-    /** 
-     * Enumeration of supported text styles for notes. Action names are defined 
-     * in the Swing library, some of which do not have symbolic constants
-     * defined.
-     * @see javax.swing.text.DefaultEditorKit
-     * @see javax.swing.text.StyledEditorKit#defaultActions
-     * @see javax.swing.text.html.HTMLEditorKit#defaultActions
-     */
-    public enum TextAction {
-        ALIGN_CENTER("center-justify"),
-        ALIGN_JUSTIFY(""), // TODO implement.
-        ALIGN_LEFT("left-justify"),
-        ALIGN_RIGHT("right-justify"),
-
-        FONT(""), // TODO implement.
-        FONT_COLOR(HTMLEditorKit.COLOR_ACTION),
-        FONT_SIZE_BIGGER(HTMLEditorKit.FONT_CHANGE_BIGGER),
-        FONT_SIZE_SMALLER(HTMLEditorKit.FONT_CHANGE_SMALLER),
-        
-        STYLE_BOLD("font-bold"),
-//        STYLE_BOLD(HTMLEditorKit.BOLD_ACTION),
-        STYLE_ITALIC("font-italic"),
-        STYLE_STRIKETHROUGH("font-strikethrough"),
-        STYLE_UNDERLINE("font-underline"),
-        
-        INSERT_BREAK(DefaultEditorKit.insertBreakAction),
-        INSERT_IMAGE(""), // TODO implement.
-        INSERT_LINK(""), // TODO implement.
-        INSERT_LIST_NUMBERED("InsertOrderedListItem"),
-        INSERT_LIST_NUMBERED_ITEM("InsertOrderedList"),
-        INSERT_LIST_BULLETTED("InsertUnorderedList"),
-        INSERT_LIST_BULLETTED_ITEM("InsertUnorderedListItem"),
-        INSERT_SEPERATOR("InsertHR"),
-        INSERT_TABLE("InsertTable"),
-        INSERT_TABLE_COL("InsertTableDataCell"),
-        INSERT_TABLE_ROW("InsertTableRow")
-        ;
-        
-        /** Identifier of the Swing action associated with this text style. */
-        private final String actionName;
-        
-        private TextAction(String actionName) {
-            this.actionName = actionName;
-        }
-    }
+//    /** 
+//     * Enumeration of supported text styles for notes. Action names are defined 
+//     * in the Swing library, some of which do not have symbolic constants
+//     * defined.
+//     * @see javax.swing.text.DefaultEditorKit
+//     * @see javax.swing.text.StyledEditorKit#defaultActions
+//     * @see javax.swing.text.html.HTMLEditorKit#defaultActions
+//     */
+//    public enum TextAction {
+//        ALIGN_CENTER("center-justify"),
+//        ALIGN_JUSTIFY(""), // TODO implement.
+//        ALIGN_LEFT("left-justify"),
+//        ALIGN_RIGHT("right-justify"),
+//
+//        FONT(""), // TODO implement.
+//        FONT_COLOR(HTMLEditorKit.COLOR_ACTION),
+//        FONT_SIZE_BIGGER(HTMLEditorKit.FONT_CHANGE_BIGGER),
+//        FONT_SIZE_SMALLER(HTMLEditorKit.FONT_CHANGE_SMALLER),
+//        
+//        STYLE_BOLD("font-bold"),
+////        STYLE_BOLD(HTMLEditorKit.BOLD_ACTION),
+//        STYLE_ITALIC("font-italic"),
+//        STYLE_STRIKETHROUGH("font-strikethrough"),
+//        STYLE_UNDERLINE("font-underline"),
+//        
+//        INSERT_BREAK(DefaultEditorKit.insertBreakAction),
+//        INSERT_IMAGE(""), // TODO implement.
+//        INSERT_LINK(""), // TODO implement.
+//        INSERT_LIST_NUMBERED("InsertOrderedListItem"),
+//        INSERT_LIST_NUMBERED_ITEM("InsertOrderedList"),
+//        INSERT_LIST_BULLETTED("InsertUnorderedList"),
+//        INSERT_LIST_BULLETTED_ITEM("InsertUnorderedListItem"),
+//        INSERT_SEPERATOR("InsertHR"),
+//        INSERT_TABLE("InsertTable"),
+//        INSERT_TABLE_COL("InsertTableDataCell"),
+//        INSERT_TABLE_ROW("InsertTableRow")
+//        ;
+//        
+//        /** Identifier of the Swing action associated with this text style. */
+//        private final String actionName;
+//        
+//        private TextAction(String actionName) {
+//            this.actionName = actionName;
+//        }
+//    }
     
     private final CardLayout cardLayout = new CardLayout();
-    private final JEditorPane noteTextArea = new JEditorPane("text/html", "");
+//    private final JEditorPane noteTextArea = new JEditorPane("text/html", "");
+    private final HuxleyUiManager huxleyUiManager = new HuxleyUiManager();
     
     /** The currently selected note. */
     private Note note;
@@ -136,19 +100,19 @@ class NotePanel extends JPanel {
         noSelectionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(noSelectionLabel, CardId.NO_NOTE_MESSAGE.toString());
         
-        JPanel editNotePanel = new JPanel();
-        add(editNotePanel, CardId.NOTE_TEXT.toString());
-        editNotePanel.setLayout(new BorderLayout(0, 0));
+        add(huxleyUiManager.getUiPanel(), CardId.NOTE_TEXT.toString());
         
-        JScrollPane noteTextScrollPane = new JScrollPane();
-        editNotePanel.add(noteTextScrollPane, BorderLayout.CENTER);
-        noteTextScrollPane.setBorder(null);
-        noteTextScrollPane.setViewportView(noteTextArea);
-        
-//        noteTextArea.getActionMap().put(HTMLEditorKit.BOLD_ACTION, new HtmlBoldAction(HTMLEditorKit.BOLD_ACTION));
-        
-        // Edit Tool Bar.
-        editNotePanel.add(buildEditToolBar(), BorderLayout.NORTH);
+//        JPanel editNotePanel = new JPanel();
+//        add(editNotePanel, CardId.NOTE_TEXT.toString());
+//        editNotePanel.setLayout(new BorderLayout(0, 0));
+//        
+//        JScrollPane noteTextScrollPane = new JScrollPane();
+//        editNotePanel.add(noteTextScrollPane, BorderLayout.CENTER);
+//        noteTextScrollPane.setBorder(null);
+//        noteTextScrollPane.setViewportView(noteTextArea);
+//        
+//        // Edit Tool Bar.
+//        editNotePanel.add(buildEditToolBar(), BorderLayout.NORTH);
     }
     
     /**
@@ -157,154 +121,154 @@ class NotePanel extends JPanel {
      */
     private void additionalSetup() {
         
-        // Note Editor Pane.
-        noteTextArea.addCaretListener(new TextStyleCaretListener());
-        this.addFocusListener(
-                new FocusAdapter() {
-                    @Override
-                    public void focusGained(FocusEvent e) {
-                        // When the panel gains focus, transfer focus to the
-                        // note text area if it is visible.
-                        if (noteTextArea.isVisible()) {
-                            noteTextArea.requestFocusInWindow();
-                        }
-                    }
-                });
-        
-        noteTextArea.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        noteChanged = true;
-                    }
-        
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        noteChanged = true;
-                    }
-        
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        noteChanged = true;
-                    }
-                });
-        
-        noteTextArea.setDocument(noteTextArea.getEditorKit().createDefaultDocument());
+//        // Note Editor Pane.
+//        noteTextArea.addCaretListener(new TextStyleCaretListener());
+//        this.addFocusListener(
+//                new FocusAdapter() {
+//                    @Override
+//                    public void focusGained(FocusEvent e) {
+//                        // When the panel gains focus, transfer focus to the
+//                        // note text area if it is visible.
+//                        if (noteTextArea.isVisible()) {
+//                            noteTextArea.requestFocusInWindow();
+//                        }
+//                    }
+//                });
+//        
+//        noteTextArea.getDocument().addDocumentListener(
+//                new DocumentListener() {
+//                    @Override
+//                    public void insertUpdate(DocumentEvent e) {
+//                        noteChanged = true;
+//                    }
+//        
+//                    @Override
+//                    public void removeUpdate(DocumentEvent e) {
+//                        noteChanged = true;
+//                    }
+//        
+//                    @Override
+//                    public void changedUpdate(DocumentEvent e) {
+//                        noteChanged = true;
+//                    }
+//                });
+//        
+//        noteTextArea.setDocument(noteTextArea.getEditorKit().createDefaultDocument());
         
         // By default, no note should be displayed.
         setNote(null);
     }
 
-    /**
-     * 
-     */
-    private JToolBar buildEditToolBar() {
-        JToolBar editToolBar = new JToolBar();
-        editToolBar.setFocusable(false);
-        editToolBar.setFloatable(false);
-        
-        // Font.
-        if (Main.POST_0_1_RELEASE) {
-            editToolBar.add(new JComboBox(new String[] { "Font" })); // TODO implement.
-            editToolBar.add(new JComboBox(new String[] { "Size" })); // TODO implement.
-            editToolBar.add(newBtn("FONT_SIZE_DOWN", TextAction.FONT_SIZE_SMALLER));
-            editToolBar.add(newBtn("FONT_SIZE_UP", TextAction.FONT_SIZE_BIGGER));
-            JButton colorButton = newBtn("COLOR", TextAction.FONT_COLOR);
-            colorButton.setAction(new StyledEditorKit.ForegroundAction(HTMLEditorKit.COLOR_ACTION, Color.GREEN));
-            editToolBar.add(colorButton);
-            editToolBar.addSeparator();
-        }
-        
-        // Style.
-        editToolBar.add(newTogBtn("bold", TextAction.STYLE_BOLD));
-        editToolBar.add(newTogBtn("italic", TextAction.STYLE_ITALIC));
-        editToolBar.add(newTogBtn("underline", TextAction.STYLE_UNDERLINE));
-        if (Main.POST_0_1_RELEASE) {
-            editToolBar.add(newTogBtn("strikethrough", TextAction.STYLE_STRIKETHROUGH)); // TODO implement.
-            editToolBar.addSeparator();
-        }
-        
-        // Alignment.
-        if (Main.POST_0_1_RELEASE) {
-            Collection<JToggleButton> alignButtons = Arrays.asList(
-                    newTogBtn("align-left", TextAction.ALIGN_LEFT),
-                    newTogBtn("align-center", TextAction.ALIGN_CENTER),
-                    newTogBtn("align-right", TextAction.ALIGN_RIGHT));
-            ButtonGroup alignButtonGroup = new ButtonGroup();
-            for (JToggleButton alignButton: alignButtons) {
-                alignButtonGroup.add(alignButton);
-                editToolBar.add(alignButton);
-                
-            }
-            alignButtons.add(newTogBtn("align-justity", TextAction.ALIGN_JUSTIFY));
-        }
-        
-        // Objects.
-        if (Main.POST_0_1_RELEASE) {
-            editToolBar.add(newBtn("link", TextAction.INSERT_LINK));
-            editToolBar.add(new JButton(new ImageAction()));
-            //editToolBar.add(newBtn("IMAGE", TextAction.INSERT_IMAGE));
-            editToolBar.add(newBtn("break", TextAction.INSERT_BREAK));
-            editToolBar.add(newBtn("horizontal-rule", TextAction.INSERT_SEPERATOR));
-            editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED));
-            editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED_ITEM));
-            editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED));
-            editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED_ITEM));
-            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE));
-            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_COL));
-            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_ROW));
-            editToolBar.addSeparator();
-        }
-        
-        // Paragraph.
-        if (Main.POST_0_1_RELEASE) {
-            editToolBar.add(new JComboBox());
-        }
-        
-        return editToolBar;
-    }
-    
-    /**
-     * Helper method. Instantiate and configure a toggle button for use in the 
-     * note edit tool bar.
-     * @param image Identifier for the button's image.
-     * @param action The action to be associated with the button.
-     * @return A newly created toggle button.
-     */
-    private JToggleButton newTogBtn(String image, final TextAction action) {
-//        JToggleButton button = new JToggleButton(new AbstractAction() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                noteTextArea.getActionMap().get(action.actionName).actionPerformed(e);
-//                Main.log("action [%s].", action.actionName);
-//                SwingUtilities.invokeLater(new Runnable() {
-//                    public void run() {
-//                        NotePanel.this.repaint();
-//                    }
-//                });
-//            }});
-        JToggleButton button = new JToggleButton(
-                noteTextArea.getActionMap().get(action.actionName));
-        button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
-        button.setText("");
-        button.setPreferredSize(new Dimension(16, 16));
-        button.setFocusable(false);
-        
-        
-        
-        
-        return button;
-    }
-    
-    private JButton newBtn(String image, TextAction action) {
-        JButton button = new JButton(
-                noteTextArea.getActionMap().get(action.actionName));
-        button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
-        button.setText("");
-        button.setPreferredSize(new Dimension(16, 16));
-        button.setFocusable(false);
-        return button;
-    }
+//    /**
+//     * 
+//     */
+//    private JToolBar buildEditToolBar() {
+//        JToolBar editToolBar = new JToolBar();
+//        editToolBar.setFocusable(false);
+//        editToolBar.setFloatable(false);
+//        
+//        // Font.
+//        if (Main.POST_0_1_RELEASE) {
+//            editToolBar.add(new JComboBox(new String[] { "Font" })); // TODO implement.
+//            editToolBar.add(new JComboBox(new String[] { "Size" })); // TODO implement.
+//            editToolBar.add(newBtn("FONT_SIZE_DOWN", TextAction.FONT_SIZE_SMALLER));
+//            editToolBar.add(newBtn("FONT_SIZE_UP", TextAction.FONT_SIZE_BIGGER));
+//            JButton colorButton = newBtn("COLOR", TextAction.FONT_COLOR);
+//            colorButton.setAction(new StyledEditorKit.ForegroundAction(HTMLEditorKit.COLOR_ACTION, Color.GREEN));
+//            editToolBar.add(colorButton);
+//            editToolBar.addSeparator();
+//        }
+//        
+//        // Style.
+//        editToolBar.add(newTogBtn("bold", TextAction.STYLE_BOLD));
+//        editToolBar.add(newTogBtn("italic", TextAction.STYLE_ITALIC));
+//        editToolBar.add(newTogBtn("underline", TextAction.STYLE_UNDERLINE));
+//        if (Main.POST_0_1_RELEASE) {
+//            editToolBar.add(newTogBtn("strikethrough", TextAction.STYLE_STRIKETHROUGH)); // TODO implement.
+//            editToolBar.addSeparator();
+//        }
+//        
+//        // Alignment.
+//        if (Main.POST_0_1_RELEASE) {
+//            Collection<JToggleButton> alignButtons = Arrays.asList(
+//                    newTogBtn("align-left", TextAction.ALIGN_LEFT),
+//                    newTogBtn("align-center", TextAction.ALIGN_CENTER),
+//                    newTogBtn("align-right", TextAction.ALIGN_RIGHT));
+//            ButtonGroup alignButtonGroup = new ButtonGroup();
+//            for (JToggleButton alignButton: alignButtons) {
+//                alignButtonGroup.add(alignButton);
+//                editToolBar.add(alignButton);
+//                
+//            }
+//            alignButtons.add(newTogBtn("align-justity", TextAction.ALIGN_JUSTIFY));
+//        }
+//        
+//        // Objects.
+//        if (Main.POST_0_1_RELEASE) {
+//            editToolBar.add(newBtn("link", TextAction.INSERT_LINK));
+//            editToolBar.add(new JButton(new ImageAction()));
+//            //editToolBar.add(newBtn("IMAGE", TextAction.INSERT_IMAGE));
+//            editToolBar.add(newBtn("break", TextAction.INSERT_BREAK));
+//            editToolBar.add(newBtn("horizontal-rule", TextAction.INSERT_SEPERATOR));
+//            editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED));
+//            editToolBar.add(newBtn("list-numbers", TextAction.INSERT_LIST_NUMBERED_ITEM));
+//            editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED));
+//            editToolBar.add(newBtn("list-bullets", TextAction.INSERT_LIST_BULLETTED_ITEM));
+//            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE));
+//            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_COL));
+//            editToolBar.add(newBtn("table", TextAction.INSERT_TABLE_ROW));
+//            editToolBar.addSeparator();
+//        }
+//        
+//        // Paragraph.
+//        if (Main.POST_0_1_RELEASE) {
+//            editToolBar.add(new JComboBox());
+//        }
+//        
+//        return editToolBar;
+//    }
+//    
+//    /**
+//     * Helper method. Instantiate and configure a toggle button for use in the 
+//     * note edit tool bar.
+//     * @param image Identifier for the button's image.
+//     * @param action The action to be associated with the button.
+//     * @return A newly created toggle button.
+//     */
+//    private JToggleButton newTogBtn(String image, final TextAction action) {
+////        JToggleButton button = new JToggleButton(new AbstractAction() {
+////            @Override
+////            public void actionPerformed(ActionEvent e) {
+////                noteTextArea.getActionMap().get(action.actionName).actionPerformed(e);
+////                Main.log("action [%s].", action.actionName);
+////                SwingUtilities.invokeLater(new Runnable() {
+////                    public void run() {
+////                        NotePanel.this.repaint();
+////                    }
+////                });
+////            }});
+//        JToggleButton button = new JToggleButton(
+//                noteTextArea.getActionMap().get(action.actionName));
+//        button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
+//        button.setText("");
+//        button.setPreferredSize(new Dimension(16, 16));
+//        button.setFocusable(false);
+//        
+//        
+//        
+//        
+//        return button;
+//    }
+//    
+//    private JButton newBtn(String image, TextAction action) {
+//        JButton button = new JButton(
+//                noteTextArea.getActionMap().get(action.actionName));
+//        button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
+//        button.setText("");
+//        button.setPreferredSize(new Dimension(16, 16));
+//        button.setFocusable(false);
+//        return button;
+//    }
     
     /**
      * Synchronize the current note with data from the UI.
@@ -318,7 +282,8 @@ class NotePanel extends JPanel {
      * @param syncNote The note to synchronize.
      */
     private void syncNote(Note syncNote) {
-        syncNote.setText(noteTextArea.getText());
+//        syncNote.setText(noteTextArea.getText());
+        syncNote.setText(getNoteTextArea().getText());
     }
 
     /**
@@ -338,12 +303,14 @@ class NotePanel extends JPanel {
             cardLayout.show(this, CardId.NO_NOTE_MESSAGE.toString());
             return;
         }
-        noteTextArea.setText(note.getText());
+//        noteTextArea.setText(note.getText());
+        getNoteTextArea().setText(note.getText());
         cardLayout.show(this, CardId.NOTE_TEXT.toString());
     }
     
     JEditorPane getNoteTextArea() {
-        return noteTextArea;
+//        return noteTextArea;
+        return huxleyUiManager.getTextArea();
     }
     
     /**
@@ -370,185 +337,185 @@ class NotePanel extends JPanel {
         }
     }
     
-    private static class HtmlBoldAction extends HTMLTextAction {
-        public HtmlBoldAction(String name) {
-            super(name);
-        }
-
-//        @Override
-        public void actionPerformed(ActionEvent e) {
-            JEditorPane editor = getEditor(e);
-            HTMLDocument htmlDocument = getHTMLDocument(editor);
-            HTMLEditorKit htmlEditorKit = getHTMLEditorKit(editor);
-            
-
-            int dot = editor.getCaret().getDot();
-            Element elem = htmlDocument.getCharacterElement(dot);
-            
-            try {
-                editor.getDocument().insertString(1, "<b>", null);
-                editor.getDocument().insertString(5, "</b>", null);
-//                htmlEditorKit.insertHTML(htmlDocument, elem.getStartOffset(),
-//                        "<span style=\"font-weight:bold;\">", 0, 0, HTML.Tag.SPAN);
-//                htmlEditorKit.insertHTML(htmlDocument, elem.getEndOffset(),
-//                        "</span>", 0, 0, HTML.Tag.SPAN);
-                
-//                htmlEditorKit.insertHTML(htmlDocument, 0, "<span>foo </span>", 0, 0, HTML.Tag.SPAN);
-                
-                
-//                Main.log(htmlDocument.getText(0, htmlDocument.getLength()));
-                
-                
-//                htmlDocument.insertBeforeStart(elem, "<b>");
-//                htmlDocument.insertAfterEnd(elem, "</b>");
-//                htmlDocument.insertBeforeStart(elem, "<span style=\"font-weight:bold;\">");
-//                htmlDocument.insertAfterEnd(elem, "</span>");
-            } catch (BadLocationException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-//            } catch (IOException e1) {
+//    private static class HtmlBoldAction extends HTMLTextAction {
+//        public HtmlBoldAction(String name) {
+//            super(name);
+//        }
+//
+////        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            JEditorPane editor = getEditor(e);
+//            HTMLDocument htmlDocument = getHTMLDocument(editor);
+//            HTMLEditorKit htmlEditorKit = getHTMLEditorKit(editor);
+//            
+//
+//            int dot = editor.getCaret().getDot();
+//            Element elem = htmlDocument.getCharacterElement(dot);
+//            
+//            try {
+//                editor.getDocument().insertString(1, "<b>", null);
+//                editor.getDocument().insertString(5, "</b>", null);
+////                htmlEditorKit.insertHTML(htmlDocument, elem.getStartOffset(),
+////                        "<span style=\"font-weight:bold;\">", 0, 0, HTML.Tag.SPAN);
+////                htmlEditorKit.insertHTML(htmlDocument, elem.getEndOffset(),
+////                        "</span>", 0, 0, HTML.Tag.SPAN);
+//                
+////                htmlEditorKit.insertHTML(htmlDocument, 0, "<span>foo </span>", 0, 0, HTML.Tag.SPAN);
+//                
+//                
+////                Main.log(htmlDocument.getText(0, htmlDocument.getLength()));
+//                
+//                
+////                htmlDocument.insertBeforeStart(elem, "<b>");
+////                htmlDocument.insertAfterEnd(elem, "</b>");
+////                htmlDocument.insertBeforeStart(elem, "<span style=\"font-weight:bold;\">");
+////                htmlDocument.insertAfterEnd(elem, "</span>");
+//            } catch (BadLocationException e1) {
 //                // TODO Auto-generated catch block
 //                e1.printStackTrace();
-            }
-        }
+////            } catch (IOException e1) {
+////                // TODO Auto-generated catch block
+////                e1.printStackTrace();
+//            }
+//        }
+//
+//
+//
+//        /* (non-Javadoc)
+//         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+//         */
+////        @Override
+//        public void __actionPerformed(ActionEvent e) {
+//            JEditorPane editor = getEditor(e);
+//            if (editor != null) {
+//            StyledEditorKit kit = getStyledEditorKit(editor);
+//            MutableAttributeSet attr = kit.getInputAttributes();
+//            boolean bold = (StyleConstants.isBold(attr)) ? false : true;
+//            SimpleAttributeSet sas = new SimpleAttributeSet();
+//            StyleConstants.setBold(sas, bold);
+//            setCharacterAttributes(editor, sas, false);
+//            }
+//        }
+//        
+//    }
 
-
-
-        /* (non-Javadoc)
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
+//    /**
+//     * Custom listener for caret updates; will toggle components for modifying 
+//     * text styles based on the text under the caret (a.k.a. cursor).
+//     * 
+//     * This class is based on the CaratHandler class in the SwingX JXEditorPane.
+//     * @see org.jdesktop.swingx.JXEditorPane.CaretHandler
+//     */
+//    private class TextStyleCaretListener implements CaretListener {
 //        @Override
-        public void __actionPerformed(ActionEvent e) {
-            JEditorPane editor = getEditor(e);
-            if (editor != null) {
-            StyledEditorKit kit = getStyledEditorKit(editor);
-            MutableAttributeSet attr = kit.getInputAttributes();
-            boolean bold = (StyleConstants.isBold(attr)) ? false : true;
-            SimpleAttributeSet sas = new SimpleAttributeSet();
-            StyleConstants.setBold(sas, bold);
-            setCharacterAttributes(editor, sas, false);
-            }
-        }
-        
-    }
-
-    /**
-     * Custom listener for caret updates; will toggle components for modifying 
-     * text styles based on the text under the caret (a.k.a. cursor).
-     * 
-     * This class is based on the CaratHandler class in the SwingX JXEditorPane.
-     * @see org.jdesktop.swingx.JXEditorPane.CaretHandler
-     */
-    private class TextStyleCaretListener implements CaretListener {
-        @Override
-        public void caretUpdate(CaretEvent event) {
-            StyledDocument document = (StyledDocument) noteTextArea.getDocument();
-            int dot = event.getDot();
-//            dot = dot > 0 ? dot - 1 : dot;
-            
-            Element elem = document.getCharacterElement(dot);
-            AttributeSet set = elem.getAttributes();
-
-            final ActionMap actionMap = noteTextArea.getActionMap();
-            actionMap.get(TextAction.STYLE_BOLD.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isBold(elem));
-            actionMap.get(TextAction.STYLE_ITALIC.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isItalic(elem));
-            actionMap.get(TextAction.STYLE_UNDERLINE.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isUnderline(elem));
-
-//            Main.log("align=[%d].", StyleConstants.getAlignment(set));
-            
-            elem = document.getParagraphElement(dot);
-            set = elem.getAttributes();
-
-            // Update the paragraph selector if applicable.
-//            if (selector != null) {
-//                selector.setSelectedItem(set.getAttribute(StyleConstants.NameAttribute));
-//            }
-
-            HTMLDocument doc = (HTMLDocument) noteTextArea.getDocument();
-            Element htmlElem = doc.getCharacterElement(event.getDot());
-            
-            AttributeSet attributes = htmlElem.getAttributes();
-//            Main.log("instanceof AbstractDocument=[%b].", attributes instanceof AbstractDocument.AbstractElement);
-//            Main.log("attrib=[%s].", 
-//                    ((AbstractDocument.AbstractElement) attributes).getAttribute(CSS.Attribute.FONT_WEIGHT));
-            attributes.containsAttribute(CSS.Attribute.FONT_WEIGHT, "bold");
-            
-            
-            
-//            Main.log("__c=[%s].", SwingHtmlUtil.__containsAttribute(
-//                    ((AbstractDocument.AbstractElement) attributes),
-//                    CSS.Attribute.FONT_WEIGHT, "bold"));
-//            Main.log("c=[%s].", SwingHtmlUtil.containsAttribute(
-//                    htmlElem,
-//                    CSS.Attribute.FONT_WEIGHT, "bold"));
-//            Main.log("b=[%s].", SwingHtmlUtil.isBold(htmlElem));
+//        public void caretUpdate(CaretEvent event) {
+//            StyledDocument document = (StyledDocument) noteTextArea.getDocument();
+//            int dot = event.getDot();
+////            dot = dot > 0 ? dot - 1 : dot;
 //            
-//            Main.log("htmlElem=[%s].", htmlElem);
-//            Main.log("htmlElem.attributes.b=[%s].", htmlElem.getAttributes().c);
-//            Main.log("htmlElem.parent=[%s].", htmlElem.getParentElement());
-            
-            TextAction setAlignment = null;
-//            EnumSet<TextAction> foo = EnumSet.of(
-//                    TextAction.ALIGN_LEFT, 
-//                    TextAction.ALIGN_RIGHT, 
-//                    TextAction.ALIGN_CENTER);
-            
-            if (SwingHtmlUtil.isLeftAligned(elem)) {
-                setAlignment = TextAction.ALIGN_LEFT;
-            } else if (SwingHtmlUtil.isRightAligned(elem)) {
-                setAlignment = TextAction.ALIGN_RIGHT;
-            } else if (SwingHtmlUtil.isCenterAligned(elem)) {
-                setAlignment = TextAction.ALIGN_CENTER;
-            }
-                        
-//            Main.log("setAlignment=[%s].", setAlignment);
-            
-//            switch (StyleConstants.getAlignment(set)) {
-//            case StyleConstants.ALIGN_CENTER:
-//                setAlignment = TextAction.ALIGN_CENTER;
-//                break;
-//            case StyleConstants.ALIGN_LEFT:
+//            Element elem = document.getCharacterElement(dot);
+//            AttributeSet set = elem.getAttributes();
+//
+//            final ActionMap actionMap = noteTextArea.getActionMap();
+//            actionMap.get(TextAction.STYLE_BOLD.actionName).putValue(
+//                    Action.SELECTED_KEY, SwingHtmlUtil.isBold(elem));
+//            actionMap.get(TextAction.STYLE_ITALIC.actionName).putValue(
+//                    Action.SELECTED_KEY, SwingHtmlUtil.isItalic(elem));
+//            actionMap.get(TextAction.STYLE_UNDERLINE.actionName).putValue(
+//                    Action.SELECTED_KEY, SwingHtmlUtil.isUnderline(elem));
+//
+////            Main.log("align=[%d].", StyleConstants.getAlignment(set));
+//            
+//            elem = document.getParagraphElement(dot);
+//            set = elem.getAttributes();
+//
+//            // Update the paragraph selector if applicable.
+////            if (selector != null) {
+////                selector.setSelectedItem(set.getAttribute(StyleConstants.NameAttribute));
+////            }
+//
+//            HTMLDocument doc = (HTMLDocument) noteTextArea.getDocument();
+//            Element htmlElem = doc.getCharacterElement(event.getDot());
+//            
+//            AttributeSet attributes = htmlElem.getAttributes();
+////            Main.log("instanceof AbstractDocument=[%b].", attributes instanceof AbstractDocument.AbstractElement);
+////            Main.log("attrib=[%s].", 
+////                    ((AbstractDocument.AbstractElement) attributes).getAttribute(CSS.Attribute.FONT_WEIGHT));
+//            attributes.containsAttribute(CSS.Attribute.FONT_WEIGHT, "bold");
+//            
+//            
+//            
+////            Main.log("__c=[%s].", SwingHtmlUtil.__containsAttribute(
+////                    ((AbstractDocument.AbstractElement) attributes),
+////                    CSS.Attribute.FONT_WEIGHT, "bold"));
+////            Main.log("c=[%s].", SwingHtmlUtil.containsAttribute(
+////                    htmlElem,
+////                    CSS.Attribute.FONT_WEIGHT, "bold"));
+////            Main.log("b=[%s].", SwingHtmlUtil.isBold(htmlElem));
+////            
+////            Main.log("htmlElem=[%s].", htmlElem);
+////            Main.log("htmlElem.attributes.b=[%s].", htmlElem.getAttributes().c);
+////            Main.log("htmlElem.parent=[%s].", htmlElem.getParentElement());
+//            
+//            TextAction setAlignment = null;
+////            EnumSet<TextAction> foo = EnumSet.of(
+////                    TextAction.ALIGN_LEFT, 
+////                    TextAction.ALIGN_RIGHT, 
+////                    TextAction.ALIGN_CENTER);
+//            
+//            if (SwingHtmlUtil.isLeftAligned(elem)) {
 //                setAlignment = TextAction.ALIGN_LEFT;
-//                break;
-//            case StyleConstants.ALIGN_RIGHT:
+//            } else if (SwingHtmlUtil.isRightAligned(elem)) {
 //                setAlignment = TextAction.ALIGN_RIGHT;
-//                break;
+//            } else if (SwingHtmlUtil.isCenterAligned(elem)) {
+//                setAlignment = TextAction.ALIGN_CENTER;
 //            }
-            if (setAlignment != null) {
-                actionMap.get(setAlignment.actionName)
-                        .putValue(Action.SELECTED_KEY, true);
-            }
-//            final Collection<TextAction> alignmentsToDisable;
+//                        
+////            Main.log("setAlignment=[%s].", setAlignment);
+//            
+////            switch (StyleConstants.getAlignment(set)) {
+////            case StyleConstants.ALIGN_CENTER:
+////                setAlignment = TextAction.ALIGN_CENTER;
+////                break;
+////            case StyleConstants.ALIGN_LEFT:
+////                setAlignment = TextAction.ALIGN_LEFT;
+////                break;
+////            case StyleConstants.ALIGN_RIGHT:
+////                setAlignment = TextAction.ALIGN_RIGHT;
+////                break;
+////            }
 //            if (setAlignment != null) {
 //                actionMap.get(setAlignment.actionName)
 //                        .putValue(Action.SELECTED_KEY, true);
-//                alignmentsToDisable = Sets.difference(
-//                        foo, Collections.singleton(setAlignment));
-//            } else {
-//                alignmentsToDisable = foo;
 //            }
-//            
-//            for (TextAction alignAction: alignmentsToDisable) {
-//                actionMap.get(alignAction.actionName)
-//                        .putValue(Action.SELECTED_KEY, false);
-//            }
-        }
-    }
-    
-    static class ImageAction extends AbstractAction implements ActionListener {
-        private static final long serialVersionUID = 1L;
-
-        public ImageAction() {
-            super("kueb-image-action", 
-                    new ImageIcon(ImageManager.get().getImage("image")));
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            new JFileChooser().setVisible(true);
-        }
-    }
+////            final Collection<TextAction> alignmentsToDisable;
+////            if (setAlignment != null) {
+////                actionMap.get(setAlignment.actionName)
+////                        .putValue(Action.SELECTED_KEY, true);
+////                alignmentsToDisable = Sets.difference(
+////                        foo, Collections.singleton(setAlignment));
+////            } else {
+////                alignmentsToDisable = foo;
+////            }
+////            
+////            for (TextAction alignAction: alignmentsToDisable) {
+////                actionMap.get(alignAction.actionName)
+////                        .putValue(Action.SELECTED_KEY, false);
+////            }
+//        }
+//    }
+//    
+//    static class ImageAction extends AbstractAction implements ActionListener {
+//        private static final long serialVersionUID = 1L;
+//
+//        public ImageAction() {
+//            super("kueb-image-action", 
+//                    new ImageIcon(ImageManager.get().getImage("image")));
+//        }
+//        
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new JFileChooser().setVisible(true);
+//        }
+//    }
 }
