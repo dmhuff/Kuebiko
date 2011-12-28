@@ -17,6 +17,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import dmh.kuebiko.model.Note;
+import dmh.kuebiko.model.Note.State;
 import dmh.kuebiko.model.NoteDao;
 import dmh.kuebiko.model.PersistenceException;
 import dmh.kuebiko.model.ValidationException;
@@ -33,8 +34,8 @@ public class NoteManager {
     private final NoteDao noteDao;
     
     private List<Note> notes = null;
-
     private final Collection<Note> deletedNotes;
+    private boolean unsavedChanges = false;
     
     /**
      * Constructor.
@@ -50,6 +51,7 @@ public class NoteManager {
     private void loadAllNotes() {
         try {
             notes = Lists.newArrayList(noteDao.readNotes());
+            unsavedChanges = false;
         } catch (PersistenceException e) {
             throw new DataStoreException("Could not read notes.", e);
         }
@@ -86,6 +88,26 @@ public class NoteManager {
     
     public Note getNoteAt(int index) {
         return notes.get(index);
+    }
+    
+    /**
+     * Determine if there are changes that have not been saved to the data store.
+     * @return True if there are unsaved changes.
+     */
+    public boolean hasUnsavedChanges() {
+        // First check the cached value.
+        if (unsavedChanges) {
+            return unsavedChanges;
+        }
+        // A false value does not necessarily indicate to changes are present; 
+        // we need to check each note to determine if it has been updated.
+        for (Note note : notes) {
+            if (note.getState() == State.DIRTY) {
+                unsavedChanges = true;
+                break;
+            }
+        }
+        return unsavedChanges;
     }
     
     /**
@@ -143,6 +165,7 @@ public class NoteManager {
     
     void addNote(Note newNote) {
         notes.add(newNote);
+        unsavedChanges = true;
     }
     
     public void deleteNote(Note note) {
@@ -151,6 +174,7 @@ public class NoteManager {
                     "Note [%s] does not exist.", note));
         }
         deletedNotes.add(note);
+        unsavedChanges = true;
     }
     
     /**

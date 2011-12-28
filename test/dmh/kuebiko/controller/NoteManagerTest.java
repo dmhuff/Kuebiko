@@ -54,10 +54,12 @@ public class NoteManagerTest {
             assertTrue(noteMngr.getNoteTitles().contains(dummyTitle),
                     "Note stack should contain each added note.");
         }
+        
+        doSaveAll(noteMngr);
     }
     
     @Test
-    public void addOneNewNoteWIthoutTitleTest() {
+    public void addOneNewNoteWithoutTitleTest() {
         final NoteManager noteMngr = TestHelper.newNoteManager();
         
         assertEquals(0, noteMngr.getNoteCount(), "Note stack should be empty.");
@@ -68,6 +70,8 @@ public class NoteManagerTest {
                 "First untitled note should have dafault title.");
         assertEquals(newNoteTitle, getOnlyElement(noteMngr.getNotes()).getTitle(),
                 "Note in stack should have returned title.");
+        
+        doSaveAll(noteMngr);
     }
     
     @Test
@@ -93,9 +97,9 @@ public class NoteManagerTest {
         
         // Save the added notes; this will invoke validation what will ensure 
         // that all the notes have unique titles.
-        noteMngr.saveAll();
+        doSaveAll(noteMngr);
     }
-    
+
     @Test(expectedExceptions = DataStoreException.class)
     public void saveNotesWithDuplicateTitlesTest() {
         final NoteManager noteMngr = TestHelper.newNoteManager();
@@ -109,7 +113,20 @@ public class NoteManagerTest {
                 "The only note in the stack should be the added note.");
         
         noteMngr.addNewNote(title);
-        noteMngr.saveAll();
+        doSaveAll(noteMngr);
+    }
+    
+    @Test
+    public void updateNoteTest() {
+        final NoteManager noteMngr = TestHelper.newNoteManager(
+                TestHelper.newDummyNote("foo", "bar"));
+        
+        assertEquals(noteMngr.getNoteCount(), 1,
+                "Note stack should contain 1 note.");
+
+        noteMngr.getNoteAt(0).setText("something different");
+        
+        doSaveAll(noteMngr);
     }
     
     @Test
@@ -127,7 +144,12 @@ public class NoteManagerTest {
         
         noteMngr.deleteNote(onlyNote);
         
-        assertEquals(0, noteMngr.getNotes().size(), "TThe stack should be empty.");
+        assertEquals(0, noteMngr.getNotes().size(), "The stack should be empty.");
+        
+        doSaveAll(noteMngr);
+
+        assertEquals(0, noteMngr.getNotes().size(), 
+                "The stack should be empty after saving.");
     }
     
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -135,5 +157,20 @@ public class NoteManagerTest {
         final NoteManager noteMngr = TestHelper.newNoteManager(
                 TestHelper.newDummyNote("foo", ""));
         noteMngr.deleteNote(TestHelper.newDummyNote("bar", ""));
+    }
+    
+    /**
+     * Helper method; perform a save all operation on the passed note manager 
+     * and perform assertions around it.
+     * @param noteMngr The note manager to perform the save.
+     */
+    private void doSaveAll(NoteManager noteMngr) {
+        assertTrue(noteMngr.hasUnsavedChanges(), 
+                "Should have unsaved changes prior to save.");
+        
+        noteMngr.saveAll();
+        
+        assertFalse(noteMngr.hasUnsavedChanges(), 
+                "Should no loner have unsaved changes after save.");
     }
 }
