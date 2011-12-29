@@ -11,9 +11,10 @@ import javax.swing.text.html.HTML;
 
 /**
  * Utilities for making with the Swing text HTML API easier.
- *
+ * @deprecated moved to dmh.swing.html package.
  * @author davehuffman
  */
+@Deprecated
 public final class SwingHtmlUtil {
     private SwingHtmlUtil() {
         throw new AssertionError("Cannot be instantiated.");

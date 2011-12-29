@@ -17,7 +17,6 @@ import javax.swing.Box;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -29,10 +28,10 @@ import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
-import dmh.swing.enumselect.MasterEnumSelectAction;
 import dmh.swing.html.SwingHtmlUtil;
 import dmh.swing.html.constants.ParagraphType;
 import dmh.swing.huxley.constants.TextAction;
+import dmh.util.Callback;
 
 /**
  * Manager object for the Huxley UI.
@@ -44,6 +43,7 @@ public class HuxleyUiManager {
     private final JEditorPane textArea = new JEditorPane("text/html", "");
     
     private boolean textChanged = false;
+    private Callback<Boolean> onTextChangeCallback = null;
 
     public HuxleyUiManager() {
         buildUi();
@@ -88,25 +88,24 @@ public class HuxleyUiManager {
                     }
                 });
         
+        textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
         textArea.getDocument().addDocumentListener(
                 new DocumentListener() {
                     @Override
                     public void insertUpdate(DocumentEvent e) {
-                        textChanged = true;
+                        setTextChanged(true);
                     }
         
                     @Override
                     public void removeUpdate(DocumentEvent e) {
-                        textChanged = true;
+                        setTextChanged(true);
                     }
         
                     @Override
                     public void changedUpdate(DocumentEvent e) {
-                        textChanged = true;
+                        setTextChanged(true);
                     }
                 });
-        
-        textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
     }
 
     /** DEBUG for development testing. */
@@ -127,10 +126,39 @@ public class HuxleyUiManager {
         return uiPanel;
     }
     
-    public JEditorPane getTextArea() {
-        return textArea;
+//    public JEditorPane getTextArea() {
+//        return textArea;
+//    }
+    
+    public String getText() {
+        return textArea.getText();
     }
     
+    /**
+     * Reset the text contents to a pristine state.
+     * @param text The text contents after the state has been reset.
+     */
+    public void resetText(String text) {
+        textArea.setText(text);
+        setTextChanged(false);
+    }
+    
+    public boolean isTextChanged() {
+        return textChanged;
+    }
+    
+    private void setTextChanged(boolean textChanged) {
+        boolean prevValue = this.textChanged;
+        this.textChanged = textChanged;
+        if (prevValue != this.textChanged && onTextChangeCallback != null) {
+            onTextChangeCallback.callback(this.textChanged);
+        }
+    }
+    
+    public void setOnTextChangeCallback(Callback<Boolean> onTextChangeCallback) {
+        this.onTextChangeCallback = onTextChangeCallback;
+    }
+
     /**
      * Custom listener for caret updates; will toggle components for modifying 
      * text styles based on the text under the caret (a.k.a. cursor).
@@ -168,7 +196,7 @@ public class HuxleyUiManager {
             Element htmlElem = doc.getCharacterElement(event.getDot());
             
             HTML.Tag paragraph = SwingHtmlUtil.getParagraph(htmlElem);
-            System.out.println("tag: " + paragraph);
+//            System.out.println("tag: " + paragraph);
             
             ParagraphType paragraphType = ParagraphType.lookup(paragraph);
             

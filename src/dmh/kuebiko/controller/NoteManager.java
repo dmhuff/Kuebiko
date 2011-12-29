@@ -16,6 +16,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
+import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.model.Note.State;
 import dmh.kuebiko.model.NoteDao;
@@ -95,6 +96,11 @@ public class NoteManager {
      * @return True if there are unsaved changes.
      */
     public boolean hasUnsavedChanges() {
+        boolean value = __hasUnsavedChanges();
+        Main.log("hasUnsavedChanges() #=> [%b].", value);
+        return value;
+    }
+    public boolean __hasUnsavedChanges() {
         // First check the cached value.
         if (unsavedChanges) {
             return unsavedChanges;
@@ -181,6 +187,7 @@ public class NoteManager {
      * Save any changes made to the notes.
      */
     public void saveAll() {
+        Main.log("saveAll().");
         try {
             for (Note note: deletedNotes) {
                 noteDao.deleteNote(note);

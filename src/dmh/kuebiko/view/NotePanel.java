@@ -8,13 +8,14 @@ package dmh.kuebiko.view;
 
 import java.awt.CardLayout;
 
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.swing.huxley.HuxleyUiManager;
+import dmh.util.Callback;
 
 /**
  * UI panel for displaying and editing notes.
@@ -82,7 +83,6 @@ class NotePanel extends JPanel {
     
     /** The currently selected note. */
     private Note note;
-    private boolean noteChanged = false;
 
     NotePanel() {
         initialize();
@@ -101,6 +101,13 @@ class NotePanel extends JPanel {
         add(noSelectionLabel, CardId.NO_NOTE_MESSAGE.toString());
         
         add(huxleyUiManager.getUiPanel(), CardId.NOTE_TEXT.toString());
+        
+        huxleyUiManager.setOnTextChangeCallback(new Callback<Boolean>() {
+            @Override
+            public void callback(Boolean input) {
+                Main.log("ZOMG TEXT CHANGE!!!! [%b].%n", input);
+            }
+        });
         
 //        JPanel editNotePanel = new JPanel();
 //        add(editNotePanel, CardId.NOTE_TEXT.toString());
@@ -283,7 +290,8 @@ class NotePanel extends JPanel {
      */
     private void syncNote(Note syncNote) {
 //        syncNote.setText(noteTextArea.getText());
-        syncNote.setText(getNoteTextArea().getText());
+//        syncNote.setText(getNoteTextArea().getText());
+        syncNote.setText(huxleyUiManager.getText());
     }
 
     /**
@@ -291,26 +299,30 @@ class NotePanel extends JPanel {
      * @param prevNote The previously displayed note.
      */
     private void onNoteSelected(Note prevNote) {
-//        Main.log("onNoteSelected(); [%s]", note);
-        
+        Main.log("onNoteSelected(); [%s]; noteChanged=[%b].", note, huxleyUiManager.isTextChanged());
+
         // Save any changes made to the previously selected note.
-        if (prevNote != null && noteChanged) {
+        if (prevNote != null && huxleyUiManager.isTextChanged()) {
             syncNote(prevNote);
         }
-        noteChanged = false;
         
         if (note == null) {
             cardLayout.show(this, CardId.NO_NOTE_MESSAGE.toString());
             return;
         }
 //        noteTextArea.setText(note.getText());
-        getNoteTextArea().setText(note.getText());
+//        getNoteTextArea().setText(note.getText());
+        huxleyUiManager.resetText(note.getText());
         cardLayout.show(this, CardId.NOTE_TEXT.toString());
     }
     
-    JEditorPane getNoteTextArea() {
-//        return noteTextArea;
-        return huxleyUiManager.getTextArea();
+//    JEditorPane getNoteTextArea() {
+////        return noteTextArea;
+//        return huxleyUiManager.getTextArea();
+//    }
+    
+    HuxleyUiManager getHuxleyUiManager() {
+        return huxleyUiManager;
     }
     
     /**

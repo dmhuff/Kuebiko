@@ -40,12 +40,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.DefaultEditorKit;
 
+import org.apache.commons.lang.SystemUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
+import dmh.kuebiko.Main;
 import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.util.ActionManager;
 import dmh.kuebiko.util.ActionObserverUtil;
+import dmh.util.Callback;
 
 /**
  * UI frame for displaying and editing notes.
@@ -260,6 +263,11 @@ public class NoteFrame extends JFrame {
         gbc_searchText.gridy = 0;
         getContentPane().add(searchText, gbc_searchText);
         searchText.setColumns(10);
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            // Make the text field look like the standard Mac OS X search
+            // box control.
+            searchText.putClientProperty("JTextField.variant", "search");
+        }
 
         splitPane = new JSplitPane();
         splitPane.setBorder(null);
@@ -274,6 +282,13 @@ public class NoteFrame extends JFrame {
         getContentPane().add(splitPane, gbc_splitPane);
 
         notePanel = new NotePanel();
+        notePanel.getHuxleyUiManager().setOnTextChangeCallback(
+                new Callback<Boolean>() {
+                    @Override
+                    public void callback(Boolean input) {
+                        toggleUnsavedChangeIndicator(input);
+                    }
+                });
         splitPane.setRightComponent(notePanel);
 
         noteTableScroll = new JScrollPane();
@@ -368,8 +383,15 @@ public class NoteFrame extends JFrame {
         noteTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
+                Main.log("valueChanged; adjusting=[%b].", event.getValueIsAdjusting());
+                if (event.getValueIsAdjusting()) {
+                    return;
+                }
                 final Note selectedNote = noteTable.getSelectedNote();
-
+                final Note previousNote = notePanel.getNote();
+                Main.log("valueChanged; previousNote=[%s].", previousNote);
+                Main.log("valueChanged; selectedNote=[%s].", selectedNote);
+            
                 if (selectedNote == null) {
                     setModeToSearch();
                 } else {
@@ -394,6 +416,19 @@ public class NoteFrame extends JFrame {
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage("edit")));
         observable.setChangedAndNotify();
+    }
+    
+    private void toggleUnsavedChangeIndicator(boolean unsavedChanges) {
+        if (SystemUtils.IS_OS_MAC_OSX) {
+            // Toggle the Mac OS X window-modified indicator.
+            getRootPane().putClientProperty("Window.documentModified", unsavedChanges);
+        } else {
+            if (unsavedChanges) {
+                setTitle("* " + getTitle());
+            } else {
+                setTitle(getTitle().substring(2));
+            }
+        }
     }
     
     public boolean isNoteSelected() {

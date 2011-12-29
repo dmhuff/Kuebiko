@@ -28,6 +28,9 @@ import dmh.kuebiko.view.NoteFrame;
  * @author davehuffman
  */
 public class Main {
+//    /** True if this code is being run on Mac OS X. */
+//    public static final boolean MAC_OS_X = "Mac OS X".equals(System.getProperty("os.name"));
+    
     private static final String PARAM_DAO_CLASS = "kueb.dao"; 
     
     /** Temporary constant for disabling code that is not a part of the 0.1 release. */

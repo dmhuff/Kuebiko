@@ -47,7 +47,8 @@ public class NoteFrameTest {
             throw new TestException(e);
         }
         
-        String noteText = trimToNull(noteFrame.notePanel.getNoteTextArea().getText());
+//        String noteText = trimToNull(noteFrame.notePanel.getNoteTextArea().getText());
+        String noteText = trimToNull(noteFrame.notePanel.getHuxleyUiManager().getText());
         Assert.assertNotNull(noteText, "The note text area should have text.");
     }
 }
