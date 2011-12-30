@@ -9,6 +9,8 @@ package dmh.kuebiko.controller;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,9 +31,10 @@ import dmh.kuebiko.util.NoteTitleFunction;
  *
  * @author davehuffman
  */
-public class NoteManager {
+public class NoteManager extends Observable {
     static final String DEFAULT_NOTE_TITLE = "Untitled Note"; // TODO i18n.
     
+//    private final Observable observable = new Observable();
     private final NoteDao noteDao;
     
     private List<Note> notes = null;
@@ -48,11 +51,17 @@ public class NoteManager {
         deletedNotes = Lists.newArrayList();
         loadAllNotes();
     }
+    
+//    public void addObserver(Observer observer) {
+//        observable.addObserver(observer);
+//        observable.
+//    }
 
     private void loadAllNotes() {
         try {
             notes = Lists.newArrayList(noteDao.readNotes());
-            unsavedChanges = false;
+            //unsavedChanges = false;
+            setUnsavedChangesAndNotify(false);
         } catch (PersistenceException e) {
             throw new DataStoreException("Could not read notes.", e);
         }
@@ -110,10 +119,23 @@ public class NoteManager {
         for (Note note : notes) {
             if (note.getState() == State.DIRTY) {
                 unsavedChanges = true;
+                setChanged();
                 break;
             }
         }
         return unsavedChanges;
+    }
+    
+    private void setUnsavedChangesAndNotify(boolean unsavedChanges) {
+        final boolean prevValue = this.unsavedChanges;
+        this.unsavedChanges = unsavedChanges; 
+        final boolean currentValue = hasUnsavedChanges();
+        
+        // Notify observers if the new value is false or if the value has changed.
+        if (currentValue == false || prevValue != currentValue) {
+            setChanged();
+            notifyObservers(currentValue);
+        }
     }
     
     /**
@@ -171,7 +193,7 @@ public class NoteManager {
     
     void addNote(Note newNote) {
         notes.add(newNote);
-        unsavedChanges = true;
+        setUnsavedChangesAndNotify(true);
     }
     
     public void deleteNote(Note note) {
@@ -180,7 +202,7 @@ public class NoteManager {
                     "Note [%s] does not exist.", note));
         }
         deletedNotes.add(note);
-        unsavedChanges = true;
+        setUnsavedChangesAndNotify(true);
     }
     
     /**

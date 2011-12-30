@@ -42,17 +42,14 @@ public class HuxleyUiManager {
     private final JPanel uiPanel = new JPanel();
     private final JEditorPane textArea = new JEditorPane("text/html", "");
     
+    private final DocumentListener textChangeListener;
     private boolean textChanged = false;
     private Callback<Boolean> onTextChangeCallback = null;
 
-    public HuxleyUiManager() {
-        buildUi();
-    }
-
     /**
-     * Build the Huxley UI panel.
+     * Construct a Huxley UI manager.
      */
-    private void buildUi() {
+    public HuxleyUiManager() {
         uiPanel.setLayout(new BorderLayout());
         
         // Tool Bar.
@@ -89,23 +86,23 @@ public class HuxleyUiManager {
                 });
         
         textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
-        textArea.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        setTextChanged(true);
-                    }
-        
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        setTextChanged(true);
-                    }
-        
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        setTextChanged(true);
-                    }
-                });
+        textChangeListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                markTextAsChanged();
+            }
+      
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                markTextAsChanged();
+            }
+      
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                markTextAsChanged();
+            }
+        };
+        textArea.getDocument().addDocumentListener(textChangeListener);
     }
 
     /** DEBUG for development testing. */
@@ -136,22 +133,38 @@ public class HuxleyUiManager {
     
     /**
      * Reset the text contents to a pristine state.
-     * @param text The text contents after the state has been reset.
+     * @param text The text contents after the state has been reset. May be null.
      */
     public void resetText(String text) {
+        // Set the text without the change listener to prevent stray change events.
+        textArea.getDocument().removeDocumentListener(textChangeListener);
         textArea.setText(text);
-        setTextChanged(false);
+        textArea.getDocument().addDocumentListener(textChangeListener);
+        
+        resetTextChanged();
+    }
+
+    public void resetTextChanged() {
+        textChanged = false;
     }
     
     public boolean isTextChanged() {
         return textChanged;
     }
     
-    private void setTextChanged(boolean textChanged) {
-        boolean prevValue = this.textChanged;
-        this.textChanged = textChanged;
-        if (prevValue != this.textChanged && onTextChangeCallback != null) {
-            onTextChangeCallback.callback(this.textChanged);
+//    private void setTextChanged(boolean textChanged) {
+//        boolean prevValue = this.textChanged;
+//        this.textChanged = textChanged;
+//        if (prevValue != this.textChanged && onTextChangeCallback != null) {
+//            onTextChangeCallback.callback(this.textChanged);
+//        }
+//    }
+    
+    private void markTextAsChanged() {
+        if (!textChanged && onTextChangeCallback != null) {
+            // Only call the callback the first time the text is changed.
+            textChanged = true;
+            onTextChangeCallback.callback(textChanged);
         }
     }
     
@@ -216,7 +229,7 @@ public class HuxleyUiManager {
             }
                         
             if (setAlignment != null) {
-                System.out.println("alignment " + setAlignment);
+//                System.out.println("alignment " + setAlignment);
                 actionMap.get(setAlignment.actionName)
                         .putValue(Action.SELECTED_KEY, true);
             }

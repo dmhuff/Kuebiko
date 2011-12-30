@@ -257,7 +257,7 @@ public abstract class AbstractNoteDaoTest {
         changes.add(Pair.of("The Empire Strikes Back", "Luke meets his dad.")); 
         changes.add(Pair.of("Return of the Jedi", "Ewoks sing and dance."));
         
-        final int noteCount = 3;
+        final int noteCount = changes.size();
         final NoteDao noteDao = saveDummyNotes(noteCount);
         final List<Note> origNotes = ImmutableList.copyOf(noteDao.readNotes());
         
@@ -301,6 +301,47 @@ public abstract class AbstractNoteDaoTest {
                     "Note should have new text.");
             
             checkIntegrity(noteDao, noteCount);
+        }
+    }
+    
+    /**
+     * Test the note DAO's behavior when updating an existing note several times.
+     */
+    @Test
+    public void multipleUpdateNoteTest() throws Exception {
+        List<Pair<String, String>> changes = Lists.newArrayList();
+        changes.add(Pair.of("A New Hope", "The Death Star blows up."));
+        changes.add(Pair.of("The Empire Strikes Back", "Luke meets his dad.")); 
+        changes.add(Pair.of("Return of the Jedi", "Ewoks sing and dance."));
+        
+        final NoteDao noteDao = saveDummyNotes(1);
+        
+        for (Pair<String, String> change : changes) {
+            final Note origNote = Iterables.getOnlyElement(noteDao.readNotes());
+            
+            assertFalse(origNote.getTitle().equals(change.first), 
+                    "Original title must be different.");
+            assertFalse(origNote.getText().equals(change.second), 
+                    "Original text must be different.");
+            
+            origNote.setTitle(change.first);
+            origNote.setText(change.second);
+            
+            new NoteUpdateTestHarness(origNote) {
+                @Override
+                Note performUpdate(Note testNote) throws Exception {
+                    return noteDao.updateNote(origNote);
+                }
+            }.runTest();
+            
+            final Note updatedNote = Iterables.getOnlyElement(noteDao.readNotes());
+            
+            assertEquals(updatedNote.getTitle(), change.first, 
+                    "Note should have new title.");
+            assertEquals(updatedNote.getText(), change.second, 
+                    "Note should have new text.");
+            
+            checkIntegrity(noteDao, 1);
         }
     }
     

@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.collect.Lists;
+
+import dmh.kuebiko.Main;
 
 /**
  * Value object representing a note.
@@ -253,6 +253,7 @@ public class Note implements Serializable {
     }
 
     public void setText(String text) {
+        Main.log("setText([%s]).", text);
         if (isHollow()) {
             throw new IllegalStateException("Note is hollow.");
         }

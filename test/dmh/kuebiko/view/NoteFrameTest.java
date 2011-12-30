@@ -9,7 +9,6 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Method;
 

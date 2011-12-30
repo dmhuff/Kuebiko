@@ -6,11 +6,12 @@
 package dmh.swing.huxley;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -48,6 +49,11 @@ class ToolBarBuilder {
         JToolBar editToolBar = new JToolBar();
         editToolBar.setFocusable(false);
         editToolBar.setFloatable(false);
+        editToolBar.setRollover(true);
+        editToolBar.setMargin(new Insets(0, 0, 0, 0));
+        
+//        editToolBar.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
+
         
         // Font.
         if (Main.POST_0_1_RELEASE) {
@@ -113,10 +119,11 @@ class ToolBarBuilder {
                                 psa.actionPerformed(e);
                             }
                         });
-        editToolBar.add(masterParagraphAction.buildComboBox());
-        
         instrumentedTextArea.getActionMap().put("huxley-paragraph", masterParagraphAction);
-        
+        final JComboBox paragraphComboBox = masterParagraphAction.buildComboBox();
+        paragraphComboBox.setFont(paragraphComboBox.getFont().deriveFont(11f));
+        paragraphComboBox.setMaximumSize(paragraphComboBox.getPreferredSize());
+        editToolBar.add(paragraphComboBox);
         
         editToolBar.add(Box.createHorizontalGlue());
         
@@ -128,7 +135,7 @@ class ToolBarBuilder {
                 instrumentedTextArea.getActionMap().get(action.actionName));
         button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
         button.setText(null);
-        button.setPreferredSize(new Dimension(16, 16));
+//        button.setPreferredSize(new Dimension(16, 16));
         button.setFocusable(false);
         return button;
     }
@@ -145,7 +152,8 @@ class ToolBarBuilder {
                 instrumentedTextArea.getActionMap().get(action.actionName));
         button.setIcon(new ImageIcon(ImageManager.get().getImage(image)));
         button.setText(null);
-        button.setPreferredSize(new Dimension(16, 16));
+//        button.setMaximumSize(new Dimension(16, 16));
+        button.setMargin(new Insets(0,0,0,0));
         button.setFocusable(false);
         return button;
     }

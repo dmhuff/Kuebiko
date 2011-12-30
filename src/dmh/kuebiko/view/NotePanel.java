@@ -7,6 +7,8 @@
 package dmh.kuebiko.view;
 
 import java.awt.CardLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -130,17 +132,17 @@ class NotePanel extends JPanel {
         
 //        // Note Editor Pane.
 //        noteTextArea.addCaretListener(new TextStyleCaretListener());
-//        this.addFocusListener(
-//                new FocusAdapter() {
-//                    @Override
-//                    public void focusGained(FocusEvent e) {
-//                        // When the panel gains focus, transfer focus to the
-//                        // note text area if it is visible.
-//                        if (noteTextArea.isVisible()) {
-//                            noteTextArea.requestFocusInWindow();
-//                        }
-//                    }
-//                });
+        this.addFocusListener(
+                new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        // When the panel gains focus, transfer focus to the
+                        // note text area if it is visible.
+                        if (huxleyUiManager.getUiPanel().isVisible()) {
+                            huxleyUiManager.getUiPanel().requestFocusInWindow();
+                        }
+                    }
+                });
 //        
 //        noteTextArea.getDocument().addDocumentListener(
 //                new DocumentListener() {
@@ -289,6 +291,7 @@ class NotePanel extends JPanel {
      * @param syncNote The note to synchronize.
      */
     private void syncNote(Note syncNote) {
+        Main.log("syncNote([%s]).", syncNote);
 //        syncNote.setText(noteTextArea.getText());
 //        syncNote.setText(getNoteTextArea().getText());
         syncNote.setText(huxleyUiManager.getText());
