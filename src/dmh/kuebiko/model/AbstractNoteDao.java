@@ -186,12 +186,9 @@ public abstract class AbstractNoteDao implements NoteDao {
     public final Note updateNote(Note note) throws PersistenceException {
         Preconditions.checkArgument(!note.isNew());
         Preconditions.checkArgument(note.isDirty());
+        Preconditions.checkNotNull(findNote(note.getId()), 
+                String.format("Note [%s] not found.", note));
         
-        Note foundNote = findNote(note.getId());
-        if (foundNote == null) {
-            throw new IllegalArgumentException(
-                    String.format("Note [%s] not found.", note));
-        }
         final Note updatedNote = new Note(note);
         updatedNote.setModifiedDate(new Date());
         updatedNote.reset();

@@ -171,6 +171,6 @@ public class NoteManagerTest {
         noteMngr.saveAll();
         
         assertFalse(noteMngr.hasUnsavedChanges(), 
-                "Should no loner have unsaved changes after save.");
+                "Should no longer have unsaved changes after save.");
     }
 }

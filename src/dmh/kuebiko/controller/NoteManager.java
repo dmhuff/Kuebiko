@@ -228,6 +228,7 @@ public class NoteManager extends Observable {
                     continue;
                 }
             }
+            setUnsavedChangesAndNotify(false);
         } catch (PersistenceException e) {
             throw new DataStoreException("Could not read/write notes.", e);
         } catch (ValidationException e) {
@@ -235,6 +236,6 @@ public class NoteManager extends Observable {
         }
         
         // XXX may not be necessary.
-        loadAllNotes();
+        //loadAllNotes();
     }
 }

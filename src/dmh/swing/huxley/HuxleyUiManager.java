@@ -131,6 +131,10 @@ public class HuxleyUiManager {
         return textArea.getText();
     }
     
+    public void setText(String text) {
+        textArea.setText(text);
+    }
+    
     /**
      * Reset the text contents to a pristine state.
      * @param text The text contents after the state has been reset. May be null.
