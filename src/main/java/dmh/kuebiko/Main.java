@@ -14,6 +14,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import com.google.common.collect.Maps;
 
 import dmh.kuebiko.controller.NoteManager;
@@ -30,6 +33,8 @@ import dmh.kuebiko.view.NoteFrame;
 public class Main {
 //    /** True if this code is being run on Mac OS X. */
 //    public static final boolean MAC_OS_X = "Mac OS X".equals(System.getProperty("os.name"));
+    
+    private static final Logger log = Logger.getLogger(Main.class);
     
     private static final String PARAM_DAO_CLASS = "kueb.dao"; 
     
@@ -58,7 +63,7 @@ public class Main {
 
         private void handleException(Throwable exception) {
             // TODO log or submit error somewhere where it can be reported.
-            exception.printStackTrace();
+            log.error("Uncaught exception.", exception);
 
             // TODO replace null with top-most frame or dialog.
             // TODO use special error dialog with reporting mechanism.
@@ -67,6 +72,9 @@ public class Main {
     }
     
     public static void main(final String[] args) {
+        PropertyConfigurator.configure(
+                Main.class.getClassLoader().getResource("log4j.properties"));
+        
         Thread.setDefaultUncaughtExceptionHandler(new KuebikoUncaughtExceptionHandler());
         
         try {
@@ -124,6 +132,7 @@ public class Main {
     }
     
     private static int logCount = 0;
+    @Deprecated
     public static void log(String format, Object... data) {
         System.err.printf("[%3d] %s%n", logCount++, String.format(format, data));
     }

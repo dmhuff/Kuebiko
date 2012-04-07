@@ -26,6 +26,7 @@ abstract class NoteUpdateTestHarness {
     private final Note testNote;
     private final boolean origIsNew;
     private final int origId;
+    private final String origText;
     private final Date origCreateDate;
     private final Date origModifiedDate;
 
@@ -33,6 +34,7 @@ abstract class NoteUpdateTestHarness {
         this.testNote = testNote;
         origIsNew = testNote.isNew();
         origId = testNote.getId();
+        origText = testNote.getText();
         origCreateDate = testNote.getCreateDate();
         origModifiedDate = testNote.getModifiedDate();
     }
@@ -73,6 +75,8 @@ abstract class NoteUpdateTestHarness {
         State expectedState = updatedNote.isLazy()? State.HOLLOW : State.CLEAN;
         assertEquals(updatedNote.getState(), expectedState, 
                 String.format("Note should be [%s].", expectedState));
+        
+        assertEquals(updatedNote.getText(), origText, "Text should not change.");
         
         // Validate the note's audit dates (note: create date is not universally
         // supported, in which case the create date value will be null).

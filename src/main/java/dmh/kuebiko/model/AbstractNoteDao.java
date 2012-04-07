@@ -185,17 +185,17 @@ public abstract class AbstractNoteDao implements NoteDao {
     @Override
     public final Note updateNote(Note note) throws PersistenceException {
         Preconditions.checkArgument(!note.isNew());
+        Preconditions.checkArgument(!note.isHollow());
         Preconditions.checkArgument(note.isDirty());
         Preconditions.checkNotNull(findNote(note.getId()), 
                 String.format("Note [%s] not found.", note));
         
-        final Note updatedNote = new Note(note);
-        updatedNote.setModifiedDate(new Date());
-        updatedNote.reset();
-        
-        return persistActionUpdate(updatedNote);
+        note.setModifiedDate(new Date());
+        note = persistActionUpdate(note);
+        note.reset();
+        return note;
     }
-
+    
     /**
      * Update an existing note in the data store.
      * @param updatedNote The note to update.

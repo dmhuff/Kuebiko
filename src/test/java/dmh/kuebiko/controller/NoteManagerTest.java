@@ -12,6 +12,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
@@ -27,6 +28,8 @@ import dmh.kuebiko.test.TestHelper;
  * @author davehuffman
  */
 public class NoteManagerTest {
+    private static final Logger log = Logger.getLogger(NoteManagerTest.class);
+    
     @Test(expectedExceptions = UnsupportedOperationException.class)
     public void immutableNotesTest() {
         TestHelper.newNoteManager().getNotes().add(new Note());
@@ -121,10 +124,13 @@ public class NoteManagerTest {
         final NoteManager noteMngr = TestHelper.newNoteManager(
                 TestHelper.newDummyNote("foo", "bar"));
         
-        assertEquals(noteMngr.getNoteCount(), 1,
-                "Note stack should contain 1 note.");
+        assertEquals(noteMngr.getNoteCount(), 1, "Note stack should contain 1 note.");
 
-        noteMngr.getNoteAt(0).setText("something different");
+        final String newText = "something different";
+        noteMngr.getNoteAt(0).setText(newText);
+
+        assertEquals(noteMngr.getNoteCount(), 1, "Note stack should still contain 1 note.");
+        assertEquals(noteMngr.getNoteAt(0).getText(), newText, "Saved note should have the same text.");
         
         doSaveAll(noteMngr);
     }
@@ -165,6 +171,8 @@ public class NoteManagerTest {
      * @param noteMngr The note manager to perform the save.
      */
     private void doSaveAll(NoteManager noteMngr) {
+        log.debug("doSaveAll().");
+        
         assertTrue(noteMngr.hasUnsavedChanges(), 
                 "Should have unsaved changes prior to save.");
         

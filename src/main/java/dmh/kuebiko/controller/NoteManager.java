@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.model.Note.State;
 import dmh.kuebiko.model.NoteDao;
@@ -32,6 +32,8 @@ import dmh.kuebiko.util.NoteTitleFunction;
  * @author davehuffman
  */
 public class NoteManager extends Observable {
+    private static final Logger log = Logger.getLogger(NoteManager.class);
+    
     static final String DEFAULT_NOTE_TITLE = "Untitled Note"; // TODO i18n.
     
 //    private final Observable observable = new Observable();
@@ -106,7 +108,7 @@ public class NoteManager extends Observable {
      */
     public boolean hasUnsavedChanges() {
         boolean value = __hasUnsavedChanges();
-        Main.log("hasUnsavedChanges() #=> [%b].", value);
+        log.debug(String.format("hasUnsavedChanges() #=> [%b].", value));
         return value;
     }
     public boolean __hasUnsavedChanges() {
@@ -127,6 +129,8 @@ public class NoteManager extends Observable {
     }
     
     private void setUnsavedChangesAndNotify(boolean unsavedChanges) {
+        log.debug(String.format("setUnsavedChangesAndNotify(%s).", unsavedChanges));
+        
         final boolean prevValue = this.unsavedChanges;
         this.unsavedChanges = unsavedChanges; 
         final boolean currentValue = hasUnsavedChanges();
@@ -209,14 +213,16 @@ public class NoteManager extends Observable {
      * Save any changes made to the notes.
      */
     public void saveAll() {
-        Main.log("saveAll().");
+        log.debug("saveAll().");
         try {
             for (Note note: deletedNotes) {
+                log.debug(String.format("Deleting note [%s].", note));
                 noteDao.deleteNote(note);
             }
             deletedNotes.clear();
             
             for (Note note: notes) {
+                log.debug(String.format("Saving note [%s].", note));
                 switch (note.getState()) {
                 case DIRTY:
                     noteDao.updateNote(note);

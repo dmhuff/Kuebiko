@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 
-import dmh.kuebiko.Main;
+import com.google.common.collect.Lists;
 
 /**
  * Value object representing a note.
@@ -22,6 +22,8 @@ import dmh.kuebiko.Main;
  */
 public class Note implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    private static final Logger log = Logger.getLogger(Note.class);
     
     /**
      * Enumeration of possible entity states.
@@ -146,9 +148,8 @@ public class Note implements Serializable {
 
     @Override
     public String toString() {
-        return "Note [state=" + state + ", id=" + id + ", title=" + title
-//                + ", text=" + text 
-                + ", createDate=" + createDate
+        return "Note [hashCode()=" + hashCode() + ", id=" + id + ", state="
+                + state + ", title=" + title + ", createDate=" + createDate
                 + ", modifiedDate=" + modifiedDate + ", tags=" + tags + "]";
     }
     
@@ -213,6 +214,8 @@ public class Note implements Serializable {
      * Mark this note as dirty.
      */
     private void markAsDirty() {
+        log.debug(String.format("[%s] markAsDirty().", hashCode()));
+        
         if (isHollow()) {
             throw new IllegalStateException(
                     "Hollow entities cannot be marked as dirty.");
@@ -253,7 +256,6 @@ public class Note implements Serializable {
     }
 
     public void setText(String text) {
-        Main.log("setText([%s]).", text);
         if (isHollow()) {
             throw new IllegalStateException("Note is hollow.");
         }
