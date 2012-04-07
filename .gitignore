@@ -1,6 +1,6 @@
+.DS_Store
 bin
 /.settings
 /.project
 /.classpath
 /test-output
-/scratch.jpage
