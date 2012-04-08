@@ -10,7 +10,6 @@ import static org.testng.Assert.assertTrue;
 
 import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
-import org.testng.TestException;
 import org.testng.annotations.Test;
 
 import dmh.kuebiko.controller.NoteManager;
@@ -69,7 +68,5 @@ public class NotePanelTest {
             assertTrue(refreshedNote.getText().contains(cumulativeMagicString), 
                     "Refreshed note text should contain cumulative magic string. " + i);
         }
-        
-//        throw new TestException("not finished.");
     }
 }

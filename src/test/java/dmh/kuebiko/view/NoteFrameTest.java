@@ -46,8 +46,28 @@ public class NoteFrameTest {
             throw new TestException(e);
         }
         
-//        String noteText = trimToNull(noteFrame.notePanel.getNoteTextArea().getText());
         String noteText = trimToNull(noteFrame.notePanel.getHuxleyUiManager().getText());
         Assert.assertNotNull(noteText, "The note text area should have text.");
+    }
+    
+    /**
+     * Covers issue #2 in the GitHub issue tracker.
+     */
+    @Test
+    public void deleteNoteThenSaveTest() {
+        // This bug would occur when saving a note stack after deleting a note.
+        // This test simulates the UI actions that precipitate the error.
+        
+        final NoteFrame noteFrame = new NoteFrame(
+                new NoteManager(TestHelper.newDummyNoteDao()));
+        
+        // Select a note.
+        noteFrame.noteTable.getSelectionModel().setSelectionInterval(0, 0);
+        
+        // Delete the selected note.
+        new DeleteNoteAction(noteFrame).actionPerformed(null);
+        
+        // Save the change.
+        new SaveStackAction(noteFrame).actionPerformed(null);
     }
 }

@@ -14,7 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import dmh.kuebiko.Main;
+import org.apache.log4j.Logger;
+
 import dmh.kuebiko.model.Note;
 import dmh.swing.huxley.HuxleyUiManager;
 
@@ -25,6 +26,8 @@ import dmh.swing.huxley.HuxleyUiManager;
  */
 class NotePanel extends JPanel {
     private static final long serialVersionUID = 1L;
+    
+    private static final Logger log = Logger.getLogger(NotePanel.class);
     
     /** 
      * Enumeration of CardLayout identifiers.
@@ -82,7 +85,9 @@ class NotePanel extends JPanel {
      * Synchronize the current note with data from the UI.
      */
     void syncNote() {
-        syncNote(note);
+        if (note != null) {
+            syncNote(note);
+        }
     }
     
     /**
@@ -90,7 +95,7 @@ class NotePanel extends JPanel {
      * @param syncNote The note to synchronize.
      */
     private void syncNote(Note syncNote) {
-        Main.log("syncNote([%s]).", syncNote);
+        log.debug(String.format("syncNote([%s]).", syncNote));
         syncNote.setText(huxleyUiManager.getText());
     }
 
@@ -99,7 +104,8 @@ class NotePanel extends JPanel {
      * @param prevNote The previously displayed note.
      */
     private void onNoteSelected(Note prevNote) {
-        Main.log("onNoteSelected(); [%s]; noteChanged=[%b].", note, huxleyUiManager.isTextChanged());
+        log.debug(String.format("onNoteSelected(); [%s]; noteChanged=[%b].", 
+                note, huxleyUiManager.isTextChanged()));
 
         // Save any changes made to the previously selected note.
         if (prevNote != null && huxleyUiManager.isTextChanged()) {
