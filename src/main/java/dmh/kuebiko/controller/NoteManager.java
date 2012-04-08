@@ -217,7 +217,10 @@ public class NoteManager extends Observable {
         try {
             for (Note note: deletedNotes) {
                 log.debug(String.format("Deleting note [%s].", note));
-                noteDao.deleteNote(note);
+                if (!note.isNew()) {
+                    // Only previously saved notes need to be deleted.
+                    noteDao.deleteNote(note);
+                }
             }
             deletedNotes.clear();
             

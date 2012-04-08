@@ -1,5 +1,5 @@
 /**
- * jCap - NoteManagerTest.java
+ * Kuebiko - NoteManagerTest.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
@@ -147,6 +147,33 @@ public class NoteManagerTest {
         final Note onlyNote = getOnlyElement(noteMngr.getNotes());
         assertEquals(title, onlyNote.getTitle(),
                 "The only note in the stack should be the original note.");
+        
+        noteMngr.deleteNote(onlyNote);
+        
+        assertEquals(0, noteMngr.getNotes().size(), "The stack should be empty.");
+        
+        doSaveAll(noteMngr);
+
+        assertEquals(0, noteMngr.getNotes().size(), 
+                "The stack should be empty after saving.");
+    }
+    
+    /**
+     * Covers issue #1 in GitHub issue tracker.
+     */
+    @Test
+    public void deleteUnsavedNoteTest() {
+        final String title = "foobar";
+        final NoteManager noteMngr = TestHelper.newNoteManager();
+        
+        assertEquals(0, noteMngr.getNotes().size(), 
+                "There should be no notes in the stack.");
+        
+        noteMngr.addNewNote(title);
+        
+        final Note onlyNote = getOnlyElement(noteMngr.getNotes());
+        assertEquals(title, onlyNote.getTitle(),
+                "The only note in the stack should be the added note.");
         
         noteMngr.deleteNote(onlyNote);
         
