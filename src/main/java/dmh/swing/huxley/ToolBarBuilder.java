@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;

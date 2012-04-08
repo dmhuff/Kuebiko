@@ -435,7 +435,6 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     }
     
     private void toggleUnsavedChangeIndicator(boolean unsavedChanges) {
-        Main.log("toggleUnsavedChangeIndicator [%b].", unsavedChanges);
         if (SystemUtils.IS_OS_MAC_OSX) {
             // Toggle the Mac OS X window-modified indicator.
             getRootPane().putClientProperty("Window.documentModified", unsavedChanges);

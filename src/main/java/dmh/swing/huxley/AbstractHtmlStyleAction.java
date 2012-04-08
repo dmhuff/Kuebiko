@@ -5,12 +5,9 @@
  */
 package dmh.swing.huxley;
 
-import java.awt.event.ActionEvent;
 import java.util.Map;
-import java.util.Observable;
 
 import javax.swing.Icon;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
