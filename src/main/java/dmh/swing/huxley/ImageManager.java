@@ -13,11 +13,11 @@ import javax.imageio.ImageIO;
 import com.google.common.collect.Maps;
 
 /**
- * Singleton manager for application images.
+ * Singleton manager for Huxley UI images.
  *
  * @author davehuffman
  */
-final class ImageManager {
+public final class ImageManager {
     enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
     
     private static final ImageManager INSTANCE = new ImageManager();
@@ -25,7 +25,7 @@ final class ImageManager {
     /**
      * @return The singleton instance of the class.
      */
-    static ImageManager get() {
+    public static ImageManager get() {
         return INSTANCE;
     }
     
@@ -51,7 +51,7 @@ final class ImageManager {
      * @param appImage Identifier for the desired image.
      * @return The requested image.
      */
-    Image getImage(String appImage) {
+    public Image getImage(String appImage) {
         return getImage(defaultSize, appImage);
     }
     

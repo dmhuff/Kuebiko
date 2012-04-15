@@ -11,7 +11,7 @@ import java.util.Observable;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
-import dmh.kuebiko.util.AbstractActionObserver;
+import dmh.swing.AbstractActionObserver;
 
 /**
  * Superclass for actions that have not yet been implemented.

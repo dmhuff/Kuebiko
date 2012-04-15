@@ -7,6 +7,8 @@ package dmh.kuebiko.util;
 
 import java.util.Observable;
 
+import dmh.swing.AbstractActionObserver;
+
 /**
  * Utility for working with action observer objects.
  *

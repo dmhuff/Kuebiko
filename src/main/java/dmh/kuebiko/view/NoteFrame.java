@@ -49,6 +49,8 @@ import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.util.ActionManager;
 import dmh.kuebiko.util.ActionObserverUtil;
+import dmh.swing.huxley.action.InsertDynamicTextAction;
+import dmh.swing.huxley.constant.TextAction;
 import dmh.util.Callback;
 
 /**
@@ -110,6 +112,8 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     private JMenuItem pasteMenuItem;
     private JMenuItem deleteNoteMenuItem;
     private JMenuItem renameNoteMenuItem;
+    private JMenu textMenu;
+    private JMenuItem insertDateMenuItem;
 
     /**
      * Create the frame.
@@ -195,7 +199,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(undoMenuItem);
         
-        redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem = new JMenuItem("Redo"); // FIXME mac-specific keyboard shortcut
         redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(redoMenuItem);
@@ -220,6 +224,9 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, 
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(pasteMenuItem);
+        
+        textMenu = new JMenu("Text");
+        menuBar.add(textMenu);
         
         JMenu windowMenu = new JMenu("Window");
         menuBar.add(windowMenu);
@@ -309,6 +316,15 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         noteTable = newNoteTable();
         noteTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         noteTableScroll.setViewportView(noteTable);
+        
+        ActionObserverUtil.registerEnMass(actionMngr, observable, 
+                notePanel.getHuxleyUiManager().getTextAction(TextAction.INSERT_DATE));
+        
+//        insertDateMenuItem = new JMenuItem("Insert Date");
+        insertDateMenuItem = new JMenuItem(actionMngr.getAction(InsertDynamicTextAction.class));
+        insertDateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 
+                InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        textMenu.add(insertDateMenuItem);
     }
 
     private String buildTitle() {

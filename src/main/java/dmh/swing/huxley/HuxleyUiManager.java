@@ -1,36 +1,38 @@
 /**
- * Junk - foobar.java
+ * Kuebiko - HuxleyUiManager.java
  * Copyright 2011 Dave Huffman (dave dot huffman at me dot com).
  * TODO license info.
  */
 package dmh.swing.huxley;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.EnumMap;
 
-import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.Box;
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.Element;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.html.CSS;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
 
-import dmh.swing.html.SwingHtmlUtil;
-import dmh.swing.html.constants.ParagraphType;
-import dmh.swing.huxley.constants.TextAction;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
+
+import dmh.kuebiko.Main;
+import dmh.kuebiko.Main.Setting;
+import dmh.swing.AbstractActionObserver;
+import dmh.swing.huxley.action.AbstractPlainTextAction;
+import dmh.swing.huxley.action.InsertDynamicTextAction;
+import dmh.swing.huxley.action.InsertHeadingAction;
+import dmh.swing.huxley.action.WrapTextAction;
+import dmh.swing.huxley.constant.TextAction;
 import dmh.util.Callback;
 
 /**
@@ -40,39 +42,62 @@ import dmh.util.Callback;
  */
 public class HuxleyUiManager {
     private final JPanel uiPanel = new JPanel();
-    private final JEditorPane textArea = new JEditorPane("text/html", "");
+    private final JTextArea textArea;
+    
+    private final EnumMap<TextAction, AbstractPlainTextAction> textActions = Maps.newEnumMap(TextAction.class);
     
     private final DocumentListener textChangeListener;
     private boolean textChanged = false;
     private Callback<Boolean> onTextChangeCallback = null;
 
     /**
-     * Construct a Huxley UI manager.
+     * Construct a Huxley UI manager with a basic Swing text area component.
      */
     public HuxleyUiManager() {
+        this(new JTextArea());
+        
+    }
+    /**
+     * Construct a Huxley UI manager with a custom text area component.
+     */
+    public HuxleyUiManager(JTextArea ta) {
+        this.textArea = ta;
+        
+        textActions.put(TextAction.HEADER_1, 
+                new InsertHeadingAction(TextAction.HEADER_1, "#", textArea));
+        textActions.put(TextAction.HEADER_2, 
+                new InsertHeadingAction(TextAction.HEADER_2, "=", textArea));
+        textActions.put(TextAction.HEADER_3, 
+                new InsertHeadingAction(TextAction.HEADER_3, "-", textArea));
+        textActions.put(TextAction.INSERT_LINK, 
+                new WrapTextAction(TextAction.INSERT_LINK, "[", "]", textArea));
+        textActions.put(TextAction.INSERT_DATE, 
+                new InsertDynamicTextAction(TextAction.INSERT_DATE, 
+                        new Function<Void, String>() {
+                            @Override
+                            public String apply(Void input) {
+                                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                            }
+                        }, textArea));
+        
         uiPanel.setLayout(new BorderLayout());
         
         // Tool Bar.
         Box toolBarBox = Box.createHorizontalBox();
         toolBarBox.setAlignmentX(0);
-        toolBarBox.add(ToolBarBuilder.build(textArea));
+        toolBarBox.add(ToolBarBuilder.build(this));
         uiPanel.add(toolBarBox, BorderLayout.NORTH);
         
         // Text Area.
+        textArea.setFont(new Font(
+                Main.getSetting(Setting.FONT_NAME), Font.PLAIN, 
+                Integer.parseInt(Main.getSetting(Setting.FONT_SIZE))));
+        
         JScrollPane textScrollPane = new JScrollPane();
         uiPanel.add(textScrollPane, BorderLayout.CENTER);
         textScrollPane.setBorder(null);
         textScrollPane.setViewportView(textArea);
         
-        // DEBUG remove.
-        textArea.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println("!!! prop change" + evt.getPropertyName());
-            }
-        });
-        
-        textArea.addCaretListener(new TextStyleCaretListener());
         uiPanel.addFocusListener(
                 new FocusAdapter() {
                     @Override
@@ -85,7 +110,7 @@ public class HuxleyUiManager {
                     }
                 });
         
-        textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
+//        textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
         textChangeListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -119,13 +144,17 @@ public class HuxleyUiManager {
         
     }
     
+    /**
+     * @param action
+     * @return
+     */
+    public AbstractActionObserver getTextAction(TextAction action) {
+        return textActions.get(action);
+    }
+    
     public JPanel getUiPanel() {
         return uiPanel;
     }
-    
-//    public JEditorPane getTextArea() {
-//        return textArea;
-//    }
     
     public String getText() {
         return textArea.getText();
@@ -144,6 +173,11 @@ public class HuxleyUiManager {
         textArea.getDocument().removeDocumentListener(textChangeListener);
         textArea.setText(text);
         textArea.getDocument().addDocumentListener(textChangeListener);
+        textArea.setCaretPosition(0);
+        
+        if (textArea instanceof RSyntaxTextArea) {
+            ((RSyntaxTextArea) textArea).discardAllEdits();
+        }
         
         resetTextChanged();
     }
@@ -174,71 +208,5 @@ public class HuxleyUiManager {
     
     public void setOnTextChangeCallback(Callback<Boolean> onTextChangeCallback) {
         this.onTextChangeCallback = onTextChangeCallback;
-    }
-
-    /**
-     * Custom listener for caret updates; will toggle components for modifying 
-     * text styles based on the text under the caret (a.k.a. cursor).
-     * 
-     * This class is based on the CaratHandler class in the SwingX JXEditorPane.
-     * @see org.jdesktop.swingx.JXEditorPane.CaretHandler
-     */
-    private class TextStyleCaretListener implements CaretListener {
-        @Override
-        public void caretUpdate(final CaretEvent event) {
-//            SwingUtilities.invokeLater(new Runnable() {
-//                @Override
-//                public void run() {
-                
-            StyledDocument document = (StyledDocument) textArea.getDocument();
-            int dot = event.getDot();
-//            dot = dot > 0 ? dot - 1 : dot;
-            
-            Element elem = document.getCharacterElement(dot);
-            AttributeSet set = elem.getAttributes();
-
-            final ActionMap actionMap = textArea.getActionMap();
-            actionMap.get(TextAction.STYLE_BOLD.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isBold(elem));
-            actionMap.get(TextAction.STYLE_ITALIC.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isItalic(elem));
-            actionMap.get(TextAction.STYLE_UNDERLINE.actionName).putValue(
-                    Action.SELECTED_KEY, SwingHtmlUtil.isUnderline(elem));
-            
-
-            elem = document.getParagraphElement(dot);
-            set = elem.getAttributes();
-
-            HTMLDocument doc = (HTMLDocument) textArea.getDocument();
-            Element htmlElem = doc.getCharacterElement(event.getDot());
-            
-            HTML.Tag paragraph = SwingHtmlUtil.getParagraph(htmlElem);
-//            System.out.println("tag: " + paragraph);
-            
-            ParagraphType paragraphType = ParagraphType.lookup(paragraph);
-            
-//            actionMap.get("huxley-paragraph").putValue(MasterEnumSelectAction.SELECTED_VALUE_KEY, paragraphType);
-            
-            AttributeSet attributes = htmlElem.getAttributes();
-            attributes.containsAttribute(CSS.Attribute.FONT_WEIGHT, "bold");
-            
-            TextAction setAlignment = null;
-            
-            if (SwingHtmlUtil.isLeftAligned(elem)) {
-                setAlignment = TextAction.ALIGN_LEFT;
-            } else if (SwingHtmlUtil.isRightAligned(elem)) {
-                setAlignment = TextAction.ALIGN_RIGHT;
-            } else if (SwingHtmlUtil.isCenterAligned(elem)) {
-                setAlignment = TextAction.ALIGN_CENTER;
-            }
-                        
-            if (setAlignment != null) {
-//                System.out.println("alignment " + setAlignment);
-                actionMap.get(setAlignment.actionName)
-                        .putValue(Action.SELECTED_KEY, true);
-            }
-//                }
-//            });
-        }
     }
 }

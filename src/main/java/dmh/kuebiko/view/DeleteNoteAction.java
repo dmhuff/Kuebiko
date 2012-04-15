@@ -13,7 +13,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
-import dmh.kuebiko.util.AbstractActionObserver;
+import dmh.swing.AbstractActionObserver;
 
 /**
  * Swing action for deleting the currently selected note.

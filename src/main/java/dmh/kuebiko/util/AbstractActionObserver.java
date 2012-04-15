@@ -12,9 +12,10 @@ import javax.swing.Icon;
 
 /**
  * Superclass for UI actions that may also observe events.
- *
+ * @deprecated use version in swing utils package instead.
  * @author davehuffman
  */
+@Deprecated
 public abstract class AbstractActionObserver extends AbstractAction 
 implements Observer {
     private static final long serialVersionUID = 1L;

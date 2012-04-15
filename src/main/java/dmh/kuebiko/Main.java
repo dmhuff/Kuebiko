@@ -6,8 +6,13 @@
 
 package dmh.kuebiko;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.EnumMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
@@ -31,15 +36,14 @@ import dmh.kuebiko.view.NoteFrame;
  * @author davehuffman
  */
 public class Main {
-//    /** True if this code is being run on Mac OS X. */
-//    public static final boolean MAC_OS_X = "Mac OS X".equals(System.getProperty("os.name"));
-    
     private static final Logger log = Logger.getLogger(Main.class);
     
-    private static final String PARAM_DAO_CLASS = "kueb.dao"; 
+    public static enum Setting {
+        DAO_CLASS, DATA_LOCATION, FONT_NAME, FONT_SIZE;
+    }
     
-    /** Temporary constant for disabling code that is not a part of the 0.1 release. */
-    public static final boolean POST_0_1_RELEASE = false;
+    private static final EnumMap<Setting, String> SETTINGS = Maps.newEnumMap(Setting.class);
+    private static final String SETTINGS_FILE_NAME = "kuebiko.properties";
     
     /**
      * Exception handler for Kuebiko.
@@ -88,6 +92,8 @@ public class Main {
             e.printStackTrace();
         }
         
+        loadSettings();
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -95,15 +101,20 @@ public class Main {
 //                getPrefs().put(Preference.CURRENT_STACK_LOCATION.toString(), "");
 //                getPrefs().put(Preference.CURRENT_STACK_DAO.toString(), InMemoryNoteDao.class.getName());
                 
+//                Map<String, String> daoParams = Maps.newHashMap();
+//                for (DaoParameter daoParam: DaoParameter.values()) {
+//                    
+//                    String key = "kueb." + daoParam.toString();
+//                    String property = System.getProperty(key);
+//                    
+//                    System.out.printf("[CONFIG] Parameter [%s] = [%s].%n", key, property);
+//                    
+//                    daoParams.put(daoParam.toString(), property); 
+//                }
+                
                 Map<String, String> daoParams = Maps.newHashMap();
-                for (DaoParameter daoParam: DaoParameter.values()) {
-                    String key = "kueb." + daoParam.toString();
-                    String property = System.getProperty(key);
-                    
-                    System.out.printf("[CONFIG] Parameter [%s] = [%s].%n", key, property);
-                    
-                    daoParams.put(daoParam.toString(), property); 
-                }
+                daoParams.put(DaoParameter.CLASS_NAME.toString(), getSetting(Setting.DAO_CLASS)); 
+                daoParams.put(DaoParameter.DIRECTORY.toString(), getSetting(Setting.DATA_LOCATION)); 
                 
                 NoteManager noteMngr;
                 try {
@@ -121,6 +132,36 @@ public class Main {
                 noteFrame.setVisible(true);
             }
         });
+    }
+    
+    public static final void loadSettings() {
+        // Load the properties file.
+        final Properties rawSettings = new Properties();
+        try {
+            rawSettings.load(new FileInputStream(SETTINGS_FILE_NAME));
+        } catch (FileNotFoundException e) {
+            log.warn(String.format("Settings file [%s] does not exist.", SETTINGS_FILE_NAME));
+        } catch (IOException e) {
+            log.error(String.format("Error reading settings file [%s].", SETTINGS_FILE_NAME), e);
+            throw new RuntimeException(e);
+        }
+        
+        SETTINGS.clear();
+        for (Map.Entry<Object, Object> rawSetting : rawSettings.entrySet()) {
+            Setting key;
+            try {
+                key = Setting.valueOf(rawSetting.getKey().toString());
+            } catch (IllegalArgumentException e) {
+                log.warn(String.format("Setting [%s] is unknown.", rawSetting.getKey()));
+                continue;
+            }
+            
+            SETTINGS.put(key, rawSetting.getValue().toString());
+        }
+    }
+    
+    public static String getSetting(Setting setting) {
+        return SETTINGS.get(setting);
     }
     
     enum Preference {

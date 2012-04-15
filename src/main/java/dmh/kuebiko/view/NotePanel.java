@@ -12,9 +12,13 @@ import java.awt.event.FocusEvent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import org.apache.log4j.Logger;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import dmh.kuebiko.model.Note;
 import dmh.swing.huxley.HuxleyUiManager;
@@ -29,6 +33,22 @@ class NotePanel extends JPanel {
     
     private static final Logger log = Logger.getLogger(NotePanel.class);
     
+    private static JTextArea rSyntaxTextAreaFactory() {
+        RSyntaxTextArea textArea = new RSyntaxTextArea(10, 40);
+        textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
+        textArea.setLineWrap(true);
+        textArea.setCodeFoldingEnabled(false);
+        textArea.setAntiAliasingEnabled(false);
+        textArea.setHighlightCurrentLine(false);
+        textArea.setAnimateBracketMatching(false);
+        textArea.setBracketMatchingEnabled(false);
+        textArea.setTabsEmulated(true);
+        textArea.setTabSize(2);
+        RTextScrollPane sp = new RTextScrollPane(textArea);
+        sp.setFoldIndicatorEnabled(true);
+        return textArea;
+    }
+    
     /** 
      * Enumeration of CardLayout identifiers.
      * @see NotePanel#cardLayout
@@ -36,7 +56,7 @@ class NotePanel extends JPanel {
     private enum CardId { NO_NOTE_MESSAGE, NOTE_TEXT }
     
     private final CardLayout cardLayout = new CardLayout();
-    private final HuxleyUiManager huxleyUiManager = new HuxleyUiManager();
+    private final HuxleyUiManager huxleyUiManager = new HuxleyUiManager(rSyntaxTextAreaFactory());
     
     /** The currently selected note. */
     private Note note;
