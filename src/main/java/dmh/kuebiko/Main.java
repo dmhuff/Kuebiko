@@ -39,7 +39,16 @@ public class Main {
     private static final Logger log = Logger.getLogger(Main.class);
     
     public static enum Setting {
-        DAO_CLASS, DATA_LOCATION, FONT_NAME, FONT_SIZE;
+        DAO_CLASS("IN_MEMORY"), 
+        DATA_LOCATION(null), 
+        FONT_NAME("Monospaced"),
+        FONT_SIZE("12");
+        
+        final String defaultValue;
+        
+        private Setting(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
     }
     
     private static final EnumMap<Setting, String> SETTINGS = Maps.newEnumMap(Setting.class);
@@ -161,7 +170,8 @@ public class Main {
     }
     
     public static String getSetting(Setting setting) {
-        return SETTINGS.get(setting);
+        return SETTINGS.containsKey(setting) ? 
+                SETTINGS.get(setting) : setting.defaultValue;
     }
     
     enum Preference {
