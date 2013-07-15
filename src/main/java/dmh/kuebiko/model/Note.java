@@ -111,13 +111,18 @@ public class Note implements Serializable {
         this.createDate = new Date();
     }
     
+    private void changeStateTo(State newState) {
+        log.debug(String.format("[%s] changeStageTo(%s); state=[%s].", getId(), newState, state));
+        this.state = newState;
+    }
+    
     /**
      * Reset the dirty flag on this note, which signifies that it's data is 
      * consistent with the data store. This method should only be called from 
      * the model layer.
      */
     void reset() {
-        state = isLazy()? State.HOLLOW : State.CLEAN;
+        changeStateTo(isLazy()? State.HOLLOW : State.CLEAN);
     }
     
     /**
@@ -214,7 +219,7 @@ public class Note implements Serializable {
      * Mark this note as dirty.
      */
     private void markAsDirty() {
-        log.debug(String.format("[%s] markAsDirty().", hashCode()));
+        log.debug(String.format("[%s] markAsDirty().", getId()));
         
         if (isHollow()) {
             throw new IllegalStateException(
@@ -222,7 +227,7 @@ public class Note implements Serializable {
         }
         
         if (state != State.NEW) {
-            state = State.DIRTY;
+            changeStateTo(State.DIRTY);
         }
     }
     
@@ -250,7 +255,7 @@ public class Note implements Serializable {
             } catch (PersistenceException e) {
                 throw new RuntimeException(e); // TODO determine what to do with this exception.
             }
-            state = State.CLEAN;
+            changeStateTo(State.CLEAN);
         }
         return text;
     }

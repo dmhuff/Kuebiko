@@ -61,7 +61,7 @@ public final class TestHelper {
     public static NoteDao newDummyNoteDao() {
         NoteDao noteDao;
         try {
-            noteDao = NoteDaoFactory.get(InMemoryNoteDao.class.getName());
+            noteDao = NoteDaoFactory.get(DEFAULT_TEST_NOTE_DAO);
             fillNoteDaoWithDummyData(noteDao);
             return noteDao;
         } catch (Exception e) {

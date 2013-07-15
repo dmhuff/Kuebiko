@@ -103,13 +103,19 @@ public abstract class AbstractNoteDaoTest {
     protected final void checkIds(AbstractNoteDao noteDao) throws PersistenceException {
         final List<Note> allNotes = noteDao.readNotes();
         
-        Map<Integer, Note> noteMap = Maps.newHashMap();
-        for (Note note: allNotes) {
-            noteMap.put(note.getId(), note);
-        }
+//        Map<Integer, Note> noteMap = Maps.newHashMap();
+//        for (Note note: allNotes) {
+//            noteMap.put(note.getId(), note);
+//        }
+//        
+//        for (Entry<Integer, Note> noteEntry: noteMap.entrySet()) {
+//            assertEquals(noteEntry.getValue(), noteDao.findNote(noteEntry.getKey()),
+//                    "Note IDs should match.");
+//        }
         
-        for (Entry<Integer, Note> noteEntry: noteMap.entrySet()) {
-            assertEquals(noteEntry.getValue(), noteDao.findNote(noteEntry.getKey()),
+        for (Note note : allNotes) {
+            final int id = note.getId();
+            assertEquals(id, noteDao.findNote(note.getId()).getId(),
                     "Note IDs should match.");
         }
     }
