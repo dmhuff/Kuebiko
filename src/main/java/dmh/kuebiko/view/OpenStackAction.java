@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import dmh.swing.UnimplementedAction;
+
 /**
  * Swing action for opening a note stack.
  *
@@ -19,13 +21,13 @@ import java.util.Observable;
  */
 public class OpenStackAction extends UnimplementedAction {
     private static final long serialVersionUID = 1L;
-    
+
     public OpenStackAction() {
-        super("Open Stack"); // TODO i18n.
-        
-        putValue(SHORT_DESCRIPTION, "Open a stack of notes."); // TODO i18n.
+        super("Open Stack");
+
+        putValue(SHORT_DESCRIPTION, "Open a stack of notes.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_O, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_O,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_O);
     }

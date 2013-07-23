@@ -6,9 +6,9 @@
 package dmh.kuebiko.util;
 
 /**
- * Checked exception thrown when the application cannot handle a request for a 
- * particular class. For example, this exception might be thrown when trying 
- * to load a missing or invalid plug-in.
+ * Checked exception thrown when the application cannot handle a request for a
+ * particular class. For example, this exception might be thrown when trying
+ * to load a missing or invalid plugin.
  *
  * @author davehuffman
  */

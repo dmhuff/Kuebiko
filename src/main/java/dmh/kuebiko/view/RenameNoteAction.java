@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import dmh.swing.UnimplementedAction;
+
 /**
  * Swing action for renaming the current note.
  *
@@ -19,20 +21,20 @@ import java.util.Observable;
  */
 public class RenameNoteAction extends UnimplementedAction {
     private static final long serialVersionUID = 1L;
-    
-    private final NoteFrame noteFrame;
-    
-    public RenameNoteAction(NoteFrame noteFrame) {
-        super("Rename Note"); // TODO i18n.
+
+    private final NoteStackFrame noteFrame;
+
+    public RenameNoteAction(NoteStackFrame noteFrame) {
+        super("Rename Note");
         this.noteFrame = noteFrame;
-        
-        putValue(SHORT_DESCRIPTION, "Rename a note."); // TODO i18n.
+
+        putValue(SHORT_DESCRIPTION, "Rename a note.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_R, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_R,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_R);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         super.actionPerformed(event);

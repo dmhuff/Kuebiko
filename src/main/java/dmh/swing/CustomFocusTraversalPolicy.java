@@ -1,13 +1,13 @@
 /**
  * Kuebiko - CustomTraversalPolicy.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
- * 
+ *
  * Derived from Sun's Focus Traversal Demo:
  * http://download.oracle.com/javase/tutorial/uiswing/examples/misc/FocusTraversalDemoProject/src/misc/FocusTraversalDemo.java
- * 
+ *
  * TODO license info.
  */
-package dmh.kuebiko.view;
+package dmh.swing;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -20,10 +20,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 /**
- * TODO there's nothing Kuebiko specific here. consider moving to a util package.
- * Custom focus traversal policy; allows for the traversal of a set of 
+ * Custom focus traversal policy; allows for the traversal of a set of
  * components in order.
- * 
+ *
  * @author davehuffman
  */
 public class CustomFocusTraversalPolicy extends FocusTraversalPolicy {
@@ -32,11 +31,11 @@ public class CustomFocusTraversalPolicy extends FocusTraversalPolicy {
     public CustomFocusTraversalPolicy(Component... components) {
         this(Arrays.asList(components));
     }
-    
+
     public CustomFocusTraversalPolicy(List<Component> order) {
         Preconditions.checkNotNull(order);
         Preconditions.checkArgument(!order.isEmpty());
-        
+
         this.components = ImmutableList.copyOf(order);
     }
 

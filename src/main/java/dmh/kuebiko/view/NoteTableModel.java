@@ -6,7 +6,9 @@
 
 package dmh.kuebiko.view;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -20,36 +22,39 @@ import dmh.kuebiko.model.Note;
  */
 public class NoteTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
-    
-    /** Enumeration of all columns supported by this table model.  
-     *  TODO i18n. */
+
+    /** Enumeration of all columns supported by this table model. */
     public static enum Column {
-        TITLE("Title"), 
-//        TAGS("Tags"), 
-        DATE_MODIFIED("Date Modified"); 
-//        DATE_CREATED("Date Created");
-        
+    	// Note: the Tags and Date Created columns were never fully implemented.
+
+        TITLE("Title"),
+        DATE_MODIFIED("Date Modified"),
+        TAGS("Tags"),
+        DATE_CREATED("Date Created");
+
         private final String label;
-        
+
         private Column(String label) {
             this.label = label;
         }
-        
+
         public String getLabel() {
             return label;
         }
     }
+    private static final Set<Column> displayColumns = EnumSet.of(
+    		Column.TITLE, Column.DATE_MODIFIED);
 
     private final NoteManager noteMngr;
-    
+
     public NoteTableModel(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
     }
-    
+
     private List<Note> getNotes() {
         return noteMngr.getNotes();
     }
-    
+
     /**
      * Add a new note to the stack with a default title.
      * @return The title of the new note.
@@ -59,7 +64,7 @@ public class NoteTableModel extends AbstractTableModel {
         onNoteAdded();
         return title;
     }
-    
+
     /**
      * Add a new note to the stack with a particular title.
      * @param title The new note's title.
@@ -76,17 +81,17 @@ public class NoteTableModel extends AbstractTableModel {
         int newNoteRow = noteMngr.getNoteCount() - 1;
         fireTableRowsInserted(newNoteRow, newNoteRow);
     }
-    
+
     void deleteNote(Note note) {
         noteMngr.deleteNote(note);
         fireTableDataChanged();
     }
-    
+
     @Override
     public int getColumnCount() {
-        return Column.values().length;
+    	return displayColumns.size();
     }
-    
+
     @Override
     public String getColumnName(int col) {
         return Column.values()[col].getLabel();
@@ -96,11 +101,7 @@ public class NoteTableModel extends AbstractTableModel {
     public int getRowCount() {
         return getNotes() == null? 0 : noteMngr.getNoteCount();
     }
-    
-    /**
-     * @param rowIndex
-     * @return
-     */
+
     Note getNoteAtRow(int rowIndex) {
         return noteMngr.getNoteAt(rowIndex);
     }
@@ -110,23 +111,23 @@ public class NoteTableModel extends AbstractTableModel {
         if (noteMngr.isEmpty()) {
             return null;
         }
-        
+
         Note note = getNoteAtRow(row);
         switch (Column.values()[col]) {
         case TITLE:
             return note.getTitle();
-//        case TAGS:
-//            return note.getTags();
+        case TAGS:
+            return note.getTags();
         case DATE_MODIFIED:
             return note.getModifiedDate();
-//        case DATE_CREATED:
-//            return note.getCreateDate();
+        case DATE_CREATED:
+            return note.getCreateDate();
         }
-        
+
         throw new IllegalArgumentException(
                 String.format("Invalid column index [%d].", col));
     }
-    
+
     /**
      * Retrieve the value in a particular cell.
      * @param row The cell's row index.
@@ -136,22 +137,25 @@ public class NoteTableModel extends AbstractTableModel {
     public Object getValueAt(int row, Column column) {
         return getValueAt(row, column.ordinal());
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-//        if (columnIndex == Column.TAGS.ordinal()) {
-//            getNoteAtRow(rowIndex).setTags((List<String>) aValue);
-//        } else {
+        if (columnIndex == Column.TAGS.ordinal()) {
+            getNoteAtRow(rowIndex).setTags((List<String>) aValue);
+        } else {
             throw new IllegalArgumentException(String.format(
-                    "Cell (row=[%s],col=[%s]) is not editable.", 
+                    "Cell (row=[%s],col=[%s]) is not editable.",
                     rowIndex, columnIndex));
-//        }
+        }
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
+    	// Eventually the plan was to allow users to edit note tags from the
+    	// note table itself.
+    	// return columnIndex == Column.TAGS.ordinal();
+
         return false;
-//        return columnIndex == Column.TAGS.ordinal();
     }
 }

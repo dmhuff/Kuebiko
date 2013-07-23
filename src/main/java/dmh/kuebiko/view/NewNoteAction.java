@@ -22,16 +22,16 @@ import dmh.swing.AbstractActionObserver;
  */
 class NewNoteAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
-    
-    private final NoteFrame noteFrame;
-    
-    NewNoteAction(NoteFrame noteFrame) {
-        super("New Note"); // TODO i18n.
+
+    private final NoteStackFrame noteFrame;
+
+    NewNoteAction(NoteStackFrame noteFrame) {
+        super("New Note");
         this.noteFrame = noteFrame;
-        
-        putValue(SHORT_DESCRIPTION, "Add a new note to the stack."); // TODO i18n.
+
+        putValue(SHORT_DESCRIPTION, "Add a new note to the stack.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_N);
     }
@@ -53,9 +53,9 @@ class NewNoteAction extends AbstractActionObserver {
             noteTable.getNoteTableModel().addNewNote(noteTitle);
         }
         noteFrame.getSearchText().setText(noteTitle);
-        
+
         if (noteFrame.isInEditMode()) {
-            // If we're in edit mode, we need to do a bit more work on the UI, 
+            // If we're in edit mode, we need to do a bit more work on the UI,
             // since most of the needed setup work happens only in search mode.
             noteTable.filter(noteFrame.getSearchText().getText());
             noteTable.selectNote(noteTitle);

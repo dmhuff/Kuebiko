@@ -21,16 +21,16 @@ import dmh.swing.AbstractActionObserver;
  */
 class OpenNoteAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
-    
-    private final NoteFrame noteFrame;
-    
-    OpenNoteAction(NoteFrame noteFrame) {
-        super("Open Note"); // TODO i18n.
+
+    private final NoteStackFrame noteFrame;
+
+    OpenNoteAction(NoteStackFrame noteFrame) {
+        super("Open Note");
         this.noteFrame = noteFrame;
-        
-        putValue(SHORT_DESCRIPTION, "Open a note in the stack."); // TODO i18n.
+
+        putValue(SHORT_DESCRIPTION, "Open a note in the stack.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_L, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_L,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_L);
     }

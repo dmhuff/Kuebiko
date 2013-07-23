@@ -20,7 +20,7 @@ import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.test.TestHelper;
 
 /**
- * TestNG test class for the UI class {@link NoteFrame}.
+ * TestNG test class for the UI class {@link NoteStackFrame}.
  *
  * @author davehuffman
  */
@@ -28,7 +28,7 @@ public class NoteFrameTest {
     @Test
     public void partialMatchSelectTabTest() {
         NoteManager noteMngr = new NoteManager(TestHelper.newDummyNoteDao());
-        NoteFrame noteFrame = new NoteFrame(noteMngr);
+        NoteStackFrame noteFrame = new NoteStackFrame(noteMngr);
         
         // Set focus on the search text field.
         noteFrame.searchText.requestFocus();
@@ -58,7 +58,7 @@ public class NoteFrameTest {
         // This bug would occur when saving a note stack after deleting a note.
         // This test simulates the UI actions that precipitate the error.
         
-        final NoteFrame noteFrame = new NoteFrame(
+        final NoteStackFrame noteFrame = new NoteStackFrame(
                 new NoteManager(TestHelper.newDummyNoteDao()));
         
         // Select a note.

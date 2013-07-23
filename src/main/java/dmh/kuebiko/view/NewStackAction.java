@@ -13,6 +13,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import dmh.swing.UnimplementedAction;
+
 /**
  * TODO Document.
  *
@@ -20,13 +22,13 @@ import java.util.Observable;
  */
 public class NewStackAction extends UnimplementedAction {
     private static final long serialVersionUID = 1L;
-    
+
     public NewStackAction() {
-        super("New Stack"); // TODO i18n.
-        
-        putValue(SHORT_DESCRIPTION, "Create a new stack of notes."); // TODO i18n.
+        super("New Stack");
+
+        putValue(SHORT_DESCRIPTION, "Create a new stack of notes.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_N,
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(MNEMONIC_KEY, KeyEvent.VK_T);
     }

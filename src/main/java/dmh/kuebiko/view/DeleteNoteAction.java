@@ -22,20 +22,20 @@ import dmh.swing.AbstractActionObserver;
  */
 public class DeleteNoteAction extends AbstractActionObserver {
 private static final long serialVersionUID = 1L;
-    
-    private final NoteFrame noteFrame;
-    
-    public DeleteNoteAction(NoteFrame noteFrame) {
-        super("Delete Note"); // TODO i18n.
+
+    private final NoteStackFrame noteFrame;
+
+    public DeleteNoteAction(NoteStackFrame noteFrame) {
+        super("Delete Note");
         this.noteFrame = noteFrame;
-        
-        putValue(SHORT_DESCRIPTION, "Delete the selected note from the stack."); // TODO i18n.
+
+        putValue(SHORT_DESCRIPTION, "Delete the selected note from the stack.");
         putValue(LONG_DESCRIPTION, getValue(SHORT_DESCRIPTION));
-        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_D, 
+        putValue(ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_D,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK));
         putValue(MNEMONIC_KEY, KeyEvent.VK_E);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent event) {
         noteFrame.deleteSelectedNote();

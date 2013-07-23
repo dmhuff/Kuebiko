@@ -44,50 +44,34 @@ import javax.swing.text.DefaultEditorKit;
 import org.apache.commons.lang.SystemUtils;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import dmh.kuebiko.Main;
 import dmh.kuebiko.controller.NoteManager;
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.util.ActionManager;
 import dmh.kuebiko.util.ActionObserverUtil;
+import dmh.swing.CustomFocusTraversalPolicy;
+import dmh.swing.GenericObservable;
 import dmh.swing.huxley.action.InsertDynamicTextAction;
 import dmh.swing.huxley.constant.TextAction;
 import dmh.util.Callback;
 
 /**
  * UI frame for displaying and editing notes.
- * XXX consider changing this class to be a POJO with a JFrame field.
  *
  * @author davehuffman
  */
-public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
+public class NoteStackFrame extends JFrame {
     private static final long serialVersionUID = 1L;
-    
+
     private static enum Mode { SEARCH, EDIT }
-    
-    /** XXX consider moving to a utility class. */
-    private static class NoteFrameObservable extends Observable {
-        private void setChangedAndNotify() {
-            setChangedAndNotify(null);
-        }
-        
-        private void setChangedAndNotify(final Object arg) {
-            setChanged();
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    notifyObservers(arg);
-                }});
-        }
-    }
 
     private final NoteManager noteMngr;
-    
+
     private Mode mode;
-    
+
     private final transient ActionManager actionMngr = new ActionManager();
-    
-    private final NoteFrameObservable observable = new NoteFrameObservable();
-    
+
+    private final GenericObservable observable = new GenericObservable();
+
     private JSplitPane splitPane;
     JTextField searchText;
     private JScrollPane noteTableScroll;
@@ -118,9 +102,10 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     /**
      * Create the frame.
      */
-    public NoteFrame(NoteManager noteMngr) {
+    public NoteStackFrame(NoteManager noteMngr) {
         this.noteMngr = noteMngr;
-        
+
+        // Setup the various actions for the frame.
         noteMngr.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
@@ -131,106 +116,105 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
                 }
             }
         });
-        
-        // XXX consider moving this to a registration object to move instantiating, registering, and setting on a component to a single line for each action.
-        ActionObserverUtil.registerEnMass(actionMngr, observable, 
-                new NewNoteAction(this), 
-                new OpenNoteAction(this), 
-                new DeleteNoteAction(this), 
+
+        ActionObserverUtil.registerEnMass(actionMngr, observable,
+                new NewNoteAction(this),
+                new OpenNoteAction(this),
+                new DeleteNoteAction(this),
                 new RenameNoteAction(this),
                 new SaveStackAction(this));
-        
+
+        // Build the menus.
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        
+
         fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
-        
+
         newNoteMenuItem = new JMenuItem(actionMngr.getAction(NewNoteAction.class));
         fileMenu.add(newNoteMenuItem);
 
         JMenuItem openNoteMenuItem = new JMenuItem(actionMngr.getAction(OpenNoteAction.class));
         fileMenu.add(openNoteMenuItem);
-        
+
         deleteNoteMenuItem = new JMenuItem(actionMngr.getAction(DeleteNoteAction.class));
         fileMenu.add(deleteNoteMenuItem);
-        
+
         renameNoteMenuItem = new JMenuItem(actionMngr.getAction(RenameNoteAction.class));
         fileMenu.add(renameNoteMenuItem);
-        
+
         fileMenu.addSeparator();
-        
+
         newStackMenuItem = new JMenuItem(actionMngr.getAction(NewStackAction.class));
         fileMenu.add(newStackMenuItem);
-        
+
         openStackMenuItem = new JMenuItem(actionMngr.getAction(OpenStackAction.class));
         fileMenu.add(openStackMenuItem);
-        
+
         fileMenu.addSeparator();
-        
+
         closeMenuItem = new JMenuItem("Close");
-        closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
+        closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeMenuItem.setEnabled(false);
         fileMenu.add(closeMenuItem);
-        
+
         closeAllMenuItem = new JMenuItem("Close All");
-        closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 
+        closeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         closeAllMenuItem.setEnabled(false);
         fileMenu.add(closeAllMenuItem);
-        
+
         fileMenu.addSeparator();
-        
+
         saveMenuItem = new JMenuItem(actionMngr.getAction(SaveStackAction.class));
         fileMenu.add(saveMenuItem);
-        
+
         saveAllMenuItem = new JMenuItem("Save All");
-        saveAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 
+        saveAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAllMenuItem.setEnabled(false);
         fileMenu.add(saveAllMenuItem);
-        
+
         editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
-        
+
         undoMenuItem = new JMenuItem("Undo");
-        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(undoMenuItem);
-        
+
         redoMenuItem = new JMenuItem("Redo"); // FIXME mac-specific keyboard shortcut
-        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
+        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z,
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(redoMenuItem);
-        
+
         editMenu.addSeparator();
-        
+
         cutMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CutAction.class));
         cutMenuItem.setText("Cut");
-        cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, 
+        cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(cutMenuItem);
-        
-//        copyMenuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
+
         copyMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.CopyAction.class));
         copyMenuItem.setText("Copy");
-        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 
+        copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(copyMenuItem);
-        
+
         pasteMenuItem = new JMenuItem(actionMngr.getAction(DefaultEditorKit.PasteAction.class));
         pasteMenuItem.setText("Paste");
-        pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, 
+        pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(pasteMenuItem);
-        
+
         textMenu = new JMenu("Text");
         menuBar.add(textMenu);
-        
+
         JMenu windowMenu = new JMenu("Window");
         menuBar.add(windowMenu);
-        
+
         initialize();
         additionalSetup();
     }
@@ -240,7 +224,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     }
 
     /**
-     * Initialize the contents of the frame. The contents of this method was 
+     * Initialize the contents of the frame. The contents of this method was
      * generated by Window Builder Pro.
      */
     private void initialize() {
@@ -254,7 +238,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         gridBagLayout.rowWeights = new double[] { 0.0, 1.0, 1.0, 1.0, 1.0,
                 Double.MIN_VALUE };
         getContentPane().setLayout(gridBagLayout);
-        
+
         horizontalStrut = Box.createHorizontalStrut(20);
         horizontalStrut.setMinimumSize(new Dimension(3, 0));
         horizontalStrut.setPreferredSize(new Dimension(3, 0));
@@ -264,7 +248,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         gbc_horizontalStrut.gridx = 0;
         gbc_horizontalStrut.gridy = 0;
         getContentPane().add(horizontalStrut, gbc_horizontalStrut);
-        
+
         GridBagConstraints gbc_stateImageLabel = new GridBagConstraints();
         gbc_stateImageLabel.insets = new Insets(0, 0, 0, 0);
         gbc_stateImageLabel.anchor = GridBagConstraints.EAST;
@@ -316,13 +300,12 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         noteTable = newNoteTable();
         noteTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         noteTableScroll.setViewportView(noteTable);
-        
-        ActionObserverUtil.registerEnMass(actionMngr, observable, 
+
+        ActionObserverUtil.registerEnMass(actionMngr, observable,
                 notePanel.getHuxleyUiManager().getTextAction(TextAction.INSERT_DATE));
-        
-//        insertDateMenuItem = new JMenuItem("Insert Date");
+
         insertDateMenuItem = new JMenuItem(actionMngr.getAction(InsertDynamicTextAction.class));
-        insertDateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 
+        insertDateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,
                 InputEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         textMenu.add(insertDateMenuItem);
     }
@@ -330,48 +313,17 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     private String buildTitle() {
         return "Kuebiko";
     }
-    
-//    static class FocusVetoableChangeListener implements VetoableChangeListener {
-//        @Override
-//        public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-//            Component oldComp = (Component)evt.getOldValue();
-//            Component newComp = (Component)evt.getNewValue();
-//            
-//            if ("focusOwner".equals(evt.getPropertyName())) {
-//                if (oldComp == null) {
-//                    // the newComp component will gain the focus
-//                } else {
-//                    // the oldComp component will lose the focus
-//                }
-//            } 
-////            else if ("focusedWindow".equals(evt.getPropertyName())) {
-////                if (oldComp == null) {
-////                    // the newComp window will gain the focus
-////                } else {
-////                    // the oldComp window will lose the focus
-////                }
-////            }
-//
-//            boolean vetoFocusChange = false;
-//            if (vetoFocusChange) {
-//                throw new PropertyVetoException("message", evt);
-//            }
-//        }
-//    }
-    
+
     /**
-     * Perform additional setup to the frame. This is separate from the 
+     * Perform additional setup to the frame. This is separate from the
      * initialize() method so that the GUI builder doesn't mess with it.
      */
     private void additionalSetup() {
-//        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-//                .addVetoableChangeListener(new FocusVetoableChangeListener());
-        
         mode = Mode.SEARCH;
-        
+
         setFocusTraversalPolicy(
                 new CustomFocusTraversalPolicy(searchText, notePanel));
-        
+
         // Search Text Field.
         AutoCompleteDecorator.decorate(searchText, noteMngr.getNoteTitles(), false);
         searchText.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "clear");
@@ -397,7 +349,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
             public void actionPerformed(ActionEvent e) {
                 searchText.setText(null);
             }});
-        
+
         searchText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -410,20 +362,16 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
             }
         });
         searchText.addActionListener(actionMngr.getAction(NewNoteAction.class));
-        
+
         // Note Table.
         noteTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
-//                Main.log("valueChanged; adjusting=[%b].", event.getValueIsAdjusting());
                 if (event.getValueIsAdjusting()) {
                     return;
                 }
                 final Note selectedNote = noteTable.getSelectedNote();
-                final Note previousNote = notePanel.getNote();
-//                Main.log("valueChanged; previousNote=[%s].", previousNote);
-//                Main.log("valueChanged; selectedNote=[%s].", selectedNote);
-            
+
                 if (selectedNote == null) {
                     setModeToSearch();
                 } else {
@@ -434,7 +382,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
             }
         });
     }
-    
+
     private void setModeToSearch() {
         mode = Mode.SEARCH;
         stateImageLabel.setIcon(new ImageIcon(
@@ -442,14 +390,14 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
         noteTable.clearSelection();
         observable.setChangedAndNotify();
     }
-    
+
     private void setModeToEdit() {
         mode = Mode.EDIT;
         stateImageLabel.setIcon(new ImageIcon(
                 ImageManager.get().getImage("edit")));
         observable.setChangedAndNotify();
     }
-    
+
     private void toggleUnsavedChangeIndicator(boolean unsavedChanges) {
         if (SystemUtils.IS_OS_MAC_OSX) {
             // Toggle the Mac OS X window-modified indicator.
@@ -462,28 +410,20 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
             }
         }
     }
-    
-//    private void onStackChange() {
-//        toggleUnsavedChangeIndicator(true);
-//    }
-//    
-//    private void onStackSave() {
-//        toggleUnsavedChangeIndicator(false);
-//    }
-    
+
     public boolean isNoteSelected() {
         return (noteTable == null? false : (noteTable.getSelectedRow() != -1));
     }
-    
+
     void deleteSelectedNote() {
         if (!isNoteSelected()) {
             throw new IllegalStateException("No note currently selected.");
         }
-        
+
         noteTable.deleteSelectedNote();
         searchText.setText("");
     }
-    
+
     /**
      * Handler for when the contents of the search text field changes.
      */
@@ -499,7 +439,7 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
             });
         }
     }
-    
+
     boolean isInSearchMode() {
         return (mode == Mode.SEARCH);
     }
@@ -507,19 +447,19 @@ public class NoteFrame extends JFrame { // TODO rename to "StackFrame".
     boolean isInEditMode() {
         return (mode == Mode.EDIT);
     }
-    
+
     JTextField getSearchText() {
         return searchText;
     }
-    
+
     NoteTable getNoteTable() {
         return noteTable;
     }
-    
+
     NotePanel getNotePanel() {
         return notePanel;
     }
-    
+
     NoteManager getNoteMngr() {
         return noteMngr;
     }

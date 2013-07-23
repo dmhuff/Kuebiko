@@ -39,10 +39,10 @@ import dmh.kuebiko.view.NoteTableModel.Column;
  */
 public class NoteTable extends JTable {
     private static final long serialVersionUID = 1L;
-    
+
     private static class DateTimeCellRenderer extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
-        
+
         private static final DateTimeCellRenderer INSTANCE = new DateTimeCellRenderer();
 
         @Override
@@ -51,21 +51,25 @@ public class NoteTable extends JTable {
             super.setValue((value == null)? "" : formatter.format(value));
         }
     }
-    
-    private static class TagCellRenderer extends DefaultTableCellRenderer {
+
+    // Tags were never fully implemented.
+    @SuppressWarnings("unused")
+	private static class TagCellRenderer extends DefaultTableCellRenderer {
         private static final long serialVersionUID = 1L;
 
         private static final TagCellRenderer INSTANCE = new TagCellRenderer();
         private static final Joiner JOINER = Joiner.on(", ");
-        
+
         @Override
         protected void setValue(Object value) {
             List<?> tagList = (List<?>) value;
             super.setValue(JOINER.join(tagList));
         }
     }
-    
-    private static class TagCellEditor extends DefaultCellEditor {
+
+    // Tags were never fully implemented.
+    @SuppressWarnings("unused")
+	private static class TagCellEditor extends DefaultCellEditor {
         private static final long serialVersionUID = 1L;
 
         private static final TagCellEditor  INSTANCE = new TagCellEditor();
@@ -79,50 +83,41 @@ public class NoteTable extends JTable {
             Object cellEditorValue = super.getCellEditorValue();
             return Arrays.asList(ObjectUtils.toString(cellEditorValue).split(" "));
         }
-        
+
         @Override
         public Component getTableCellEditorComponent(JTable table,
                 Object value, boolean isSelected, int row, int column) {
             List<?> tagList = (List<?>) value;
             String tags = Joiner.on(" ").join(tagList);
-            
+
             return super.getTableCellEditorComponent(table, tags, isSelected, row, column);
         }
     }
-    
+
     private final NoteTableModel noteTableModel;
     private final TableRowSorter<NoteTableModel> sorter;
 
     NoteTable(NoteTableModel noteTableModel) {
         this.noteTableModel = noteTableModel;
         setModel(noteTableModel);
-        
+
         sorter = new TableRowSorter<NoteTableModel>(this.noteTableModel);
         setRowSorter(sorter);
     }
-    
+
     @Override
     public TableCellRenderer getCellRenderer(int row, int column) {
-//        if (column == Column.TAGS.ordinal()) {
-//            return TagCellRenderer.INSTANCE;
-//        } else if (column == Column.DATE_MODIFIED.ordinal()
-//                    || column == Column.DATE_CREATED.ordinal()) {
-//            return DateTimeCellRenderer.INSTANCE;
-//        }
         if (column == Column.DATE_MODIFIED.ordinal()) {
             return DateTimeCellRenderer.INSTANCE;
         }
         return super.getCellRenderer(row, column);
     }
-    
+
     @Override
     public TableCellEditor getCellEditor(int row, int column) {
-//        if (column == Column.TAGS.ordinal()) {
-//            return TagCellEditor.INSTANCE;
-//        }
         return super.getCellEditor(row, column);
     }
-    
+
     /**
      * Apply a filter to the table's, hiding all rows that don't match.
      * @param filterString The string to use as a filter.
@@ -133,18 +128,17 @@ public class NoteTable extends JTable {
             sorter.setRowFilter(null);
             return;
         }
-        
+
         final RowFilter<NoteTableModel, Integer> rowFilter;
         try {
-            rowFilter = RowFilter.regexFilter(
-                    String.format(".*?%s.*", Pattern.quote(filterString)), 
-                    Column.TITLE.ordinal()/*, Column.TAGS.ordinal()*/);
+            rowFilter = RowFilter.regexFilter(String.format(".*?%s.*",
+            		Pattern.quote(filterString)), Column.TITLE.ordinal());
         } catch (PatternSyntaxException e) {
             throw new IllegalArgumentException("Invalid filter string", e);
         }
         sorter.setRowFilter(rowFilter);
     }
-    
+
     /**
      * Manually select a note in the table.
      * @param title The title of the note to select.
@@ -153,7 +147,7 @@ public class NoteTable extends JTable {
         if (isEmpty(title)) {
             return;
         }
-        
+
         // Attempt to find an existing note by title.
         final String trimTitle = title.trim();
         final int titleCol = convertColumnIndexToView(Column.TITLE.ordinal());
@@ -164,12 +158,12 @@ public class NoteTable extends JTable {
             }
         }
     }
-    
+
     void deleteSelectedNote() {
         noteTableModel.deleteNote(getSelectedNote());
         clearSelection();
     }
-    
+
     /**
      * @return The currently selected note, or null if there is no selection.
      */
@@ -178,7 +172,7 @@ public class NoteTable extends JTable {
         final int modelSelectedRow = (viewSelectedRow < 0)? -1 : convertRowIndexToModel(viewSelectedRow);
         return (modelSelectedRow < 0)? null : noteTableModel.getNoteAtRow(modelSelectedRow);
     }
-    
+
     public NoteTableModel getNoteTableModel() {
         return noteTableModel;
     }
