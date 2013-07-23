@@ -37,39 +37,44 @@ import dmh.kuebiko.util.LapCounter;
  * @author davehuffman
  */
 public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLoader {
-    public static final Set<DaoParameter> REQUIRED_PARAMETERS = 
+    public static final Set<DaoParameter> REQUIRED_PARAMETERS =
             Collections.unmodifiableSet(EnumSet.of(DaoParameter.DIRECTORY));
 
     private LapCounter idGenerator = new LapCounter();
     private FileSystemNoteCache noteCache = null;
     private File noteDir;
-    
+
     public FileSystemNoteDao() {
         super(REQUIRED_PARAMETERS);
     }
-    
+
     @Override
     public void postInitialize() throws DaoConfigurationException {
         noteDir = new File(getDirectory());
-        if (!noteDir.exists()) { 
+        if (!noteDir.exists()) {
             throw new DaoConfigurationException(
                     String.format("Note directory [%s] does not exist.", noteDir));
         }
     }
-    
+
     private void loadNotes() {
         File[] noteFiles = NoteFileUtil.listNoteFilesInDir(noteDir);
-        
+
         // Reset the internal data structures.
         noteCache = new FileSystemNoteCache(noteFiles.length);
         idGenerator = new LapCounter();
 
         for (File noteFile: noteFiles) {
             String name = NoteFileUtil.fileNameToNoteTitle(noteFile.getName());
-            Date createDate = null; // TODO the file API doesn't have a way to get this because not all platforms support it. I'll have to embed the information in the file itself.
-            Note note = newNote(name, createDate, 
-                    new Date(noteFile.lastModified()), this); 
-            
+
+            // Note: the Java file API doesn't have a way to get the create date
+            // because not all platforms support it. It will have to be embedded
+            // in the file itself (someday).
+            Date createDate = null;
+
+            Note note = newNote(name, createDate,
+                    new Date(noteFile.lastModified()), this);
+
             noteCache.put(note.getId(), noteFile, note);
         }
     }
@@ -98,9 +103,10 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
     @Override
     protected Note findNote(int id) {
         if (noteCache == null) {
-            throw new IllegalStateException("Note cache has been reset, ID may be invalid.");
+            throw new IllegalStateException(
+            		"Note cache has been reset, ID may be invalid.");
         }
-        
+
         for (Note note: getNotesFromCache()) {
             if (id == note.getId()) {
                 return note;
@@ -108,7 +114,7 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         }
         return null;
     }
-    
+
     @Override
     protected Note findNote(String title) {
         for (Note note: getNotesFromCache()) {
@@ -118,12 +124,12 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         }
         return null;
     }
-    
+
     @Override
     protected int getUniqueId() {
         return idGenerator.tick();
     }
-    
+
     /**
      * Write (persist) note data to the file system.
      * @param note The note to persist.
@@ -131,7 +137,7 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
      */
     private File writeNoteToFile(Note note) throws PersistenceException {
         Preconditions.checkNotNull(note);
-        
+
         File noteFile = NoteFileUtil.getNoteFile(noteDir, note);
 
         Writer out = null;
@@ -154,12 +160,12 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         }
         return noteFile;
     }
-    
+
     @Override
     protected Note persistActionAdd(Note addedNote) throws PersistenceException {
         File noteFile = writeNoteToFile(addedNote);
         noteCache.put(addedNote.getId(), noteFile, addedNote);
-        
+
         return addedNote;
     }
 
@@ -172,15 +178,15 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
             throw new PersistenceException(
                     String.format("No note exists for ID [%d].", noteId));
         }
-        
+
         // Delete the note file from the file system.
         boolean success = noteFile.delete();
         if (!success) {
             throw new PersistenceException(
-                    String.format("Unable to delete note [%d:%s].", 
+                    String.format("Unable to delete note [%d:%s].",
                             noteId, deletedNote.getTitle()));
         }
-        
+
         // Update the cache.
         noteCache.remove(noteId);
     }
@@ -190,14 +196,14 @@ public class FileSystemNoteDao extends AbstractNoteDao implements NoteTextLazyLo
         // Perform the update by replacing the old data.
         persistActionDelete(updatedNote);
         persistActionAdd(updatedNote);
-        
+
         return updatedNote;
     }
 
     @Override
     public String loadText(Note note) throws PersistenceException {
         final StringBuilder text = new StringBuilder();
-        
+
         Scanner scanner = null;
         try {
             scanner = new Scanner(new FileInputStream(NoteFileUtil.getNoteFile(noteDir, note)));

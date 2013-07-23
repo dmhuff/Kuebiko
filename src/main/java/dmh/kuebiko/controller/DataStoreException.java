@@ -6,9 +6,8 @@
 package dmh.kuebiko.controller;
 
 /**
- * Exception thrown when an error occurs during a controller interaction with 
+ * Exception thrown when an error occurs during a controller interaction with
  * the data store.
- * XXX should this be checked or unchecked? 
  *
  * @author davehuffman
  */
