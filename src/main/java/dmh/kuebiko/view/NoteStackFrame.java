@@ -386,7 +386,7 @@ public class NoteStackFrame extends JFrame {
     private void setModeToSearch() {
         mode = Mode.SEARCH;
         stateImageLabel.setIcon(new ImageIcon(
-                ImageManager.get().getImage("search")));
+        		KuebikoImageManager.get().getImage("search")));
         noteTable.clearSelection();
         observable.setChangedAndNotify();
     }
@@ -394,7 +394,7 @@ public class NoteStackFrame extends JFrame {
     private void setModeToEdit() {
         mode = Mode.EDIT;
         stateImageLabel.setIcon(new ImageIcon(
-                ImageManager.get().getImage("edit")));
+        		KuebikoImageManager.get().getImage("edit")));
         observable.setChangedAndNotify();
     }
 

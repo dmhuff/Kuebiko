@@ -22,7 +22,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-import dmh.kuebiko.view.ImageManager.ImageSize;
+import dmh.swing.huxley.HuxleyImageManager;
+import dmh.util.ImageManager.ImageSize;
 
 /**
  * TestNG test class for {@link dmh.kuebiko.view.ImageManager}
@@ -32,22 +33,22 @@ import dmh.kuebiko.view.ImageManager.ImageSize;
 public class ImageManagerTest {
     @Test
     public void singletonTest() {
-        assertSame(ImageManager.get(), ImageManager.get(),
+        assertSame(HuxleyImageManager.get(), HuxleyImageManager.get(),
                 "There should only be one instance of the ImageManager class");
     }
 
     @Test
     public void getImageTest() throws Exception {
         for (ImageSize size: ImageSize.values()) {
-            ImageManager.get().setDefaultSize(size);
+            HuxleyImageManager.get().setDefaultSize(size);
 
             Collection<String> imageIds = getImageIds(size);
 
             for (String imageId: imageIds) {
-                final Image image = ImageManager.get().getImage(imageId);
+                final Image image = HuxleyImageManager.get().getImage(imageId);
 
                 assertNotNull(image, "Return value should not be null.");
-                assertSame(ImageManager.get().getImage(imageId), image,
+                assertSame(HuxleyImageManager.get().getImage(imageId), image,
                         "Buffering should return same object for same ID.");
             }
         }

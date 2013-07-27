@@ -3,7 +3,7 @@
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
-package dmh.swing.huxley;
+package dmh.util;
 
 import java.awt.Image;
 import java.util.Map;
@@ -13,39 +13,41 @@ import javax.imageio.ImageIO;
 import com.google.common.collect.Maps;
 
 /**
- * Singleton manager for Huxley UI images.
+ * Manager for application images. By default, base classes will read images
+ * from a subpackage called "images", with further images representing image
+ * size; for example: "images.small.super_cool_icon.png".
  *
  * @author davehuffman
  */
-public final class ImageManager {
-    enum ImageSize { SMALL /*, BIG*/ } // TODO implement big images.
-    
-    private static final ImageManager INSTANCE = new ImageManager();
-    
-    /**
-     * @return The singleton instance of the class.
-     */
-    public static ImageManager get() {
-        return INSTANCE;
-    }
-    
-    private final Map<ImageSize, Map<String, Image>> images;
+public abstract class ImageManager {
+    public enum ImageSize { SMALL /*, BIG*/ } // Big images are not yet implemented.
+
+    private final String imagePackage;
+    private final Map<ImageSize, Map<String, Image>> imageCache;
     private ImageSize defaultSize;
-    
+
     /**
-     * Private constructor, since this is a singleton class. Assigns default
-     * state.
+     * Default constructor.
      */
-    private ImageManager() {
-        images = Maps.newHashMap();
+    protected ImageManager() {
+    	this("images");
+    }
+
+    /**
+     * Constructor.
+     * @param imagePackage A custom package for images, relative to the base class.
+     */
+    protected ImageManager(String imagePackage) {
+    	this.imagePackage = imagePackage;
+        imageCache = Maps.newHashMap();
         for (ImageSize size: ImageSize.values()) {
             Map<String, Image> sizeMap = Maps.newHashMap();
-            images.put(size, sizeMap);
+            imageCache.put(size, sizeMap);
         }
-        
+
         defaultSize = ImageSize.SMALL;
     }
-    
+
     /**
      * Retrieve an image from the buffer.
      * @param appImage Identifier for the desired image.
@@ -54,7 +56,7 @@ public final class ImageManager {
     public Image getImage(String appImage) {
         return getImage(defaultSize, appImage);
     }
-    
+
     /**
      * Retrieve an image from the buffer.
      * @param size The size of the desired image.
@@ -62,12 +64,12 @@ public final class ImageManager {
      * @return The requested image.
      */
     private Image getImage(ImageSize size, String appImage) {
-        Image image = images.get(size).get(appImage);
+        Image image = imageCache.get(size).get(appImage);
         if (image == null) {
-            // If this is the first time the client has requested this image, 
+            // If this is the first time the client has requested this image,
             // we'll need to load it.
             image = loadImage(size, appImage);
-            images.get(size).put(appImage, image);
+            imageCache.get(size).put(appImage, image);
         }
         return image;
     }
@@ -79,8 +81,8 @@ public final class ImageManager {
      * @return The loaded image.
      */
     private Image loadImage(ImageSize size, String appImage) {
-        final String path = String.format("images/%s/%s.png",
-                size.toString().toLowerCase(), 
+        final String path = String.format("%s/%s/%s.png",
+                imagePackage, size.toString().toLowerCase(),
                 appImage.toString().toLowerCase().replaceAll("_", "-"));
         try {
             return ImageIO.read(getClass().getResource(path));
@@ -92,7 +94,7 @@ public final class ImageManager {
         }
     }
 
-    void setDefaultSize(ImageSize defaultSize) {
+    public void setDefaultSize(ImageSize defaultSize) {
         this.defaultSize = defaultSize;
     }
 }

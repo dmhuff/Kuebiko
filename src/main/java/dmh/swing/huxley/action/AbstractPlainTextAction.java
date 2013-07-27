@@ -13,7 +13,7 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import dmh.swing.AbstractActionObserver;
-import dmh.swing.huxley.ImageManager;
+import dmh.swing.huxley.HuxleyImageManager;
 import dmh.swing.huxley.constant.TextAction;
 
 /**
@@ -29,7 +29,7 @@ public abstract class AbstractPlainTextAction extends AbstractActionObserver {
 
     public AbstractPlainTextAction(TextAction actionId, JTextComponent textComponent) {
         super(actionId.actionName,
-                new ImageIcon(ImageManager.get().getImage(actionId.actionName)));
+                new ImageIcon(HuxleyImageManager.get().getImage(actionId.actionName)));
         this.actionId = actionId;
         this.textComponent = textComponent;
     }
