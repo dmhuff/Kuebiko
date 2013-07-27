@@ -47,11 +47,11 @@ import dmh.kuebiko.util.Pair;
 public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
     private File tempDir;
     private Map<String, String> params;
-    
+
     @BeforeMethod
     public void checkConfig() {
-        // Ensure a premature cleanup hasn't occurred. This is necessary because 
-        // TestNG will call the @AfterClass method when a superclass's methods 
+        // Ensure a premature cleanup hasn't occurred. This is necessary because
+        // TestNG will call the @AfterClass method when a superclass's methods
         // are complete, and this class subclasses AbstractNoteDaoTest.
         if (tempDir == null) {
             tempDir = Files.createTempDir();
@@ -59,17 +59,17 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
             params.put(DaoParameter.DIRECTORY.toString(), tempDir.getPath());
         }
     }
-    
+
     @AfterMethod
     public void methodCleanup() throws IOException {
         // Clean the temp directory for the next test.
         FileUtils.cleanDirectory(tempDir);
     }
-    
+
     @AfterClass
     public void classCleanup() throws IOException {
         FileUtils.deleteDirectory(tempDir);
-        
+
         tempDir = null;
         params = null;
     }
@@ -78,39 +78,39 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
     protected AbstractNoteDao newNoteDao() {
         try {
             NoteDao noteDao = NoteDaoFactory.get(FileSystemNoteDao.class.getName(), params);
-            Assert.assertTrue(noteDao instanceof FileSystemNoteDao, 
+            Assert.assertTrue(noteDao instanceof FileSystemNoteDao,
                     "Factory should return DAO of expected type.");
             return (AbstractNoteDao) noteDao;
         } catch (Exception e) {
             throw new TestException("Couldn't instantiate note DAO.", e);
         }
     }
-    
+
     private FileSystemNoteDao newFileSystemNoteDao() {
         return (FileSystemNoteDao) newNoteDao();
     }
-    
+
     @Test
     public void parameterTest() {
         FileSystemNoteDao fsDao = newFileSystemNoteDao();
-        
-        assertEquals(fsDao.getDirectory(), 
+
+        assertEquals(fsDao.getDirectory(),
                 params.get(DaoParameter.DIRECTORY.toString()));
     }
 
     @Test(expectedExceptions = DaoConfigurationException.class)
-    public void nullParameterTest() 
+    public void nullParameterTest()
     throws BadClassException, DaoConfigurationException {
         NoteDaoFactory.get(FileSystemNoteDao.class.getName(), null);
     }
-    
+
     @Test(expectedExceptions = DaoConfigurationException.class)
-    public void missingParameterTest() 
+    public void missingParameterTest()
     throws BadClassException, DaoConfigurationException {
         HashMap<String, String> emptyParamMap = Maps.newHashMap();
         NoteDaoFactory.get(FileSystemNoteDao.class.getName(), emptyParamMap);
     }
-    
+
     /**
      * Test the life cycle of a single note, from creation to deletion.
      */
@@ -118,30 +118,30 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
     public void lifeCycleTest() throws Exception {
         final String dummyTitle = "The Great Gatsby";
         final String dummyText = "by F. Scott Fitzgerald";
-        final NoteDao dao = newNoteDao(); //NoteDaoFactory.get(FileSystemNoteDao.class.getName(), params);
-        
+        final NoteDao dao = newNoteDao();
+
         // Create a single note.
         dao.addNote(newDummyNote(dummyTitle , dummyText));
-        
+
         // Check the contents of the storage directory for the new note.
         final File[] dataFiles = tempDir.listFiles();
         assertEquals(dataFiles.length, 1, "One note should exist.");
-        assertEquals(dataFiles[0].getName(), 
-                String.format("%s.%s", dummyTitle, NoteFileUtil.FILE_EXTENSION), 
+        assertEquals(dataFiles[0].getName(),
+                String.format("%s.%s", dummyTitle, NoteFileUtil.FILE_EXTENSION),
                 "Note's name should use expected title.");
-        
+
         // Test reading and lazy loading.
         final Note note = Iterables.getOnlyElement(dao.readNotes());
         assertEquals(note.getTitle(), dummyTitle, "Note should have expected title.");
         assertTrue(note.getText().contains(dummyText), "Note should have expected text.");
-        
+
         // Delete the note.
         dao.deleteNote(note);
-        
+
         // Check the contents of the storage directory for emptiness.
         assertEquals(tempDir.listFiles().length, 0, "No notes should exist.");
     }
-    
+
     @Test
     public void multipleDaoCrudTest() throws Exception {
         final List<Pair<String, String>> redShirts = Pair.list(
@@ -155,13 +155,13 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
             writeOneDao.addNote(newDummyNote("foo", "bar"));
             checkIntegrity(writeOneDao, 1);
         }
-        
+
         // Read the first note and save it for later.
         FileSystemNoteDao tempFsDao = newFileSystemNoteDao();
         //tempFsDao.readNotes();
         final Note firstNote = tempFsDao.findNote("foo");
         assertNotNull(firstNote, "First note should exist");
-        
+
         // Write a bunch of new notes.
         {
             final NoteDao writeManyDao = newNoteDao();
@@ -170,25 +170,25 @@ public class FileSystemNoteDaoTest extends AbstractNoteDaoTest {
             }
             checkIntegrity(writeManyDao, redShirts.size() + 1);
         }
-        
+
         // Check what's been done so far with a new DAO.
         checkIntegrity(newNoteDao(), redShirts.size() + 1);
-        
+
         // Update a note.
         {
             NoteDao updateDao = newNoteDao();
             Note updateNote = updateDao.readNotes().get(0);
-            
-            // Be sure to read the text before setting it because note text 
+
+            // Be sure to read the text before setting it because note text
             // is lazy loaded.
             updateNote.setText(updateNote.getText() + " chunky bacon!");
-            
+
             updateDao.updateNote(updateNote);
         }
 
         // Check again after the update.
         checkIntegrity(newNoteDao(), redShirts.size() + 1);
-        
+
         // Delete a note.
         {
             NoteDao deleteDao = newNoteDao();

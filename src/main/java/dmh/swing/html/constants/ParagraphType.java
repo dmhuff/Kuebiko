@@ -17,13 +17,11 @@ import com.google.common.collect.Lists;
 import dmh.swing.html.HasHtmlTag;
 
 /**
- * TODO Document.
- * TODO i18n.
+ * Enumeration of paragraph formatting types.
  * @author davehuffman
  */
 public enum ParagraphType implements HasHtmlTag {
     PARAGRAPH_FORMAT("Normal", null),
-//    NORMAL("Normal", Tag.P),
     HEADING_1("Heading 1", Tag.H1),
     HEADING_2("Heading 2", Tag.H2),
     HEADING_3("Heading 3", Tag.H3),
@@ -31,10 +29,12 @@ public enum ParagraphType implements HasHtmlTag {
     HEADING_5("Heading 5", Tag.H5),
     HEADING_6("Heading 6", Tag.H6),
     FORMATTED("Formatted", Tag.PRE);
-//    ADDRESS("Address", Tag.ADDRESS);
-    
+
+    /**
+     * @return A list of all supported HTML tags.
+     */
     public static List<HTML.Tag> getTags() {
-        return Lists.transform(Arrays.asList(values()), 
+        return Lists.transform(Arrays.asList(values()),
                 new Function<ParagraphType, HTML.Tag>() {
                     @Override
                     public Tag apply(ParagraphType input) {
@@ -42,7 +42,7 @@ public enum ParagraphType implements HasHtmlTag {
                     }
                 });
     }
-    
+
     public static ParagraphType lookup(HTML.Tag tag) {
         for (ParagraphType paragraphType: values()) {
             if (paragraphType.tag != null && paragraphType.tag.equals(tag)) {
@@ -69,8 +69,8 @@ public enum ParagraphType implements HasHtmlTag {
     public String toString() {
         return text;
     }
-    
+
     public String getActionName() {
-        return "huxley-" + toString();
+        return "dmh-html-" + toString();
     }
 }

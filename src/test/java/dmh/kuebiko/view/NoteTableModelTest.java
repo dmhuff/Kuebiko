@@ -13,16 +13,13 @@ import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
-
 import dmh.kuebiko.model.Note;
 import dmh.kuebiko.test.TestHelper;
-import dmh.kuebiko.view.NoteTableModel;
 
 /**
  * Unit test class for NoteTableModel.
- * 
  * @see dmh.kuebiko.view.NoteTableModel
- * 
+ *
  * @author davehuffman
  */
 public class NoteTableModelTest {

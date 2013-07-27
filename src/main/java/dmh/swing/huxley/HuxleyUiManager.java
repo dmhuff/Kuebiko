@@ -43,9 +43,9 @@ import dmh.util.Callback;
 public class HuxleyUiManager {
     private final JPanel uiPanel = new JPanel();
     private final JTextArea textArea;
-    
+
     private final EnumMap<TextAction, AbstractPlainTextAction> textActions = Maps.newEnumMap(TextAction.class);
-    
+
     private final DocumentListener textChangeListener;
     private boolean textChanged = false;
     private Callback<Boolean> onTextChangeCallback = null;
@@ -55,49 +55,49 @@ public class HuxleyUiManager {
      */
     public HuxleyUiManager() {
         this(new JTextArea());
-        
+
     }
     /**
      * Construct a Huxley UI manager with a custom text area component.
      */
     public HuxleyUiManager(JTextArea ta) {
         this.textArea = ta;
-        
-        textActions.put(TextAction.HEADER_1, 
+
+        textActions.put(TextAction.HEADER_1,
                 new InsertHeadingAction(TextAction.HEADER_1, "#", textArea));
-        textActions.put(TextAction.HEADER_2, 
+        textActions.put(TextAction.HEADER_2,
                 new InsertHeadingAction(TextAction.HEADER_2, "=", textArea));
-        textActions.put(TextAction.HEADER_3, 
+        textActions.put(TextAction.HEADER_3,
                 new InsertHeadingAction(TextAction.HEADER_3, "-", textArea));
-        textActions.put(TextAction.INSERT_LINK, 
+        textActions.put(TextAction.INSERT_LINK,
                 new WrapTextAction(TextAction.INSERT_LINK, "[", "]", textArea));
-        textActions.put(TextAction.INSERT_DATE, 
-                new InsertDynamicTextAction(TextAction.INSERT_DATE, 
+        textActions.put(TextAction.INSERT_DATE,
+                new InsertDynamicTextAction(TextAction.INSERT_DATE,
                         new Function<Void, String>() {
                             @Override
                             public String apply(Void input) {
                                 return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                             }
                         }, textArea));
-        
+
         uiPanel.setLayout(new BorderLayout());
-        
+
         // Tool Bar.
         Box toolBarBox = Box.createHorizontalBox();
         toolBarBox.setAlignmentX(0);
         toolBarBox.add(ToolBarBuilder.build(this));
         uiPanel.add(toolBarBox, BorderLayout.NORTH);
-        
+
         // Text Area.
         textArea.setFont(new Font(
-                Main.getSetting(Setting.FONT_NAME), Font.PLAIN, 
+                Main.getSetting(Setting.FONT_NAME), Font.PLAIN,
                 Integer.parseInt(Main.getSetting(Setting.FONT_SIZE))));
-        
+
         JScrollPane textScrollPane = new JScrollPane();
         uiPanel.add(textScrollPane, BorderLayout.CENTER);
         textScrollPane.setBorder(null);
         textScrollPane.setViewportView(textArea);
-        
+
         uiPanel.addFocusListener(
                 new FocusAdapter() {
                     @Override
@@ -109,19 +109,18 @@ public class HuxleyUiManager {
                         }
                     }
                 });
-        
-//        textArea.setDocument(textArea.getEditorKit().createDefaultDocument());
+
         textChangeListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 markTextAsChanged();
             }
-      
+
             @Override
             public void removeUpdate(DocumentEvent e) {
                 markTextAsChanged();
             }
-      
+
             @Override
             public void changedUpdate(DocumentEvent e) {
                 markTextAsChanged();
@@ -130,40 +129,22 @@ public class HuxleyUiManager {
         textArea.getDocument().addDocumentListener(textChangeListener);
     }
 
-    /** DEBUG for development testing. */
-    public void describeSelection() {
-        String selectedText = textArea.getSelectedText();
-        if (selectedText != null) {
-            selectedText = selectedText.replaceAll("\n", "\\\\n");
-        }
-        
-        System.out.printf("%d-%d:[%s]%n", 
-                textArea.getSelectionStart(),
-                textArea.getSelectionEnd(),
-                selectedText);
-        
-    }
-    
-    /**
-     * @param action
-     * @return
-     */
     public AbstractActionObserver getTextAction(TextAction action) {
         return textActions.get(action);
     }
-    
+
     public JPanel getUiPanel() {
         return uiPanel;
     }
-    
+
     public String getText() {
         return textArea.getText();
     }
-    
+
     public void setText(String text) {
         textArea.setText(text);
     }
-    
+
     /**
      * Reset the text contents to a pristine state.
      * @param text The text contents after the state has been reset. May be null.
@@ -174,30 +155,22 @@ public class HuxleyUiManager {
         textArea.setText(text);
         textArea.getDocument().addDocumentListener(textChangeListener);
         textArea.setCaretPosition(0);
-        
+
         if (textArea instanceof RSyntaxTextArea) {
             ((RSyntaxTextArea) textArea).discardAllEdits();
         }
-        
+
         resetTextChanged();
     }
 
     public void resetTextChanged() {
         textChanged = false;
     }
-    
+
     public boolean isTextChanged() {
         return textChanged;
     }
-    
-//    private void setTextChanged(boolean textChanged) {
-//        boolean prevValue = this.textChanged;
-//        this.textChanged = textChanged;
-//        if (prevValue != this.textChanged && onTextChangeCallback != null) {
-//            onTextChangeCallback.callback(this.textChanged);
-//        }
-//    }
-    
+
     private void markTextAsChanged() {
         if (!textChanged && onTextChangeCallback != null) {
             // Only call the callback the first time the text is changed.
@@ -205,7 +178,7 @@ public class HuxleyUiManager {
             onTextChangeCallback.callback(textChanged);
         }
     }
-    
+
     public void setOnTextChangeCallback(Callback<Boolean> onTextChangeCallback) {
         this.onTextChangeCallback = onTextChangeCallback;
     }

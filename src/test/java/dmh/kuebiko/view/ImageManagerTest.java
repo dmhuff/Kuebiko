@@ -1,5 +1,5 @@
 /**
- * jCap - ImageManagerTest.java
+ * Kuebiko - ImageManagerTest.java
  * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
  * TODO license info.
  */
@@ -35,19 +35,19 @@ public class ImageManagerTest {
         assertSame(ImageManager.get(), ImageManager.get(),
                 "There should only be one instance of the ImageManager class");
     }
-    
+
     @Test
     public void getImageTest() throws Exception {
         for (ImageSize size: ImageSize.values()) {
             ImageManager.get().setDefaultSize(size);
-            
+
             Collection<String> imageIds = getImageIds(size);
-            
+
             for (String imageId: imageIds) {
                 final Image image = ImageManager.get().getImage(imageId);
 
                 assertNotNull(image, "Return value should not be null.");
-                assertSame(ImageManager.get().getImage(imageId), image, 
+                assertSame(ImageManager.get().getImage(imageId), image,
                         "Buffering should return same object for same ID.");
             }
         }
@@ -63,19 +63,19 @@ public class ImageManagerTest {
         String path = String.format("images/%s/",
                 size.toString().toLowerCase());
         File imageDir = new File(getClass().getResource(path).toURI());
-        
+
         Collection<String> imageIds = Lists.newArrayList(Collections2.transform(
-                Arrays.asList(imageDir.list()), 
+                Arrays.asList(imageDir.list()),
                 new Function<String, String>() {
                     @Override
                     public String apply(String input) {
-                        return "png".equals(FilenameUtils.getExtension(input))? 
+                        return "png".equals(FilenameUtils.getExtension(input))?
                                 FilenameUtils.removeExtension(input)
                                 : "";
                     }
                 }));
         imageIds.removeAll(Collections.singleton(""));
-        
+
         return imageIds;
     }
 }

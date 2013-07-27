@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<!-- Test suite that will execute all tests for Kuebiko. -->
 <suite name="Kuebiko" parallel="false">
   <test name="All Tests">
     <packages>

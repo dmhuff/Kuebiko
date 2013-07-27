@@ -28,13 +28,13 @@ import com.google.common.collect.Maps;
  */
 public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
     private static final long serialVersionUID = 1L;
-    
+
     /** Action key for for the selected enum value. */
-    public final static String SELECTED_VALUE_KEY = "huxley-sel-val";
+    public final static String SELECTED_VALUE_KEY = "enum-sel-val";
 
     private final Class<T> enumClass;
     private final EnumSelectable<T> enumSelectable;
-    
+
     private final EnumMap<T, Action> actions;
     private final EnumChangeObservable<T> enumChangeObservable = new EnumChangeObservable<T>();
 
@@ -51,7 +51,7 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
             }
         });
     }
-    
+
     /**
      * Construct a new master enum selection action.
      * @param enumClass The enum class defining all possible selections.
@@ -60,14 +60,14 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
     public MasterEnumSelectAction(Class<T> enumClass, EnumSelectable<T> enumSelectable) {
         this.enumClass = enumClass;
         this.enumSelectable = enumSelectable;
-        
+
         actions = Maps.newEnumMap(enumClass);
         for (T enumValue: enumClass.getEnumConstants()) {
             EnumSelectAction<T> action = newEnumSelectAction(enumValue);
             actions.put(enumValue, action);
             addObserver(action);
         }
-        
+
         addPropertyChangeListener(
                 new PropertyChangeListener() {
                     @SuppressWarnings("unchecked")
@@ -79,17 +79,17 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
                         }
                     }
                 });
-        
+
         putValue(SELECTED_VALUE_KEY, null);
     }
-    
+
     /**
      * Factory method for actions for the selection of an individual enum value.
-     * @param actionEnumValue The enum value that corresponds to the action. 
+     * @param actionEnumValue The enum value that corresponds to the action.
      * @return A new enum select action.
      */
     private EnumSelectAction<T> newEnumSelectAction(final T actionEnumValue) {
-        return new EnumSelectAction<T>(actionEnumValue, 
+        return new EnumSelectAction<T>(actionEnumValue,
                 new EnumSelectable<T>() {
                     @Override
                     public void onEnumSelect(T enumValue, ActionEvent e) {
@@ -98,19 +98,19 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
                     }
                 });
     }
-    
+
     public List<JMenuItem> buildMenuItems() {
         List<JMenuItem> menuItems = Lists.newArrayListWithCapacity(
                 enumClass.getEnumConstants().length);
         for (T enumValue: enumClass.getEnumConstants()) {
-            EnumObserverCheckBoxMenuItem<T> menuItem = 
+            EnumObserverCheckBoxMenuItem<T> menuItem =
                     new EnumObserverCheckBoxMenuItem<T>(enumValue, getAction(enumValue));
             enumChangeObservable.addObserver(menuItem);
             menuItems.add(menuItem);
         }
         return menuItems;
     }
-    
+
     public JComboBox buildComboBox() {
         final EnumObserverComboBox<T> comboBox = new EnumObserverComboBox<T>(enumClass, this);
         this.addObserver(comboBox);
@@ -134,15 +134,15 @@ public class MasterEnumSelectAction<T extends Enum<T>> extends AbstractAction {
     public void addObserver(Observer observer) {
         enumChangeObservable.addObserver(observer);
     }
-    
+
     public Object getselectedValue() {
         return getValue(SELECTED_VALUE_KEY);
     }
-    
+
     public void setSelectedValue(T selectedValue) {
         putValue(SELECTED_VALUE_KEY, selectedValue);
     }
-    
+
     public Action getAction(T value) {
         return actions.get(value);
     }

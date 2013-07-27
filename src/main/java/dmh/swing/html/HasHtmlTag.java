@@ -8,12 +8,11 @@ package dmh.swing.html;
 import javax.swing.text.html.HTML.Tag;
 
 /**
- * TODO Document.
+ * Interface for objects that represent a HTML tag.
  *
  * @author davehuffman
  */
 public interface HasHtmlTag {
-
+    /** @return The HTML {@link Tag} that this object represents. */
     public Tag getTag();
-
 }

@@ -16,7 +16,7 @@ import javax.swing.text.html.HTML;
 import dmh.swing.html.constants.ParagraphType;
 
 /**
- * Utilities for making with the Swing text HTML API easier.
+ * Utilities for making dealing with the Swing text HTML API easier.
  *
  * @author davehuffman
  */
@@ -24,13 +24,7 @@ public final class SwingHtmlUtil {
     private SwingHtmlUtil() {
         throw new AssertionError("Cannot be instantiated.");
     }
-    
-//    public static boolean __containsAttribute(AbstractDocument.AbstractElement element, 
-//            Object name, Object value) {
-//        return value.equals(element.getAttribute(name));
-//    }
-    
-    
+
     public static void refreshJTextComponent(JTextComponent textComponent) {
         // borrowed from metaphase editor
         int pos = textComponent.getCaretPosition();
@@ -45,13 +39,12 @@ public final class SwingHtmlUtil {
             System.err.println(e.getMessage());
         }
     }
-    
+
     public static HTML.Tag getParagraph(Element element) {
         final List<HTML.Tag> paragraphTags = ParagraphType.getTags();
-        
+
         HTML.Tag tag = nameOf(element);
         while (!tag.equals(HTML.Tag.BODY)) {
-//            System.out.println(tag);
             if (paragraphTags.contains(tag)) {
                 return tag;
             }
@@ -60,54 +53,48 @@ public final class SwingHtmlUtil {
         }
         return null;
     }
-    
+
     public static HTML.Tag nameOf(Element element) {
         return (HTML.Tag) element.getAttributes().getAttribute(AttributeSet.NameAttribute);
     }
-    
-    public static boolean containsAttribute(Element element, 
-            Object name, Object value) {
-        
+
+    public static boolean containsAttribute(Element element, Object name, Object value) {
         if (element == null) {
             return false;
         }
-        
+
         Object attribute = element.getAttributes().getAttribute(name);
-        
+
         if (attribute == null) {
             return containsAttribute(element.getParentElement(), name, value);
         }
         return value.equals(attribute.toString());
-        
-        
-//        return attribute == null? false : value.equals(attribute.toString());
     }
-    
+
     public static boolean isBold(Element element) {
         return containsAttribute(element, CSS.Attribute.FONT_WEIGHT, "bold");
     }
-    
+
     public static boolean isUnderline(Element element) {
         return containsAttribute(element, CSS.Attribute.TEXT_DECORATION, "underline");
     }
-    
+
     public static boolean isItalic(Element element) {
         return containsAttribute(element, CSS.Attribute.FONT_STYLE, "italic");
     }
-    
+
     public static boolean isStrikethrough(Element element) {
         return containsAttribute(element, CSS.Attribute.TEXT_DECORATION, "line-through");
     }
-    
+
     public static boolean isLeftAligned(Element element) {
         return containsAttribute(element, HTML.Attribute.ALIGN, "left");
     }
 
     public static boolean isRightAligned(Element element) {
         return containsAttribute(element, HTML.Attribute.ALIGN, "right");
-//        return containsAttribute(element, CSS.Attribute.TEXT_ALIGN, "right");
     }
-    
+
     public static boolean isCenterAligned(Element element) {
         return containsAttribute(element, HTML.Attribute.ALIGN, "center");
     }

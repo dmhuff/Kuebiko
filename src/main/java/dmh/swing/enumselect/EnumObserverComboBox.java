@@ -12,12 +12,12 @@ import javax.swing.Action;
 import javax.swing.JComboBox;
 
 /**
- * Combobox UI component capable of listening for enum selections from the 
- * outside world. 
+ * Combo box UI component capable of listening for enum selections from the
+ * outside world.
  *
  * @author davehuffman
  */
-public class EnumObserverComboBox<T extends Enum<T>> 
+public class EnumObserverComboBox<T extends Enum<T>>
 extends JComboBox implements Observer {
     private static final long serialVersionUID = 1L;
 
@@ -35,22 +35,14 @@ extends JComboBox implements Observer {
     public void update(Observable o, Object arg) {
         setSelectedItem(arg);
     }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.JComboBox#setSelectedIndex(int)
-     */
+
     @Override
     public void setSelectedIndex(int anIndex) {
-        System.out.println("setSelectedIndex " + anIndex);
         super.setSelectedIndex(anIndex);
     }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.JComboBox#setSelectedItem(java.lang.Object)
-     */
+
     @Override
     public void setSelectedItem(Object anObject) {
-        System.out.println("setSelectedItem " + anObject);
         super.setSelectedItem(anObject);
     }
 }

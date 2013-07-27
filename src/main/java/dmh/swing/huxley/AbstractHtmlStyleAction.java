@@ -8,6 +8,7 @@ package dmh.swing.huxley;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
@@ -20,15 +21,12 @@ import dmh.swing.AbstractActionObserver;
 import dmh.swing.html.SwingHtmlUtil;
 
 /**
- * TODO Document.
+ * Swing action for styling text with HTML.
  *
  * @author davehuffman
  */
 public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
     private static final long serialVersionUID = 1L;
-    
-    @Deprecated
-    public static final String KEY_SELECTION = "huxley-selection";
 
     public AbstractHtmlStyleAction() {}
 
@@ -43,9 +41,9 @@ public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
     protected void performStyleChange(JTextComponent textComponent, HTML.Tag tag) {
         performStyleChange(textComponent, tag, null);
     }
-    
-    protected void performStyleChange(final JTextComponent textComponent, 
-                HTML.Tag tag, Map<String, String> attributes) {  
+
+    protected void performStyleChange(final JTextComponent textComponent,
+                HTML.Tag tag, Map<String, String> attributes) {
         final HTMLDocument htmlDocument = (HTMLDocument) textComponent.getDocument();
 
         final int start = textComponent.getSelectionStart();
@@ -64,13 +62,12 @@ public abstract class AbstractHtmlStyleAction extends AbstractActionObserver {
             }
         }
 
-//        SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
                 htmlDocument.setParagraphAttributes(start, end - start, newAttrs, true);
                 SwingHtmlUtil.refreshJTextComponent(textComponent);
-//            }
-//        });
+            }
+        });
     }
-
 }
