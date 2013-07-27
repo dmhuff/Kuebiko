@@ -73,10 +73,7 @@ public class NoteStackFrame extends JFrame {
     private final GenericObservable observable = new GenericObservable();
 
     private JSplitPane splitPane;
-    JTextField searchText;
     private JScrollPane noteTableScroll;
-    NoteTable noteTable;
-    NotePanel notePanel;
     private final JLabel stateImageLabel = new JLabel();
     private Component horizontalStrut;
     private JMenuBar menuBar;
@@ -98,6 +95,10 @@ public class NoteStackFrame extends JFrame {
     private JMenuItem renameNoteMenuItem;
     private JMenu textMenu;
     private JMenuItem insertDateMenuItem;
+
+    JTextField searchText;
+    NoteTable noteTable;
+    NotePanel notePanel;
 
     /**
      * Create the frame.
@@ -328,20 +329,20 @@ public class NoteStackFrame extends JFrame {
         AutoCompleteDecorator.decorate(searchText, noteMngr.getNoteTitles(), false);
         searchText.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "clear");
         searchText.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        onSearchTextChanged();
-                    }
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        onSearchTextChanged();
-                    }
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        onSearchTextChanged();
-                    }
-                });
+            new DocumentListener() {
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    onSearchTextChanged();
+                }
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    onSearchTextChanged();
+                }
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    onSearchTextChanged();
+                }
+            });
         searchText.getActionMap().put("clear", new AbstractAction() {
             private static final long serialVersionUID = 1L;
 
@@ -413,6 +414,10 @@ public class NoteStackFrame extends JFrame {
 
     public boolean isNoteSelected() {
         return (noteTable == null? false : (noteTable.getSelectedRow() != -1));
+    }
+
+    Note getSelectedNote() {
+    	return noteTable.getSelectedNote();
     }
 
     void deleteSelectedNote() {

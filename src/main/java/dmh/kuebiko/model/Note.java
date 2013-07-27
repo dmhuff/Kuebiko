@@ -128,7 +128,7 @@ public class Note implements Serializable {
     /**
      * @return True if this entity supports lazy loading.
      */
-    boolean isLazy() {
+    public boolean isLazy() {
         return (loader != null);
     }
 

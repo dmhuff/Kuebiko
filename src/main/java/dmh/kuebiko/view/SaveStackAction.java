@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 
+import dmh.kuebiko.model.Note;
 import dmh.swing.UnimplementedAction;
 
 /**
@@ -40,6 +41,14 @@ public class SaveStackAction extends UnimplementedAction {
         // Synchronize the current note before saving.
         noteFrame.getNotePanel().syncNote();
         noteFrame.getNoteMngr().saveAll();
+
+        // If there's a lazy note selected on the UI, force it's data to be
+        // refreshed. This will prevent the app from getting into an invalid
+        // state where the displayed note has not been loaded.
+        Note selectedNote = noteFrame.getSelectedNote();
+        if (selectedNote != null && selectedNote.isLazy()) {
+			selectedNote.getText();
+        }
     }
 
     @Override
