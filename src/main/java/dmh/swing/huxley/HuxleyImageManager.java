@@ -1,7 +1,7 @@
 /**
  * Kuebiko - KuebikoImageManager.java
  * Copyright 2013 Dave Huffman (dave dot huffman at me dot com).
- * TODO license info.
+ * Open source under the BSD 3-Clause License.
  */
 package dmh.swing.huxley;
 

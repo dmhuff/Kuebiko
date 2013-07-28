@@ -1,11 +1,11 @@
 /**
  * Kuebiko - CustomTraversalPolicy.java
- * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
+ * Copyright 2013 Dave Huffman (dave dot huffman at me dot com).
  *
  * Derived from Sun's Focus Traversal Demo:
  * http://download.oracle.com/javase/tutorial/uiswing/examples/misc/FocusTraversalDemoProject/src/misc/FocusTraversalDemo.java
  *
- * TODO license info.
+ * Open source under the BSD 3-Clause License.
  */
 package dmh.swing;
 

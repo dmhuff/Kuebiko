@@ -1,7 +1,7 @@
 /**
  * Kuebiko - NotePanel.java
- * Copyright 2011 Dave Huffman (daveh303 at yahoo dot com).
- * TODO license info.
+ * Copyright 2013 Dave Huffman (dave dot huffman at me dot com).
+ * Open source under the BSD 3-Clause License.
  */
 
 package dmh.kuebiko.view;
