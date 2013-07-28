@@ -1,7 +1,3 @@
-Title:  README for Kuebiko.
-Author: dmhuff
-Date:   2013-07-28
-
 Kuebiko
 =======
 A (partial) [Notational Velocity](http://notational.net) clone written in Java.
