@@ -6,7 +6,7 @@
 
   <groupId>dmh</groupId>
   <artifactId>kuebiko</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <packaging>jar</packaging>
 
   <name>kuebiko</name>
@@ -16,7 +16,7 @@
     <developer>
       <id>dmhuff</id>
       <name>Dave Huffman</name>
-      <email>dave.huffman@me.com</email>
+      <email>dave dot huffman at me dot com</email>
       <url>http://github.com/dmhuff</url>
     </developer>
   </developers>
