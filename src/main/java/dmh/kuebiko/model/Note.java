@@ -104,7 +104,7 @@ public class Note implements Serializable {
 
     private Note(int id, State state) {
         this.id = id;
-        this.state = state;
+        changeStateTo(state);
     }
 
     private void assignDefaults() {

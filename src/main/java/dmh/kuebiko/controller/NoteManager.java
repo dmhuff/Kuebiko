@@ -205,7 +205,7 @@ public class NoteManager extends Observable {
      * Save any changes made to the notes.
      */
     public void saveAll() {
-        log.debug("saveAll().");
+		log.debug("saveAll().");
         try {
             for (Note note: deletedNotes) {
                 log.debug(String.format("Deleting note [%s].", note));
@@ -229,7 +229,7 @@ public class NoteManager extends Observable {
                     continue;
                 }
             }
-            setUnsavedChangesAndNotify(false);
+            loadAllNotes();
         } catch (PersistenceException e) {
             throw new DataStoreException("Could not read/write notes.", e);
         } catch (ValidationException e) {
